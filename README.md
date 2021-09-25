@@ -18,6 +18,7 @@
 ## 0. Change Log
 
 * 24/09: Edited channel membership `AccessError`s to require a valid `channel_id`, clarified handle generation instructions, removed references to DMs in permissions section
+* 25/09: Clarified `channel_join_v1`'s `AccessError`
 
 ## 1. Aims:
 
@@ -458,7 +459,7 @@ These interface specifications come from Andrea and Andrew, who are building the
       </ul>
       <b>AccessError</b> when:
       <ul>
-        <li>channel_id refers to a channel that is private and the authorised user is not a global owner</li>
+        <li>channel_id refers to a channel that is private and the authorised user is not already a channel member and is not a global owner</li>
       </ul>
     </td>
   </tr>
