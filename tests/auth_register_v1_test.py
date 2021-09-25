@@ -14,7 +14,9 @@ def test_invalid_email():
         assert auth_register_v1("invalidemail", "password", "First", "Last")
 
 def test_registered_email():
-    assert auth_register_v1("valid@gmail.com", "password", "First", "Last")
+    clear_v1()
+    auth_register_v1("valid@gmail.com", "password", "First", "Last")
+    
     with pytest.raises(InputError):
         assert auth_register_v1("valid@gmail.com", "password1", "First1", "Last1")
 
