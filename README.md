@@ -15,6 +15,10 @@
   9.  Automarking
   10. Plagiarism
 
+## 0. Change Log
+
+* 24/09: Edited channel membership `AccessError`s to require a valid `channel_id`, clarified handle generation instructions, removed references to DMs in permissions section
+
 ## 1. Aims:
 
 * To provide students with hands on experience testing, developing, and maintaining a backend server in Python.
@@ -396,7 +400,7 @@ These interface specifications come from Andrea and Andrew, who are building the
     </td>
   </tr>
   <tr>
-    <td><code>auth_register_v1</code><br /><br />Given a user's first and last name, email address, and password, create a new account for them and return a new `auth_user_id`.<br /><br />A handle is generated that is the concatenation of their lowercase-only alphanumeric (a-z0-9) first name and last name. If the concatenation is longer than 20 characters, it is cut off at 20 characters. Once you've concatenated it, if the handle is once again taken, append the concatenated names with the smallest number (starting from 0) that forms a new handle that isn't already taken. The addition of this final number may result in the handle exceeding the 20 character limit (the handle 'abcdefghijklmnopqrst0' is allowed if the handle 'abcdefghijklmnopqrst' is already taken).</td>
+    <td><code>auth_register_v1</code><br /><br />Given a user's first and last name, email address, and password, create a new account for them and return a new `auth_user_id`.<br /><br />A handle is generated that is the concatenation of their casted-to-lowercase alphanumeric (a-z0-9) first name and last name (i.e. make lowercase then remove non-alphanumeric characters). If the concatenation is longer than 20 characters, it is cut off at 20 characters. Once you've concatenated it, if the handle is once again taken, append the concatenated names with the smallest number (starting from 0) that forms a new handle that isn't already taken. The addition of this final number may result in the handle exceeding the 20 character limit (the handle 'abcdefghijklmnopqrst0' is allowed if the handle 'abcdefghijklmnopqrst' is already taken).</td>
     <td><b>Parameters:</b><br /><code>{ email, password, name_first, name_last }</code><br /><br /><b>Return Type:</b><br /><code>{ auth_user_id }</code></td>
     <td>
       <b>InputError</b> when any of:
@@ -439,7 +443,7 @@ These interface specifications come from Andrea and Andrew, who are building the
       </ul>
       <b>AccessError</b> when:
       <ul>
-        <li>the authorised user is not a member of the channel</li>
+        <li>channel_id is valid and the authorised user is not a member of the channel</li>
       </ul>
     </td>
   </tr>
@@ -470,7 +474,7 @@ These interface specifications come from Andrea and Andrew, who are building the
       </ul>
       <b>AccessError</b> when:
       <ul>
-        <li>the authorised user is not a member of the channel</li>
+        <li>channel_id is valid and the authorised user is not a member of the channel</li>
       </ul>
     </td>
   </tr>
@@ -485,7 +489,7 @@ These interface specifications come from Andrea and Andrew, who are building the
       </ul>
       <b>AccessError</b> when:
       <ul>
-        <li>the authorised user is not a member of the channel</li>
+        <li>channel_id is valid and the authorised user is not a member of the channel</li>
       </ul>
     </td>
   </tr>
@@ -528,16 +532,16 @@ For example, in iteration 1, if we imagine a user with `auth_user_id` "12345" is
 
 ### 6.7. Permissions
 
- * Members in a channel and DM have one of two channel permissions
-   1) Owner of the channel/DM (the person who created it, and whoever else that creator adds)
-   2) Members of the channel/DM
+ * Members in a channel have one of two channel permissions
+   1) Owner of the channel (the person who created it, and whoever else that creator adds)
+   2) Members of the channel
  * Streams users have two global permissions
    1) Owners (permission id 1), who can also modify other owners' permissions
    2) Members (permission id 2), who do not have any special permissions
 * All Streams users are members by default, except for the very first user who signs up, who is an owner
 
 A user's primary permissions are their global permissions. Then the channel permissions are layered on top. For example:
-* An owner of Streams has channel owner permissions in every channel they've joined. Despite obtaining owner permissions upon joining a channel, they do not become channel owners unless a channel owner adds them as one, meaning if they are removed as a global owner, they will no longer have those channel owner permissions. However, Streams owners do not have owner permissions in DMs. The only user with owner permissions in DMs are the original creators of each DM.
+* An owner of Streams has channel owner permissions in every channel they've joined. Despite obtaining owner permissions upon joining a channel, they do not become channel owners unless a channel owner adds them as one, meaning if they are removed as a global owner, they will no longer have those channel owner permissions.
 * A member of Streams is a member in channels they are not owners of
 * A member of Streams is an owner in channels they are owners of
 
