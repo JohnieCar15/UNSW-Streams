@@ -13,11 +13,7 @@ def clear_and_register():
 
 # change later for implementation
 def test_valid_id_valid_name_public(clear_and_register):
-    assert channels_create_v1(id, 'name', True) == 1 
-
-# change later for implementation 
-def test_valid_id_valid_name_private(clear_and_register):
-    assert channels_create_v1(id, 'name' , False) == 1 
+    assert channels_create_v1(id, 'name', True) == {'channel_id': 1}
     
 def test_valid_id_invalid_name(clear_and_register):
     with pytest.raises(InputError):
