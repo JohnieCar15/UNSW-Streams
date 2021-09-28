@@ -6,9 +6,18 @@ import re
 regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
 def auth_login_v1(email, password):
-    return {
-        'auth_user_id': 1,
-    }
+    store = data_store.get()
+
+    for user in store['users']:
+        if user['email'] == email:
+            if user['password'] == password:
+                return {
+                    'auth_user_id': user['id'],
+                }
+            else:
+                raise InputError("Incorrect password")
+    
+    raise InputError("Email is not registered")
 
 def auth_register_v1(email, password, name_first, name_last):
     if not re.fullmatch(regex, email):
@@ -30,11 +39,13 @@ def auth_register_v1(email, password, name_first, name_last):
     store = data_store.get()
 
     for user in store['users']:
-        if user[1] == email:
+        if user['email'] == email:
             raise InputError("Email address already in use")
 
     auth_user_id = len(store['users']) + 1
-    store['users'].append((auth_user_id, email, password, name_first, name_last))
+    user_dict = {'id': auth_user_id, 'email': email, 'password': password, 'name_first': name_first, 'name_last': name_last}
+
+    store['users'].append(user_dict)
     data_store.set(store)
     
     return {
