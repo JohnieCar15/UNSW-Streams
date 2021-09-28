@@ -20,30 +20,30 @@ def test_auth_register_v1(clear):
 
 def test_invalid_email(clear):
     with pytest.raises(InputError):
-        assert auth_register_v1("invalidemail", "password", "First", "Last")
+        auth_register_v1("invalidemail", "password", "First", "Last")
 
 def test_registered_email(clear):
     auth_register_v1("valid@gmail.com", "password", "First", "Last")
     
     with pytest.raises(InputError):
-        assert auth_register_v1("valid@gmail.com", "password1", "First1", "Last1")
+        auth_register_v1("valid@gmail.com", "password1", "First1", "Last1")
 
 def test_short_password(clear):
     with pytest.raises(InputError):
-        assert auth_register_v1("valid@gmail.com", "pass", "First", "Last")
+        auth_register_v1("valid@gmail.com", "pass", "First", "Last")
 
 def test_short_firstname(clear):
     with pytest.raises(InputError):
-        assert auth_register_v1("valid@gmail.com", "password", "", "Last")
+        auth_register_v1("valid@gmail.com", "password", "", "Last")
 
 def test_long_firstname(clear):
     with pytest.raises(InputError):
-        assert auth_register_v1("valid@gmail.com", "password", ("a" * 51), "Last")
+        auth_register_v1("valid@gmail.com", "password", ("a" * 51), "Last")
 
 def test_short_lastname(clear):
     with pytest.raises(InputError):
-        assert auth_register_v1("valid@gmail.com", "password", "First", "")
+        auth_register_v1("valid@gmail.com", "password", "First", "")
 
 def test_long_lastname(clear): 
     with pytest.raises(InputError):
-        assert auth_register_v1("valid@gmail.com", "password", "First", ("a" * 51))
+        auth_register_v1("valid@gmail.com", "password", "First", ("a" * 51))
