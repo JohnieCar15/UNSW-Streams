@@ -12,7 +12,7 @@ def auth_login_v1(email, password):
         if user[1] == email:
             if user[2] == password:
                 return {
-                    'auth_user_id': auth_user_id,
+                    'auth_user_id': user[0],
                 }
             else:
                 raise InputError("Incorrect password")

@@ -20,10 +20,10 @@ def test_auth_login_v1(clear):
 
 def test_unregistered_email(clear):
     with pytest.raises(InputError):
-        assert auth_login_v1("unregistered@gmail.com", "password")
+        auth_login_v1("unregistered@gmail.com", "password")
     
 def test_incorrect_password(clear):
     auth_register_v1("valid@gmail.com", "password", "First", "Last")
 
     with pytest.raises(InputError):
-        assert auth_login_v1("valid@gmail.com", "notpassword")
+        auth_login_v1("valid@gmail.com", "notpassword")
