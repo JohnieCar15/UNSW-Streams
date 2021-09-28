@@ -9,10 +9,10 @@ def auth_login_v1(email, password):
     store = data_store.get()
 
     for user in store['users']:
-        if user[1] == email:
-            if user[2] == password:
+        if user['email'] == email:
+            if user['password'] == password:
                 return {
-                    'auth_user_id': user[0],
+                    'auth_user_id': user['id'],
                 }
             else:
                 raise InputError("Incorrect password")
@@ -39,11 +39,13 @@ def auth_register_v1(email, password, name_first, name_last):
     store = data_store.get()
 
     for user in store['users']:
-        if user[1] == email:
+        if user['email'] == email:
             raise InputError("Email address already in use")
 
     auth_user_id = len(store['users']) + 1
-    store['users'].append((auth_user_id, email, password, name_first, name_last))
+    user_dict = {'id': auth_user_id, 'email': email, 'password': password, 'name_first': name_first, 'name_last': name_last}
+
+    store['users'].append(user_dict)
     data_store.set(store)
     
     return {
