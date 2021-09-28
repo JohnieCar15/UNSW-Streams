@@ -24,19 +24,19 @@ from src.channels import channels_listall_v1, channels_create_v1
 def clear_then_crete_public0_and_private0():
     clear_v1()
     # register public_0_owner and create channel public_0
-    public_0_owner = auth_register_v1("0000@unsw.edu.au", "password", "firstname0","lastname0")
+    public_0_owner = auth_register_v1("0000@unsw.edu.au", "password", "firstname0","lastname0")['auth_user_id']
     public_0 = channels_create_v1(public_0_owner, "public_0", True)
 
     # register public_0_member and join channel public_0
-    public_0_member = auth_register_v1("0001@unsw.edu.au", "password", "firstname1","lastname1")
+    public_0_member = auth_register_v1("0001@unsw.edu.au", "password", "firstname1","lastname1")['auth_user_id']
     channel_invite_v1(public_0_owner, public_0, public_0_member)
 
     # register private_0_owner and create channel private_0
-    private_0_owner = auth_register_v1("0002@unsw.edu.au", "password", "firstname2","lastname2")
+    private_0_owner = auth_register_v1("0002@unsw.edu.au", "password", "firstname2","lastname2")['auth_user_id']
     private_0 = channels_create_v1(private_0_owner, "private_0", False)
     
     # register public_0_member and invite to channel public_0    
-    private_0_member = auth_register_v1("0003@unsw.edu.au", "password", "firstname3","lastname3")
+    private_0_member = auth_register_v1("0003@unsw.edu.au", "password", "firstname3","lastname3")['auth_user_id']
     channel_invite_v1(private_0_owner, private_0, private_0_member)
 
 # test invalid u_id and this should raise AccessError 
@@ -50,7 +50,7 @@ def test_invalid_user_id():
     # To avoid that is coidcidence by no creation for channels, further test is carried
     clear_v1()
     id_invalid = 100
-    public_0_owner = auth_register_v1("0000@unsw.edu.au", "password", "firstname0","lastname0")
+    public_0_owner = auth_register_v1("0000@unsw.edu.au", "password", "firstname0","lastname0")['auth_user_id']
     # since there is only one valid uid for "public_0_owner"
     # to get a invalid uid, just make it different with "public_0_owner"
     while id_invalid == public_0_owner:  # avoid id_invalid == id_onwer
@@ -62,49 +62,51 @@ def test_invalid_user_id():
 
 
 def test_valid_user_but_no_channels_have_been_created():
-    user_in_no_channels = auth_register_v1("0004@unsw.edu.au", "password", "firstname4","lastname4")
+    clear_v1()
+    user_in_no_channels = auth_register_v1("0004@unsw.edu.au", "password", "firstname4","lastname4")['auth_user_id']
     assert channels_listall_v1(user_in_no_channels) == {'channels': []}
 
 def test_normal_case(clear_then_crete_public0_and_private0):
-    uid = auth_login_v1("0000@unsw.edu.au", "password")
+    uid = auth_login_v1("0000@unsw.edu.au", "password")['auth_user_id']
     assert channels_listall_v1(uid) == {'channels': [
         {'channel_id': 1, 'name': 'public_0'}, 
         {'channel_id': 2, 'name': 'private_0'},
         ]}
 
 def test_complex_case(clear_then_crete_public0_and_private0):
+    clear_v1()
     # register public_0_owner and create channel public_0
-    public_0_owner = auth_register_v1("0000@unsw.edu.au", "password", "firstname0","lastname0")
+    public_0_owner = auth_register_v1("0000@unsw.edu.au", "password", "firstname0","lastname0")['auth_user_id']
     public_0 = channels_create_v1(public_0_owner, "public_0", True)
 
     # register public_0_member and join channel public_0
-    public_0_member = auth_register_v1("0001@unsw.edu.au", "password", "firstname1","lastname1")
+    public_0_member = auth_register_v1("0001@unsw.edu.au", "password", "firstname1","lastname1")['auth_user_id']
     channel_invite_v1(public_0_owner, public_0, public_0_member)
 
     # register private_0_owner and create channel private_0
-    private_0_owner = auth_register_v1("0002@unsw.edu.au", "password", "firstname2","lastname2")
+    private_0_owner = auth_register_v1("0002@unsw.edu.au", "password", "firstname2","lastname2")['auth_user_id']
     private_0 = channels_create_v1(private_0_owner, "private_0", False)
     
     # register public_0_member and invite to channel public_0    
-    private_0_member = auth_register_v1("0003@unsw.edu.au", "password", "firstname3","lastname3")
+    private_0_member = auth_register_v1("0003@unsw.edu.au", "password", "firstname3","lastname3")['auth_user_id']
     channel_invite_v1(private_0_owner, private_0, private_0_member)
     
     # create a user who is not in any channel
-    user_in_no_channels = auth_register_v1("0004@unsw.edu.au", "password", "firstname4","lastname4")
+    user_in_no_channels = auth_register_v1("0004@unsw.edu.au", "password", "firstname4","lastname4")['auth_user_id']
 
     # register public_1_owner and create channel public_1
-    public_1_owner = auth_register_v1("0005@unsw.edu.au", "password", "firstname5","lastname5")
+    public_1_owner = auth_register_v1("0005@unsw.edu.au", "password", "firstname5","lastname5")['auth_user_id']
     public_1 = channels_create_v1(public_1_owner, "public_1", True)
 
     # register public_2_owner and create channel public_2
-    public_2_owner = auth_register_v1("0006@unsw.edu.au", "password", "firstname6","lastname6")
+    public_2_owner = auth_register_v1("0006@unsw.edu.au", "password", "firstname6","lastname6")['auth_user_id']
     public_2 = channels_create_v1(public_2_owner, "public_2", True)
 
     # register private_1_owner and create channel private_1
-    private_1_owner = auth_register_v1("0007unsw.edu.au", "password", "firstname7","lastname7")
+    private_1_owner = auth_register_v1("0007unsw.edu.au", "password", "firstname7","lastname7")['auth_user_id']
     private_1 = channels_create_v1(private_1_owner, "private_1", False)
 
-    member_in_all_channels = auth_register_v1("0008unsw.edu.au", "password", "firstname8","lastname8")
+    member_in_all_channels = auth_register_v1("0008unsw.edu.au", "password", "firstname8","lastname8")['auth_user_id']
 
     # member_in_all_channels is in all channels
     channel_invite_v1(public_0_owner, public_0, member_in_all_channels)
