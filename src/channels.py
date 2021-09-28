@@ -25,21 +25,14 @@ def channels_listall_v1(auth_user_id):
 def channels_create_v1(auth_user_id, name, is_public):
     
     store = data_store.get()
-    
-    check = 0
 
     # check if user_id valid 
-    for user in store['users']:
-        if user[0] == auth_user_id:
-            check = 1
-
-    if check == 0:
-        raise AccessError
+    if auth_user_id not in [user[0] for user in store['users']]:
+        raise AccessError("Invalid user_id")
 
     # check if name is valid
     if (len(name) < 1 or len(name) > 20):
         raise InputError("Invalid name length")
-    
     
     # channel id will be len of existing list + 1 
     new_id = len(store['channels']) + 1
