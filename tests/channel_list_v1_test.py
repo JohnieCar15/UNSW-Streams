@@ -29,7 +29,7 @@ def clear_then_crete_public0_and_private0():
 
     # register public_0_member and join channel public_0
     public_0_member = auth_register_v1("0001@unsw.edu.au", "password", "firstname1","lastname1")['auth_user_id']
-    channel_invite_v1(public_0_owner, public_0, public_0_member)['channel_id']
+    channel_invite_v1(public_0_owner, public_0, public_0_member)
 
     # register private_0_owner and create channel private_0
     private_0_owner = auth_register_v1("0002@unsw.edu.au", "password", "firstname2","lastname2")['auth_user_id']
