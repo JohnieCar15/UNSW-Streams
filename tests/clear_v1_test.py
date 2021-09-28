@@ -16,7 +16,6 @@ def user_id():
 def channel_id():
     channelid = channels_create_v1(user_id, "channel", True)
     return channelid
-'''
 
 def test_register_login():
     auth_register_v1("valid@gmail.com", "password", "First", "Last")
@@ -24,6 +23,7 @@ def test_register_login():
     
     with pytest.raises(InputError):
         assert(auth_login_v1("valid@gmail.com", "password"))
+'''
 
 def test_register_twice():
     auth_register_v1("valid@gmail.com", "password", "First", "Last")
