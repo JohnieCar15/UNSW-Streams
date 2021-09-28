@@ -27,7 +27,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     store = data_store.get()
 
     # check if user_id valid 
-    if auth_user_id not in [user[0] for user in store['users']]:
+    if auth_user_id not in [user['id'] for user in store['users']]:
         raise AccessError("Invalid user_id")
 
     # check if name is valid
