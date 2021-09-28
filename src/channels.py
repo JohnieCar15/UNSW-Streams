@@ -27,7 +27,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     store = data_store.get()
 
     # check if user_id valid 
-    if auth_user_id not in [user[0] for user in store['users']]:
+    if auth_user_id not in [user['id'] for user in store['users']]:
         raise AccessError("Invalid user_id")
 
     # check if name is valid
@@ -36,8 +36,9 @@ def channels_create_v1(auth_user_id, name, is_public):
     
     # channel id will be len of existing list + 1 
     new_id = len(store['channels']) + 1
-    # store a tuple containing the following 
-    store['channels'].append([new_id, name, auth_user_id, is_public,[auth_user_id]])
+    # store a dictionary containing the following 
+    channel_dictionary = {'id': new_id, 'name': name, 'owner': auth_user_id, 'is_public': is_public, 'members': [auth_user_id]}
+    store['channels'].append(channel_dictionary)
     
     return {
         'channel_id': new_id,
