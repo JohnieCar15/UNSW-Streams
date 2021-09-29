@@ -6,6 +6,7 @@ from src.channels import channels_create_v1
 from src.other import clear_v1
 from src.error import InputError, AccessError
 
+@pytest.mark.skip
 def test_general():
     clear_v1()
     creator_id = auth_register_v1('creator@gmail.com', 'password', 'First', 'Last')['auth_user_id']
