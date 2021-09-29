@@ -11,7 +11,7 @@ def test_register_login():
     clear_v1()
     
     with pytest.raises(InputError):
-        assert(auth_login_v1("valid@gmail.com", "password"))
+        auth_login_v1("valid@gmail.com", "password")
 
 
 def test_register_twice():
@@ -26,7 +26,7 @@ def test_channel_details():
 
     clear_v1()
     with pytest.raises(InputError):
-        assert(channel_details_v1(user_id, channel_id))
+        channel_details_v1(user_id, channel_id)
 
 def test_channel_join():
     user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")
@@ -34,7 +34,7 @@ def test_channel_join():
 
     clear_v1()
     with pytest.raises(InputError):
-        assert(channel_join_v1(user_id, channel_id))
+        channel_join_v1(user_id, channel_id)
 
 def test_channel_message():
     user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")
@@ -42,6 +42,6 @@ def test_channel_message():
 
     clear_v1()
     with pytest.raises(InputError):
-        assert(channel_messages_v1(user_id, channel_id, 0))
+        channel_messages_v1(user_id, channel_id, 0)
 
 '''
