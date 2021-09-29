@@ -9,12 +9,17 @@ from src.error import AccessError
 @pytest.fixture
 def clear_and_register():
     clear_v1()
-    id_num = auth_register_v1("yes@yes.com", "aaaaaa", "firstname", "lastname")
-    
+    id_return = auth_register_v1("yes@yes.com", "aaaaaa", "firstname", "lastname")
+    return id_return['auth_user_id']
+
 def test_valid_channel_authorised(clear_and_register):
-    channel_id = channels_create_v1( id_numb, "name", True )
+    id_num = clear_and_register
+    channel_id_ret = channels_create_v1( id_num, "name", True )
+    channel_id = channel_id_ret['channel_id']
+
     assert channel_details_v1( id_num, channel_id) == {
-        'name': 'aaaaaa',
+        'name': 'name',
+        'is_public': True,
         'owner_members': [
             {
                 'u_id': id_num,
@@ -36,18 +41,26 @@ def test_valid_channel_authorised(clear_and_register):
     }
     
 def test_valid_channel_unauthorised(clear_and_register):
-    id_num_2 = auth_register_v1("yes2@yes.com" , "aaaaaa", "firstname", "lastname")
-    channel_id = channels_create_v1(id_num, "name", True )
+    id_num = clear_and_register
+    id_num_2_ret = auth_register_v1("yes2@yes.com" , "aaaaaa", "firstname", "lastname")
+    id_num_2 = id_num_2_ret['auth_user_id']
+    channel_id_ret = channels_create_v1(id_num, "name", True )
+    channel_id = channel_id_ret['channel_id']
+
     with pytest.raises(AccessError):
-        assert channel_details_v1( id_num_2, channel_id)
+        channel_details_v1( id_num_2, channel_id)
 
 def test_valid_channel_invalid_id(clear_and_register):
-    channel_id = channels_create_v1(id_num, "name", True )
+    id_num = clear_and_register
+    channel_id_ret = channels_create_v1(id_num, "name", True )
+    channel_id = channel_id_ret['channel_id']
+
     with pytest.raises(AccessError):
-        assert channel_details_v1( (id_num + 1), channel_id)
+        assert channel_details_v1( id_num + 1, channel_id)
 
 
 def test_invalid_channel_unauthorised(clear_and_register):
+    id_num = clear_and_register
     with pytest.raises(AccessError):
         assert channel_details_v1 ( id_num, 1)
 
