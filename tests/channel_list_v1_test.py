@@ -6,6 +6,12 @@ from src.auth import auth_register_v1, auth_login_v1
 from src.channel import channel_invite_v1
 from src.channels import channels_list_v1, channels_create_v1
 
+# assumption: channels_listall_v1 will return {list of channels} in the form of 
+# {'channels': [{'channel_id': channel_id, 'name': 'channel_name'}, ... ]}
+# and according to https://edstem.org/au/courses/7025/discussion/613604
+# the order of those channels is not important, so the test will be passed 
+# for any order of the correct list
+
 # this test file defined function:
 # test_invalid_user_id
 # test_valid_user_not_in_any_channel
@@ -53,7 +59,7 @@ def test_invalid_user_id():
     public_0_owner = auth_register_v1("0000@unsw.edu.au", "password", "firstname0","lastname0")['auth_user_id']
     # since there is only one valid uid for "public_0_owner"
     # to get a invalid uid, just make it different with "public_0_owner"
-    while id_invalid == public_0_owner:  # avoid id_invalid == id_onwer
+    if id_invalid == public_0_owner:  # avoid id_invalid == id_onwer
         id_invalid += 1
     
     public_channel_0 = channels_create_v1(public_0_owner, "public_0", True)['channel_id']
@@ -61,7 +67,7 @@ def test_invalid_user_id():
         channels_list_v1(id_invalid)
 
 
-def test_valid_user_not_in_any_channel():
+def test_valid_user_not_in_any_channel(clear_then_crete_public0_and_private0):
     # create a user who is not in any channel
     clear_v1()
     user_in_no_channels = auth_register_v1("0004@unsw.edu.au", "password", "firstname4","lastname4")['auth_user_id']
@@ -83,7 +89,7 @@ def test_member_of_one_private_channel(clear_then_crete_public0_and_private0):
     private_0_member = auth_login_v1("0003@unsw.edu.au", "password")['auth_user_id']
     assert channels_list_v1(private_0_member) == {'channels':[{ 'channel_id': 2,'name': "private_0",}],}
 
-def test_complex_case(clear_then_crete_public0_and_private0):
+def test_complex_case():
     clear_v1()
     # register public_0_owner and create channel public_0
     public_0_owner = auth_register_v1("0000@unsw.edu.au", "password", "firstname0","lastname0")['auth_user_id']
@@ -151,51 +157,53 @@ def test_complex_case(clear_then_crete_public0_and_private0):
     # private_1_owner is in private_1, public_0, private_0
     
     
-
+    # channels_listall_v1(uid) will return {'channels' : list of channels that user belongs to}
+    # the the sorted function will return the only list of dictionary sorted by "channel_id"
     assert channels_list_v1(user_in_no_channels) == {'channels': []}
-    assert channels_list_v1(member_in_all_channels) == {'channels': [
+
+    assert sorted(channels_list_v1(member_in_all_channels)['channels'],key=lambda k: k['channel_id']) == [
         {'channel_id': 1, 'name': 'public_0'}, 
         {'channel_id': 2, 'name': 'private_0'},
         {'channel_id': 3, 'name': 'public_1'},
         {'channel_id': 4, 'name': 'public_2'},
         {'channel_id': 5, 'name': 'private_1'},
-        ]}
+        ]
 
-    assert channels_list_v1(public_0_owner) == {'channels': [
+    assert sorted(channels_list_v1(public_0_owner)['channels'],key=lambda k: k['channel_id']) == [
         {'channel_id': 1, 'name': 'public_0'}, 
         {'channel_id': 3, 'name': 'public_1'}
-        ]}
+        ]
 
-    assert channels_list_v1(public_0_member) == {'channels': [
+    assert sorted(channels_list_v1(public_0_member)['channels'],key=lambda k: k['channel_id']) == [
         {'channel_id': 1, 'name': 'public_0'},        
         {'channel_id': 3, 'name': 'public_1'},
         {'channel_id': 4, 'name': 'public_2'},
         {'channel_id': 5, 'name': 'private_1'}
-        ]}
+        ]
 
-    assert channels_list_v1(private_0_owner) == {'channels': [
+    assert sorted(channels_list_v1(private_0_owner)['channels'],key=lambda k: k['channel_id']) == [
         {'channel_id': 2, 'name': 'private_0'}
-        ]}
+        ]
 
-    assert channels_list_v1(private_0_member) == {'channels': [
+    assert sorted(channels_list_v1(private_0_member)['channels'],key=lambda k: k['channel_id']) == [
         {'channel_id': 2, 'name': 'private_0'},
         {'channel_id': 5, 'name': 'private_1'},
-        ]}
+        ]
 
-    assert channels_list_v1(public_1_owner) == {'channels': [
+    assert sorted(channels_list_v1(public_1_owner)['channels'],key=lambda k: k['channel_id']) == [
         {'channel_id': 2, 'name': 'private_0'},
         {'channel_id': 3, 'name': 'public_1'},
-        ]}
+        ]
 
-    assert channels_list_v1(public_2_owner) == {'channels': [        
+    assert sorted(channels_list_v1(public_2_owner)['channels'],key=lambda k: k['channel_id']) == [ 
         {'channel_id': 3, 'name': 'public_1'},
         {'channel_id': 4, 'name': 'public_2'},
         {'channel_id': 5, 'name': 'private_1'},
-        ]}
+        ]
 
     
-    assert channels_list_v1(private_1_owner) == {'channels': [
+    assert sorted(channels_list_v1(private_1_owner)['channels'],key=lambda k: k['channel_id']) == [
         {'channel_id': 1, 'name': 'public_0'}, 
         {'channel_id': 2, 'name': 'private_0'},
         {'channel_id': 5, 'name': 'private_1'},
-        ]}
+        ]
