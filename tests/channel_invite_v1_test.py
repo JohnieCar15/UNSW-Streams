@@ -46,7 +46,7 @@ def test_invalid_auth_id():
         invalid_auth_id += 1
 
     with pytest.raises(AccessError):
-        assert channel_invite_v1(invalid_auth_id, valid_channel_id, valid_invitee_id)
+        channel_invite_v1(invalid_auth_id, valid_channel_id, valid_invitee_id)
 
 def test_invalid_invitee_id():
     clear_v1()
@@ -60,7 +60,7 @@ def test_invalid_invitee_id():
         invalid_invitee_id += 1
 
     with pytest.raises(InputError):
-        assert channel_invite_v1(valid_auth_id, valid_channel_id, invalid_invitee_id)
+        channel_invite_v1(valid_auth_id, valid_channel_id, invalid_invitee_id)
 
 def test_invalid_channel_id():
     clear_v1()
@@ -71,7 +71,7 @@ def test_invalid_channel_id():
 
     invalid_channel_id = valid_channel_id + 1
     with pytest.raises(InputError):
-        assert channel_invite_v1(valid_auth_id, invalid_channel_id, valid_invitee_id)
+        channel_invite_v1(valid_auth_id, invalid_channel_id, valid_invitee_id)
 
 def test_all_ids_invalid():
     clear_v1()
@@ -91,7 +91,7 @@ def test_all_ids_invalid():
         invalid_invitee_id += 1
 
     with pytest.raises(AccessError):
-        assert channel_invite_v1(invalid_auth_id, invalid_channel_id, invalid_invitee_id)
+        channel_invite_v1(invalid_auth_id, invalid_channel_id, invalid_invitee_id)
 
 
 def test_duplicate_invite():
@@ -103,7 +103,7 @@ def test_duplicate_invite():
 
     channel_invite_v1(auth_id, channel_id, invitee_id)
     with pytest.raises(InputError):
-        assert channel_invite_v1(auth_id, channel_id, invitee_id)
+        channel_invite_v1(auth_id, channel_id, invitee_id)
 
 def test_inviter_not_in_channel():
     clear_v1()
@@ -112,5 +112,5 @@ def test_inviter_not_in_channel():
     channel_id = channels_create_v1(auth_id, 'Channel', False)['channel_id']
 
     with pytest.raises(AccessError):
-        assert channel_invite_v1(auth_id, channel_id, invitee_id)
+        channel_invite_v1(auth_id, channel_id, invitee_id)
 
