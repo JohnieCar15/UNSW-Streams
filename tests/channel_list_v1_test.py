@@ -63,7 +63,7 @@ def test_invalid_user_id():
 
 def test_valid_user_not_in_any_channel():
     # create a user who is not in any channel
-    clear_v1
+    clear_v1()
     user_in_no_channels = auth_register_v1("0004@unsw.edu.au", "password", "firstname4","lastname4")['auth_user_id']
     assert channels_list_v1(user_in_no_channels) == {'channels': []}
 
@@ -84,7 +84,7 @@ def test_member_of_one_private_channel(clear_then_crete_public0_and_private0):
     assert channels_list_v1(private_0_member) == {'channels':[{ 'channel_id': 2,'name': "private_0",}],}
 
 def test_complex_case(clear_then_crete_public0_and_private0):
-    clear_v1
+    clear_v1()
     # register public_0_owner and create channel public_0
     public_0_owner = auth_register_v1("0000@unsw.edu.au", "password", "firstname0","lastname0")['auth_user_id']
     public_0 = channels_create_v1(public_0_owner, "public_0", True)['channel_id']
@@ -113,10 +113,10 @@ def test_complex_case(clear_then_crete_public0_and_private0):
     public_2 = channels_create_v1(public_2_owner, "public_2", True)['channel_id']
 
     # register private_1_owner and create channel private_1
-    private_1_owner = auth_register_v1("0007unsw.edu.au", "password", "firstname7","lastname7")['auth_user_id']
+    private_1_owner = auth_register_v1("0007@unsw.edu.au", "password", "firstname7","lastname7")['auth_user_id']
     private_1 = channels_create_v1(private_1_owner, "private_1", False)['channel_id']
 
-    member_in_all_channels = auth_register_v1("0008unsw.edu.au", "password", "firstname8","lastname8")['auth_user_id']
+    member_in_all_channels = auth_register_v1("0008@unsw.edu.au", "password", "firstname8","lastname8")['auth_user_id']
 
     # member_in_all_channels is in all channels
     channel_invite_v1(public_0_owner, public_0, member_in_all_channels)
