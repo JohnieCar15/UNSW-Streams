@@ -6,7 +6,7 @@ from src.channels import channels_create_v1
 from src.other import clear_v1
 from src.error import InputError, AccessError
 
-
+@pytest.mark.skip
 def test_public_channel_invite():
     clear_v1()
     auth_id = auth_register_v1('auth@gmail.com', 'password', 'First', 'Last')['auth_user_id']
@@ -20,6 +20,7 @@ def test_public_channel_invite():
 
     assert invitee_id in channel_members_ids
 
+@pytest.mark.skip
 def test_private_channel_invite():
     clear_v1()
     auth_id = auth_register_v1('auth@gmail.com', 'password', 'First', 'Last')['auth_user_id']
