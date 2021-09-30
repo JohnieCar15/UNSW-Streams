@@ -29,6 +29,24 @@ initial_object = {
     'users': [],
     'channels': [],
 }
+'''
+user = {
+    'id': int,
+    'email': str,
+    'password': str,
+    'name_first': str,
+    'name_last': str
+}
+
+channel = {
+    'id': int,
+    'name': str,
+    'owner': int,
+    'is_public': bool,
+    'members': [int id]
+}
+
+'''
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
 class Datastore:
