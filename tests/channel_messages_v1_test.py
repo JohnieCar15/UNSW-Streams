@@ -14,7 +14,7 @@ def test_normal():
     valid_channel_id = channels_create_v1(valid_user_id, "channel", True)
 
     assert(channel_messages_v1(valid_user_id, valid_channel_id, 0)) == {
-        'messages': [{}],
+        'messages': [],
         'start': 0,
         'end': -1
     }
