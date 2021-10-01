@@ -53,7 +53,7 @@ def channel_details_v1(auth_user_id, channel_id):
             owner_email = user['email']
             owner_name_f = user['name_first']
             owner_name_l = user['name_last']
-            # owner_handle = users['handle']
+            owner_handle = user['handle_str']
 
     all_members_list = []
 
@@ -62,8 +62,8 @@ def channel_details_v1(auth_user_id, channel_id):
             member_email = member['email']
             member_name_f = member['name_first']
             member_name_l = member['name_last']
-            # member_handle = member['handle']
-            member_dict = {'u_id': member['id'], 'email': member_email, 'name_first': member_name_f, 'name_last': member_name_l, 'handle_str': 'firstnamelastname'}
+            member_handle = member['handle_str']
+            member_dict = {'u_id': member['id'], 'email': member_email, 'name_first': member_name_f, 'name_last': member_name_l, 'handle_str': member_handle }
             all_members_list.append(member_dict)
 
     return {
@@ -75,7 +75,7 @@ def channel_details_v1(auth_user_id, channel_id):
                 'email': owner_email ,
                 'name_first': owner_name_f ,
                 'name_last': owner_name_l ,
-                'handle_str': 'firstnamelastname',
+                'handle_str': owner_handle ,
             }
         ],
         'all_members': all_members_list ,
