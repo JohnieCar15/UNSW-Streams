@@ -97,16 +97,22 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
 def channel_join_v1(auth_user_id, channel_id):
     store = data_store.get()
-    user_id_list = [user['id'] for user in store['users']]
-    if auth_user_id not in user_id_list:
+
+    # Checking if the auth_user_id is valid
+    user_list = [user for user in store['users'] if user['id'] == auth_user_id]
+    if len(user_list) == 0:
         raise AccessError("Invalid user_id")
 
+    
     channel_list = [channel for channel in store['channels'] if channel['id'] == channel_id]
+    # Checking if the channel_id is valid
     if len(channel_list) == 0:
         raise InputError("Invalid channel_id")
+    # Checking if the auth_user_id is already member of the channel
     elif auth_user_id in channel_list[0]['members']:
         raise InputError('User already member of channel')
-    elif not channel_list[0]['is_public']:
+    # Checking if the channel is private and the auth user is not a global owner
+    elif user_list[0]['permission_id'] != 1 and not channel_list[0]['is_public']:
         raise AccessError("User cannot join private channel")
     else:
         channel_list[0]['members'].append(auth_user_id)
