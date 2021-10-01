@@ -6,11 +6,7 @@ def channels_list_v1(auth_user_id):
     store = data_store.get()
 
     # check if user_id valid
-<<<<<<< HEAD
-    if auth_user_id not in [user[0] for user in store['users']]:
-=======
     if auth_user_id not in [user['id'] for user in store['users']]:
->>>>>>> origin/master
         raise AccessError("Invalid user_id")
     list_of_channel = []
     
@@ -54,7 +50,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     # channel id will be len of existing list + 1 
     new_id = len(store['channels']) + 1
     # store a dictionary containing the following 
-    channel_dictionary = {'id': new_id, 'name': name, 'owner': auth_user_id, 'is_public': is_public, 'members': [auth_user_id], 'messages': {}}
+    channel_dictionary = {'id': new_id, 'name': name, 'owner': auth_user_id, 'is_public': is_public, 'members': [auth_user_id], 'messages': []}
     store['channels'].append(channel_dictionary)
     
     return {
