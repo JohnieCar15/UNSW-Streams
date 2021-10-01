@@ -38,10 +38,11 @@ def auth_register_v1(email, password, name_first, name_last):
 
     store = data_store.get()
 
-    handle_str = name_first + name_last
-    handle_str = handle_str.lower()
-    handle_str = re.sub('[^0-9a-z]+', '', handle_str)
-    handle_str = handle_str[:20]
+    handle_str = (name_first + name_last).lower()
+    handle_str = re.sub('[^0-9a-z]+', '', handle_str)[:20]
+
+    if len(handle_str) == 0:
+        raise InputError("First name and last name do not contain any alphanumeric characters")
 
     handle_count = 0
 
