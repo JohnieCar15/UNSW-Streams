@@ -2,8 +2,26 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
-    return {
-    }
+    store = data_store.get()
+    user_id_list = [user['id'] for user in store['users']]
+    if auth_user_id not in user_id_list:
+        raise AccessError("Invalid auth_user_id")
+
+    channel_list = [channel for channel in store['channels'] if channel['id'] == channel_id]
+    if len(channel_list) == 0:
+        raise InputError("Invalid channel_id")
+    elif auth_user_id not in channel_list[0]['members']:
+        raise AccessError('Auth user is not a member of channel')
+    elif u_id not in user_id_list:
+        raise InputError("Invalid u_id")
+    elif u_id in channel_list[0]['members']:
+        raise InputError('User already member of channel')
+    else:
+        channel_list[0]['members'].append(u_id)
+    
+    data_store.set(store)
+
+    return {}
 
 def channel_details_v1(auth_user_id, channel_id):
     return {
