@@ -42,7 +42,6 @@ def test_private_channel_invite(clear_and_register):
 
 # Testing the error case of passing an invalid auth_user_id
 def test_invalid_auth_id(clear_and_register):
-    clear_v1()
     valid_auth_id = clear_and_register['user1_id']
     valid_invitee_id = clear_and_register['user2_id']
     valid_channel_id = channels_create_v1(valid_auth_id, 'Channel', False)['channel_id']
