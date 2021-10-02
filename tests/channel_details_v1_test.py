@@ -103,10 +103,18 @@ def test_valid_channel_invalid_id(clear_and_register):
 
 def test_invalid_channel_unauthorised(clear_and_register):
     id_num = clear_and_register
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         assert channel_details_v1 ( id_num, 1)
 
 def test_invalid_channel_invalid_id():
     clear_v1()
     with pytest.raises(AccessError):
         assert channel_details_v1(1, 1)
+
+def test_invalid_channel_id_valid_id(clear_and_register):
+    id_num = clear_and_register
+    channel_id_ret = channels_create_v1(id_num, "name", True )
+    channel_id = channel_id_ret['channel_id']
+
+    with pytest.raises(InputError):
+        assert channel_details_v1(id_num, channel_id + 1)
