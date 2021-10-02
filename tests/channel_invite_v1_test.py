@@ -6,6 +6,7 @@ from src.channels import channels_create_v1
 from src.other import clear_v1
 from src.error import InputError, AccessError
 
+# Note: When clear_v1() is run, the data store is empty so all ids passed will be invalid
 
 @pytest.fixture
 def clear_and_register():
