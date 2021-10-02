@@ -31,7 +31,7 @@ def channel_details_v1(auth_user_id, channel_id):
     if auth_user_id not in [user['id'] for user in store['users']]:
         raise AccessError("Invalid user_id")
     
-    # check if channel id refers to a valid
+    # check if channel_id refers to a valid id
     if channel_id not in [channel['id'] for channel in store['channels']]:
         raise InputError("Invalid channel_id")
 
