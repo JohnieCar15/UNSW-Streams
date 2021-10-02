@@ -58,8 +58,12 @@ def auth_register_v1(email, password, name_first, name_last):
 
             handle_count += 1
 
+    permission_id = 2
+    if len(store['users']) == 0:
+        permission_id = 1
+
     auth_user_id = len(store['users']) + 1
-    user_dict = {'id': auth_user_id, 'email': email, 'password': password, 'name_first': name_first, 'name_last': name_last, 'handle_str': handle_str}
+    user_dict = {'id': auth_user_id, 'email': email, 'password': password, 'name_first': name_first, 'name_last': name_last, 'handle_str': handle_str, 'permission_id': permission_id}
 
     store['users'].append(user_dict)
     data_store.set(store)
