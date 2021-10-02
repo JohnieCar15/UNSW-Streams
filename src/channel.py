@@ -101,18 +101,16 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         raise InputError("Start is greater than total number of messages")
 
     messages_dict = {}
-
+    messages_dict['start'] = start
+    
     if length == 0:
-        messages_dict['start'] = 0
         messages_dict['end'] = -1
         messages_dict['messages'] = []
     elif length <= 50:
-        messages_dict['start'] = start
         messages_dict['end'] = -1
         for x in range(length):
             messages_dict['messages'].append(new_channel['messages'][f'{x + start}'].copy)
     else:
-        messages_dict['start'] = start
         messages_dict['end'] = start + 50
         for x in range(50):
             messages_dict['messages'].append(new_channel['messages'][f'{x + start}'].copy)
