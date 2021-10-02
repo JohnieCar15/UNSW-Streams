@@ -1,0 +1,1 @@
+* Assume that if a user's first name and last name are all non-alphanumeric characters, an InputError is raised

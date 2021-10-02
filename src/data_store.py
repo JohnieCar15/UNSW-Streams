@@ -35,7 +35,9 @@ user = {
     'email': str,
     'password': str,
     'name_first': str,
-    'name_last': str
+    'name_last': str,
+    'handle_str': str,
+    'permission_id': int
 }
 
 channel = {
@@ -43,7 +45,8 @@ channel = {
     'name': str,
     'owner': int,
     'is_public': bool,
-    'members': [int id]
+    'members': [int id],
+    'messages: []
 }
 
 '''
