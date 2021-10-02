@@ -27,7 +27,29 @@ Example usage:
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'users': [],
+    'channels': [],
 }
+'''
+user = {
+    'id': int,
+    'email': str,
+    'password': str,
+    'name_first': str,
+    'name_last': str,
+    'handle_str': str,
+    'permission_id': int
+}
+
+channel = {
+    'id': int,
+    'name': str,
+    'owner': int,
+    'is_public': bool,
+    'members': [int id],
+    'messages: []
+}
+
+'''
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
 class Datastore:
