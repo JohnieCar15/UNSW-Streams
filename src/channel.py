@@ -129,11 +129,11 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     elif length <= 50:
         messages_dict['end'] = -1
         for x in range(length):
-            messages_dict['messages'].append(new_channel['messages'][f'{x + start}'].copy)
+            messages_dict['messages'].append(new_channel['messages'][x + start].copy)
     else:
         messages_dict['end'] = start + 50
         for x in range(50):
-            messages_dict['messages'].append(new_channel['messages'][f'{x + start}'].copy)
+            messages_dict['messages'].append(new_channel['messages'][x + start].copy)
 
     data_store.set(store)
         
