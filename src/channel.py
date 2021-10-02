@@ -97,45 +97,49 @@ Exceptions:
     AccessError - Occurs when user is not part of channel members
 
 Return Value:
-    Returns {messages, 'start', 'end'} on <condition>
-    Returns <return value> on <condition>
+    Returns {messages, 'start', 'end'} on successful auth_user_id, channel_id and start
 
 '''
 def channel_messages_v1(auth_user_id, channel_id, start):
     store = data_store.get()
 
+  # check if auth_user_id is valid
+    if auth_user_id not in [user['id'] for user in store['users']]:
+        raise AccessError("Invalid user_id")
+  # Checks if channel id is valid
     if channel_id not in [channel['id'] for channel in store['channels']]:
         raise InputError("Invalid channel_id")
-
+  # Finds the channel with the correct id
     for channel in store['channels']:
         if channel['id'] == channel_id:
             new_channel = channel
             break
-
+  # Check if user is in channel members
     if auth_user_id not in new_channel['members']:
         raise AccessError("Invalid user_id")
 
     length = len(new_channel['messages']) - start
-
+    # A negative length implies that start > length
     if length < 0:
         raise InputError("Start is greater than total number of messages")
+    # Negative starts are invalid
+    if start < 0:
+      raise InputError("Invalid start")
 
     messages_dict = {}
     messages_dict['start'] = start
-    
+    # Deals with all cases
     if length == 0:
         messages_dict['end'] = -1
         messages_dict['messages'] = []
     elif length <= 50:
         messages_dict['end'] = -1
-        for x in range(length):
-            messages_dict['messages'].append(new_channel['messages'][x + start].copy)
+        # Create a copy of all messages from start up to final index
+        messages_dict['messages'] = new_channel['messages'][start:start + length]
     else:
         messages_dict['end'] = start + 50
-        for x in range(50):
-            messages_dict['messages'].append(new_channel['messages'][x + start].copy)
+        messages_dict['messages'] = new_channel['messages'][start:start + 50]
 
-    data_store.set(store)
         
     return messages_dict
 
