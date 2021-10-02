@@ -10,8 +10,8 @@ from src.error import InputError, AccessError
 
 def test_normal():
     clear_v1()
-    valid_user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")
-    valid_channel_id = channels_create_v1(valid_user_id, "channel", True)
+    valid_user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
+    valid_channel_id = channels_create_v1(valid_user_id, "channel", True)['channel_id']
 
     assert(channel_messages_v1(valid_user_id, valid_channel_id, 0)) == {
         'messages': [],
@@ -21,43 +21,38 @@ def test_normal():
 
 def test_invalid_start():
     clear_v1()
-    valid_user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")
-    valid_channel_id = channels_create_v1(valid_user_id, "channel", True)
+    valid_user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
+    valid_channel_id = channels_create_v1(valid_user_id, "channel", True)['channel_id']
 
     with pytest.raises(InputError):
         channel_messages_v1(valid_user_id, valid_channel_id, 10)
 
 def test_invalid_channel_id():
     clear_v1()
-    valid_user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")
+    valid_user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
 
     with pytest.raises(InputError):
         channel_messages_v1(valid_user_id, 10, 0)
 
 def test_invalid_user_id():
     clear_v1()
-    valid_user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")
-    valid_channel_id = channels_create_v1(valid_user_id, "channel", True)
+    valid_user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
+    valid_channel_id = channels_create_v1(valid_user_id, "channel", True)['channel_id']
 
     with pytest.raises(AccessError):
         channel_messages_v1(valid_user_id + 1, valid_channel_id, 0)
 
-def test_invalid_channel_id_invalid_user_id():
-    clear_v1()
-    with pytest.raises(AccessError):
-        channel_messages_v1(10, 10, 0)
-
 def test_invalid_start_invalid_id():
     clear_v1()
-    valid_user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")
-    valid_channel_id = channels_create_v1(valid_user_id, "channel", True)
+    valid_user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
+    valid_channel_id = channels_create_v1(valid_user_id, "channel", True)['channel_id']
 
     with pytest.raises(AccessError):
         channel_messages_v1(valid_user_id + 1, valid_channel_id, 10)
 
 def test_invalid_start_invalid_channel():
     clear_v1()
-    valid_user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")
+    valid_user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
 
     with pytest.raises(InputError):
         channel_messages_v1(valid_user_id, 10, 10)
