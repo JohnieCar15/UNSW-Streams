@@ -23,6 +23,24 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
     return {}
 
+'''
+channel_details_v1: Given a valid authroised user_id and valid channel_id displays details for that channel 
+
+Arguments:
+    auth_user_id (int)    - User id of the authorised user
+    channel_id    - id of the channel from which details are pulled 
+    
+
+Exceptions:
+    InputError  - Occurs when channel_id does not refer to a valid channel
+    AccessError - Occurs when channel_id is valid but authorised user is not a member of the channel
+    AccessError - Occurs when auth_user_id isn't valid 
+
+Return Value:
+    Returns {name, is_public, owner_members, all_members}
+    
+
+'''
 def channel_details_v1(auth_user_id, channel_id):
     
     store = data_store.get()
@@ -36,20 +54,17 @@ def channel_details_v1(auth_user_id, channel_id):
         raise InputError("Invalid channel_id")
 
     # check if user is member of channel
-    for channel in store['channels']:
-        if channel_id == channel['id']:
-            if auth_user_id not in channel['members']:
-                raise AccessError("Not a member of channel")
-    
- 
+    channel_dict =  [channel for channel in store['channels'] if channel_id == channel['id']][0]
+    if auth_user_id not in channel_dict['members']:
+        raise AccessError("Not a member of channel")
 
-    for channel in store['channels']:
-        if channel_id == channel['id']:
-            channel_name = channel['name']
-            channel_is_public = channel['is_public']
-            channel_members = channel['members']
-            channel_owner_id = channel['owner']
-
+    # get variables for channel details from store['channels']
+    channel_name = channel_dict['name']
+    channel_is_public = channel_dict['is_public']
+    channel_members = channel_dict['members']
+    channel_owner_id = channel_dict['owner']
+            
+    # get variables for channel details - owner from store['users']
     for user in store['users']:
         if channel_owner_id == user['id']:
             owner_email = user['email']
@@ -57,15 +72,19 @@ def channel_details_v1(auth_user_id, channel_id):
             owner_name_l = user['name_last']
             owner_handle = user['handle_str']
 
+    # initialise members list of dictionaries
     all_members_list = []
 
+    # create dictionary for each member
     for member in store['users']:
         if member['id'] in channel_members:
-            member_email = member['email']
-            member_name_f = member['name_first']
-            member_name_l = member['name_last']
-            member_handle = member['handle_str']
-            member_dict = {'u_id': member['id'], 'email': member_email, 'name_first': member_name_f, 'name_last': member_name_l, 'handle_str': member_handle }
+            member_dict = {
+                'u_id': member['id'],
+                'email': member['email'],
+                'name_first': member['name_first'],
+                'name_last': member['name_last'],
+                'handle_str': member['handle_str']
+            }
             all_members_list.append(member_dict)
 
     return {
@@ -80,7 +99,7 @@ def channel_details_v1(auth_user_id, channel_id):
                 'handle_str': owner_handle ,
             }
         ],
-        'all_members': all_members_list ,
+        'all_members': all_members_list
     }
 
 def channel_messages_v1(auth_user_id, channel_id, start):
