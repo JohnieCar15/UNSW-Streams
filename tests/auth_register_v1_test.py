@@ -1,7 +1,8 @@
 import pytest
 
-from src.auth import auth_register_v1
-from src.auth import auth_login_v1
+from src.auth import auth_register_v1, auth_login_v1
+from src.channel import channel_details_v1
+from src.channels import channels_create_v1
 from src.other import clear_v1
 from src.error import InputError
 
@@ -47,3 +48,57 @@ def test_short_lastname(clear):
 def test_long_lastname(clear): 
     with pytest.raises(InputError):
         auth_register_v1("valid@gmail.com", "password", "First", ("a" * 51))
+
+def test_no_alphanumeric_characters(clear):
+    with pytest.raises(InputError):
+        auth_register_v1("valid@gmail.com", "password", "@#!$!", "@$#!$*")
+
+def test_handle(clear):
+    auth_user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
+
+    channel_id = channels_create_v1(auth_user_id, "channel", True)['channel_id']
+
+    handle = channel_details_v1(auth_user_id, channel_id)['all_members'][0]['handle_str']
+
+    assert handle == "firstlast"
+
+def test_handle_numeric(clear):
+    auth_user_id = auth_register_v1("valid@gmail.com", "password", "12345", "12345")['auth_user_id']
+
+    channel_id = channels_create_v1(auth_user_id, "channel", True)['channel_id']
+
+    handle = channel_details_v1(auth_user_id, channel_id)['all_members'][0]['handle_str']
+
+    assert handle == "1234512345"
+
+def test_handle_uppercase(clear):
+    auth_user_id = auth_register_v1("valid@gmail.com", "password", "FIRST", "LAST")['auth_user_id']
+
+    channel_id = channels_create_v1(auth_user_id, "channel", True)['channel_id']
+
+    handle = channel_details_v1(auth_user_id, channel_id)['all_members'][0]['handle_str']
+
+    assert handle == "firstlast"
+
+def test_double_handles(clear):
+    auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
+
+    auth_user_id = auth_register_v1("other@gmail.com", "password", "First", "Last")['auth_user_id']
+
+    channel_id = channels_create_v1(auth_user_id, "channel", True)['channel_id']
+
+    handle = channel_details_v1(auth_user_id, channel_id)['all_members'][0]['handle_str']
+
+    assert handle == "firstlast0"
+
+def test_multiple_handles(clear):
+    auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
+    auth_register_v1("other@gmail.com", "password", "First", "Last")['auth_user_id']
+
+    auth_user_id = auth_register_v1("final@gmail.com", "password", "First", "Last")['auth_user_id']
+
+    channel_id = channels_create_v1(auth_user_id, "channel", True)['channel_id']
+
+    handle = channel_details_v1(auth_user_id, channel_id)['all_members'][0]['handle_str']
+
+    assert handle == "firstlast1"

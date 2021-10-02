@@ -5,6 +5,20 @@ import re
 
 regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
+'''
+auth_login_v1: Given a registered user's email and password, returns their `auth_user_id` value
+
+Arguments:
+    email (str)     - email address of a user
+    password (str)  - password of a user
+
+Exceptions:
+    InputError      - Occurs when email entered does not belong to a user
+                    - Occurs when password is not correct
+
+Return Value:
+    Returns auth_user_id on registered email and correct password
+'''
 def auth_login_v1(email, password):
     store = data_store.get()
 
@@ -19,6 +33,26 @@ def auth_login_v1(email, password):
     
     raise InputError("Email is not registered")
 
+'''
+auth_register_v1: Given a user's first and last name, email address, and password, create a new account for them and return a new `auth_user_id`
+
+Arguments:
+    email (str)         - email of a user
+    password (str)      - password of a user
+    name_first (str)    - user's first name
+    name_last (str)     - user's last name
+
+Exceptions:
+    InputError      - Occurs when email entered is not a valid email
+                    - Occurs when email address is already being used by another user
+                    - Occurs when length of password is less than 6 characters
+                    - Occurs when length of name_first is not between 1 and 50 characters inclusive
+                    - Occurs when length of name_last is not between 1 and 50 characters inclusive
+                    - Occurs when both name_first and name_last do not contain any alphanumeric characters
+
+Return Value:
+    Returns auth_user_id on valid email, password, name_first and name_last
+'''
 def auth_register_v1(email, password, name_first, name_last):
     if not re.fullmatch(regex, email):
         raise InputError("Invalid email")
