@@ -81,6 +81,26 @@ def channel_details_v1(auth_user_id, channel_id):
         'all_members': all_members_list ,
     }
 
+'''
+channel_messages_v1: Given a channel_id and start, returns up to 50 messages from start to start + 50,
+as well as the start and finishing indexes
+
+Arguments:
+    auth_user_id (int)    - id of a user
+    channel_id (int)    - id of a channel
+    start (int) - starting index of the messages to be returned
+    ...
+
+Exceptions:
+    InputError  - Occurs when invalid channel id is entered
+                - Occurs when start is greater than total number of messages
+    AccessError - Occurs when user is not part of channel members
+
+Return Value:
+    Returns {messages, 'start', 'end'} on <condition>
+    Returns <return value> on <condition>
+
+'''
 def channel_messages_v1(auth_user_id, channel_id, start):
     store = data_store.get()
 
