@@ -36,7 +36,7 @@ user = {
     'password': str,
     'name_first': str,
     'name_last': str,
-    'handle': str,
+    'handle_str': str,
     'permission_id': int
 }
 
