@@ -82,18 +82,42 @@ def channel_details_v1(auth_user_id, channel_id):
     }
 
 def channel_messages_v1(auth_user_id, channel_id, start):
-    return {
-        'messages': [
-            {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_created': 1582426789,
-            }
-        ],
-        'start': 0,
-        'end': 50,
-    }
+    store = data_store.get()
+
+    if channel_id not in [channel['id'] for channel in store['channels']]:
+        raise InputError("Invalid channel_id")
+
+    for channel in store['channels']:
+        if channel['id'] == channel_id:
+            new_channel = channel
+            break
+
+    if auth_user_id not in new_channel['members']:
+        raise AccessError("Invalid user_id")
+
+    length = len(new_channel['messages']) - start
+
+    if length < 0:
+        raise InputError("Start is greater than total number of messages")
+
+    messages_dict = {}
+    messages_dict['start'] = start
+    
+    if length == 0:
+        messages_dict['end'] = -1
+        messages_dict['messages'] = []
+    elif length <= 50:
+        messages_dict['end'] = -1
+        for x in range(length):
+            messages_dict['messages'].append(new_channel['messages'][f'{x + start}'].copy)
+    else:
+        messages_dict['end'] = start + 50
+        for x in range(50):
+            messages_dict['messages'].append(new_channel['messages'][f'{x + start}'].copy)
+
+    data_store.set(store)
+        
+    return messages_dict
 
 def channel_join_v1(auth_user_id, channel_id):
     store = data_store.get()
