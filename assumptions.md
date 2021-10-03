@@ -1,11 +1,10 @@
-h1 Assumptions for project_backend
-
----
+## Assumptions for project-backend
 
 
-* Assume that if a user's first name and last name are all non-alphanumeric characters, an InputError is raised
-* Assume that if a channel id is invalid then no user can be a member of that channel 
-* Assume that if a handle firstlast0 exists and someone inputs name_first: 'first', name_last: 'last0' the handle should be firstlast00 not firstlast1 
-* Assume channels_list_v1 will return {list of channels} in the form of  {'channels': [{'channel_id': channel_id, 'name': 'channel_name'}, ... ]} and according to the [ed forum post](https://edstem.org/au/courses/7025/discussion/613604) the order of those channels is not important, so the test will be passed for any order of the correct list
-* Assume that negative start values are invalid in channel_messages_v1 and an error must be raised
-* Assume that after clear_v1() the initial state will have no users or channels so any user or channel ids passed into a function will be invalid 
+* With auth_register_v1, if a user's first name and last name are all non-alphanumeric characters, an InputError will be raised.
+* With auth_register_v1, if a new user is created with name_first='first' and name_last='last0' and a handle of 'firstlast0' already exists, then the new handle should be 'firstlast00' not 'firstlast1'.
+* With channel_details_v1, if a valid auth_user_id and an invalid channel_id is passed in, an InputError will be returned, despite the fact than an invalid channel_id implies that no user is a member of that channel, which would return an AccessError.
+* With channels_list_v1, the order of the returned list of channels is not important and that any tests written will succeed for any order of the correct list.
+* With channel_messages_v1, a negative start value is invalid in channel_messages_v1 and an InputError will be raised.
+* After clear_v1 is run, the datastore will be completely empty and have no users or channels, hence any value passed in for user_id or channel_id into a function will automatically be invalid.
+* All inputs passed into the functions will be of the correct data type and format.
