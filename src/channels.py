@@ -2,38 +2,74 @@ from src.data_store import data_store
 from src.error import InputError
 from src.error import AccessError
 
+"""
+channels_list_v1: provides a list of all channels (and their associated details) that the authorised user is part of.
+
+Arguments:
+    auth_user_id integer    - auth_id of the user
+
+Exceptions:
+    No InputError will be raised in this function  
+    AccessError - Occurs when auth_user is invalid
+
+Return Value:
+    Returns a dictionary contains list of channels that the user belongs to when auth_user is invalid
+    For example: { 'channels': [{'channel_id': 1, 'name': channel_1}, 
+                                {'channel_id': 2, 'name': channel_2}]}
+"""
+
 def channels_list_v1(auth_user_id):
     store = data_store.get()
 
     # check if user_id valid
     if auth_user_id not in [user['id'] for user in store['users']]:
         raise AccessError("Invalid user_id")
-    list_of_channel = []
-    
-    for channel in store['channels']:
-        channel_details = {}
-        if auth_user_id in channel['members']:
-            channel_details['channel_id'] = channel['id']
-            channel_details['name'] = channel['name']
-            list_of_channel.append(channel_details)
 
+    # initilise the returned list
+    list_of_channel = []
+
+    # loop through all channels stored and check if the channel contains that user
+    for channel in store['channels']:
+        # if the channel contains that user, add related details to channel_details
+        if auth_user_id in channel['members']:
+            channel_details = {'channel_id': channel['id'], 'name': channel['name']}
+            # append channel_details to list_of_channel
+            list_of_channel.append(channel_details)
+    # { 'channels': [] } will be returned if the user not belong to any channels
     return { 'channels': list_of_channel }
 
+"""
+channels_listall_v1: Provide a list of all channels, including private channels,
+(and their associated details)
+
+Arguments:
+    auth_user_id integer    - auth_id of the user
+
+Exceptions:
+    No InputError will be raised in this function  
+    AccessError - Occurs when auth_user is invalid
+
+Return Value:
+    Returns a dictionary contains all the channels in the stream when auth_user is invalid
+    For example: { 'channels': [{'channel_id': 1, 'name': channel_1}, 
+                                {'channel_id': 2, 'name': channel_2}]}
+"""
 def channels_listall_v1(auth_user_id):
     store = data_store.get()
     # check if user_id valid
     if auth_user_id not in [user['id'] for user in store['users']]:
         raise AccessError("Invalid user_id")
+    
+    # initilise the returned list
     list_of_channel = []
-
+    # loop through all channels stored
     for channel in store['channels']:
-        channel_details = {}
-        channel_details['channel_id'] = channel['id']
-        channel_details['name'] = channel['name']
+        # initilise the channel_details dictionary, and add details
+        # then append channel_details to list_of_channel
+        channel_details = {'channel_id': channel['id'], 'name': channel['name']}
         list_of_channel.append(channel_details)
-        
+    
     return { 'channels': list_of_channel }
-
 
 '''
 channels_create_v1: creates a new channel with the given name and is set to either public or private. Also user who created it is made the owner.
