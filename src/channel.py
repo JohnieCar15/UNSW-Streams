@@ -178,10 +178,10 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     elif length <= 50:
         messages_dict['end'] = -1
         # Create a copy of all messages from start up to final index
-        messages_dict['messages'] = new_channel['messages'][start:start + length]
+        messages_dict['messages'] = new_channel['messages'][start:start + length - 1]
     else:
         messages_dict['end'] = start + 50
-        messages_dict['messages'] = new_channel['messages'][start:start + 50]
+        messages_dict['messages'] = new_channel['messages'][start:start + 49]
 
         
     return messages_dict
