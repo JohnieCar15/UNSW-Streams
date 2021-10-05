@@ -63,7 +63,6 @@ def test_invalid_user_id():
     if id_invalid == public_0_owner:  # avoid id_invalid == id_onwer
         id_invalid += 1
     
-    public_channel_0 = channels_create_v1(public_0_owner, "public_0", True)['channel_id']
     with pytest.raises(AccessError):
         channels_listall_v1(id_invalid)
 
