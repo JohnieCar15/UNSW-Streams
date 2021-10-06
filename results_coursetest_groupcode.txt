@@ -81,4 +81,4 @@ tests/other_tests/clear_test.py::test_cant_login_after_clear PASSED      [100%]
 ====== Marks recorded: 35.00 ======
 
 
-============================== 71 passed in 0.41s ==============================
+============================== 71 passed in 0.38s ==============================
