@@ -15,6 +15,9 @@
   9.  Automarking
   10. Plagiarism
 
+## 0. Change log:
+* 07/10: Fixed automarking formula
+
 ## 1. Aims:
 
 * To provide students with hands on experience testing, developing, and maintaining a backend server in Python.
@@ -251,9 +254,9 @@ For this and for all future milestones, you should consider the other expectatio
 
 The formula used for automarking in this iteration is:
 
-`Automark = 95*(t * i * min(c + 1, 100)^3) + 5*p`
+`Automark = 95*(t * i * min(c + 0.01, 1)^3) + 5*p`
 
-(Mark equals `t` multiplied by `i` multiplied by the maximum of `c + 1` and 100 to the power of three). This formula produces a value between 0 and 1.
+(Non-pylint mark component equals `t` multiplied by `i` multiplied by the minimum of `c + 0.01` and 1 to the power of three). This formula produces a value between 0 and 1.
 
 Where:
  * `t` is the mark between 0-1 you receive for your tests running against your code (100% = your implementation passes all of your tests)
