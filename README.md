@@ -17,6 +17,7 @@
 
 ## 0. Change log:
 * 07/10: Fixed automarking formula
+* 08/10: Added instructions to run coverage locally
 
 ## 1. Aims:
 
@@ -172,6 +173,23 @@ def test_echo():
     resp = requests.get(config.url + 'echo', params={'data': 'hello'})
     assert json.loads(resp.text) == {'data': 'hello'}
 ```
+
+#### 4.4.1 Test coverage
+
+To get the coverage of your tests locally, you will need to have two terminals open. Run these commands from the root directory of your project.
+
+In the first terminal, run
+```bash
+coverage run -m src.server
+```
+
+In the second terminal, run pytest as usual
+```bash
+pytest
+```
+
+Back in the first terminal, stop the server with Ctrl+C or Command-C, and run `coverage report` or `coverage html` to generate a coverage report or HTML report respectively.
+
 ### 4.5. Recommended approach
 
 Our recommendation with this iteration is that you start out trying to implement the new functions similarly to how you did in iteration 1.
