@@ -43,7 +43,7 @@ def test_single_message(message_send_url, clear_and_register):
         'start': 0
     }
     channel_messages = requests.get(config.url + 'channel/messages/v2', params=channel_messages_input).json()['messages']
-    
+    channel_messages = [message['message'] for message in channel_messages]
     assert channel_messages == ["message"]
 
 # Testing the case of sending multiple messages
@@ -71,7 +71,7 @@ def test_multiple_messages(message_send_url, clear_and_register):
         'start': 0
     }
     channel_messages = requests.get(config.url + 'channel/messages/v2', params=channel_messages_input).json()['messages']
-
+    channel_messages = [message['message'] for message in channel_messages]
     assert channel_messages == ["message2", "message1"]
 
 # Testing the error case of passing in an invalid token

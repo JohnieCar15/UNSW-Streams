@@ -43,7 +43,7 @@ def test_single_message(message_senddm_url, clear_and_register):
         'start': 0
     }
     dm_messages = requests.get(config.url + 'dm/messages/v1', params=dm_messages_input).json()['messages']
-    
+    dm_messages = [message['message'] for message in dm_messages]
     assert dm_messages == ["message"]
 
 # Testing the case of sending multiple messages
@@ -71,7 +71,7 @@ def test_multiple_messages(message_senddm_url, clear_and_register):
         'start': 0
     }
     dm_messages = requests.get(config.url + 'dm/messages/v1', params=dm_messages_input).json()['messages']
-
+    dm_messages = [message['message'] for message in dm_messages]
     assert dm_messages == ["message2", "message1"]
 
 # Testing the error case of passing in an invalid token
