@@ -9,7 +9,7 @@ from src import config
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
-
+    
 def defaultHandler(err):
     response = err.get_response()
     print('response', err, err.get_response())
