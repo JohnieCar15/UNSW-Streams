@@ -143,5 +143,19 @@ def test_user_only_global_owner(admin_user_remove_url, clear_and_register):
 
 # Testing the error case of when both the auth_user_id and u_id are invalid
 def test_invalid_auth_id_and_u_id(admin_user_remove_url, clear_and_register):
+    non_global_auth_id = clear_and_register['user2_id']
+    valid_user_id = clear_and_register['user1_id']
+
+    # Finding an invalid user_id that does not match any existing ids
+    invalid_user_id = valid_user_id + 1
+    if invalid_user_id == non_global_auth_id:
+        invalid_user_id += 1
+
+    admin_user_remove_input = {
+        'token': str(non_global_auth_id),
+        'u_id': invalid_user_id
+    }
+    r = requests.delete(admin_user_remove_url, json=admin_user_remove_input)
+
     # Throws AccessError
     assert r.status_code == AccessError.code
