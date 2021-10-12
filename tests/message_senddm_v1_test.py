@@ -1,6 +1,7 @@
 import pytest
 import requests
 from src import config
+from src.error import AccessError, InputError
 
 @pytest.fixture
 def message_senddm_url():
@@ -90,7 +91,7 @@ def test_invalid_token(message_senddm_url, clear_and_register):
     r = requests.post(message_senddm_url, json=message_senddm_input)
 
     # Throws AccessError
-    assert r.status_code == 403
+    assert r.status_code == AccessError.code
 
 # Testing the error case of passing in an invalid dm_id
 def test_invalid_dm_id(message_senddm_url, clear_and_register):
@@ -108,7 +109,7 @@ def test_invalid_dm_id(message_senddm_url, clear_and_register):
     r = requests.post(message_senddm_url, json=message_senddm_input)
 
     # Throws InputError
-    assert r.status_code == 400
+    assert r.status_code == InputError.code
 
 # Testing the error case of sending a message that is too short
 def test_message_too_short(message_senddm_url, clear_and_register):
@@ -138,7 +139,7 @@ def test_message_too_long(message_senddm_url, clear_and_register):
     r = requests.post(message_senddm_url, json=message_senddm_input)
 
     # Throws InputError
-    assert r.status_code == 400
+    assert r.status_code == InputError.code
 
 # Testing the error case of passing in an invalid token, dm_id and message
 def test_all_invalid_inputs(message_senddm_url, clear_and_register):
@@ -159,7 +160,7 @@ def test_all_invalid_inputs(message_senddm_url, clear_and_register):
     r = requests.post(message_senddm_url, json=message_senddm_input)
 
     # Throws AccessError
-    assert r.status_code == 403
+    assert r.status_code == AccessError.code
 
 # Testing the error case of sending a message when not a member of the dm
 def test_not_member_of_dm(message_senddm_url, clear_and_register):
@@ -180,4 +181,4 @@ def test_not_member_of_dm(message_senddm_url, clear_and_register):
     r = requests.post(message_senddm_url, json=message_senddm_input)
 
     # Throws AccessError
-    assert r.status_code == 403
+    assert r.status_code == AccessError.code
