@@ -221,8 +221,8 @@ def test_invalid_channel_id(register_create):
     channel_messages = requests.get(config.url + '/channel/messages/v2', params=channel_messages_input).json()
     assert channel_messages.status_code == InputError.code
 
-# Tests valid channel id and invalid user id
-def test_invalid_user_id(register_create):
+# Tests valid channel id and invalid token
+def test_invalid_token(register_create):
     channel_messages_input = {
         'token' : register_create['valid_token'] + 1,
         'channel_id' : register_create['valid_channel_id'],
@@ -233,8 +233,8 @@ def test_invalid_user_id(register_create):
     assert channel_messages.status_code == AccessError.code
 
 
-# Tests invalid start and invalid user id
-def test_invalid_start_invalid_id(register_create):
+# Tests invalid start and invalid token
+def test_invalid_start_invalid_token(register_create):
     channel_messages_input = {
         'token' : register_create['valid_token'] + 1,
         'channel_id' : register_create['valid_channel_id'],
