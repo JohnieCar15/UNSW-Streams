@@ -2,6 +2,9 @@ import pytest
 import requests
 from datetime import datetime
 from src import config
+from src.error import AccessError, InputError
+
+# Note that the 0th index is the newest message
 
 # Clears datastore, registers user and creates a channel (making the user a member)
 @pytest.fixture
@@ -44,8 +47,8 @@ def send_message(register_create, length):
     message_id_list = []
 
     for x in range (length):
-        message_id_list.append(requests.post(config.url + '/message/send/v1', json=send_message_input)['message_id'])
-        timelist.append(datetime.now())
+        message_id_list.insert(0, requests.post(config.url + '/message/send/v1', json=send_message_input)['message_id'])
+        timelist.insert(0, datetime.datetime.now())
     
     return {
         'timelist' : timelist,
@@ -66,14 +69,25 @@ def get_messages(register_create, start):
 
     return channel_messages
 
+# HELPER FUNCTION
+# Checks if time provided in channel_messages is within two seconds of sending message request
+# Returns original time of channel_messages if true (to allow assertion), else returns False
+def time_in_range(new_time, channel_messages, length):
+    difference = new_time - channel_messages['messages']['time_created'][length]
+
+    if difference.TotalSeconds < 2:
+        return channel_messages['messages']['time_created'][length]
+    else:
+        return False
+
 # Tests case where there are no messages
 def test_empty(register_create):
 
     channel_messages = get_messages(register_create, 0)
     
-    assert(channel_messages['messages']) == []
-    assert(channel_messages['start']) == 0
-    assert(channel_messages['end']) == -1
+    assert channel_messages['messages'] == []
+    assert channel_messages['start'] == 0
+    assert channel_messages['end'] == -1
 
 # Tests case for one message, starting at 0th index, less than 50 messages
 def test_one_message(register_create):
@@ -82,12 +96,12 @@ def test_one_message(register_create):
 
     channel_messages = get_messages(register_create, 0)
 
-    assert(channel_messages['messages']) == [
+    assert channel_messages['messages'] == [
         {
             'message_id' : messagedict['message_id_list'][0],
             'u_id' : register_create['valid_user_id'],
             'message' : "Hello!",
-            'time_created' : messagedict['timelist'][0]
+            'time_created' : time_in_range(messagedict['timelist'][0], channel_messages, 0)
         }
     ]
     assert(channel_messages['start']) == 0
@@ -99,23 +113,22 @@ def test_two_messages(register_create):
 
     channel_messages = get_messages(register_create, 0)
 
-    assert(channel_messages['messages']) == [
+    assert channel_messages['messages'] == [
         {
             'message_id' : messagedict['message_id_list'][0],
             'u_id' : register_create['valid_user_id'],
             'message' : "Hello!",
-            'time_created' : messagedict['timelist'][0]
-        },
+            'time_created' : time_in_range(messagedict['timelist'][0], channel_messages, 0)
+        }, 
         {
             'message_id' : messagedict['message_id_list'][1],
             'u_id' : register_create['valid_user_id'],
-            'message' : "World!",
-            'time_created' : messagedict['timelist'][1]
+            'message' : "Hello!",
+            'time_created' : time_in_range(messagedict['timelist'][1], channel_messages, 1)
         }
-
     ]
-    assert(channel_messages['start']) == 0
-    assert(channel_messages['end']) == -1
+    assert channel_messages['start'] == 0
+    assert channel_messages['end'] == -1
 
 # Tests case for more than 50 messages, starting at 0th index
 def test_more_than_50_messages_first_index(register_create):
@@ -128,7 +141,7 @@ def test_more_than_50_messages_first_index(register_create):
             'message_id' : messagedict['message_id_list'][i],
             'u_id' : register_create['valid_user_id'],
             'message' : "Hello!",
-            'time_created' : messagedict['timelist'][i]
+            'time_created' : time_in_range(messagedict['timelist'][i], channel_messages, i)
         }
     assert(channel_messages['start']) == 0
     assert(channel_messages['end']) == 50
@@ -144,7 +157,7 @@ def test_more_than_50_messages_different_index(register_create):
             'message_id' : messagedict['message_id_list'][i + 6],
             'u_id' : register_create['valid_user_id'],
             'message' : "Hello!",
-            'time_created' : messagedict['timelist'][i + 6]
+            'time_created' : time_in_range(messagedict['timelist'][i + 6], channel_messages, i + 6)
         }
     assert(channel_messages['start']) == 6
     assert(channel_messages['end']) == 56
@@ -160,7 +173,7 @@ def test_less_than_50_messages_first_index(register_create):
             'message_id' : messagedict['message_id_list'][i],
             'u_id' : register_create['valid_user_id'],
             'message' : "Hello!",
-            'time_created' : messagedict['timelist'][i]
+            'time_created' : time_in_range(messagedict['timelist'][i], channel_messages, i)
         }
     assert(channel_messages['start']) == 0
     assert(channel_messages['end']) == -1
@@ -176,7 +189,7 @@ def test_less_than_50_messages_different_index(register_create):
             'message_id' : messagedict['message_id_list'][i + 7],
             'u_id' : register_create['valid_user_id'],
             'message' : "Hello!",
-            'time_created' : messagedict['timelist'][i + 7]
+            'time_created' : time_in_range(messagedict['timelist'][i + 7], channel_messages, i + 7)
         }
     assert(channel_messages['start']) == 7
     assert(channel_messages['end']) == -1
@@ -186,15 +199,15 @@ def test_invalid_start_no_messages(register_create):
 
     channel_messages = get_messages(register_create, 20)
 
-    assert channel_messages.status_code == 400
+    assert channel_messages.status_code == InputError.code
 
 # Tests invalid start with one message
 def test_invalid_start_one_message(register_create):
-    messagedict = send_message(register_create, 1)
+    send_message(register_create, 1)
     
     channel_messages = get_messages(register_create, 2)
 
-    assert channel_messages.status_code == 400
+    assert channel_messages.status_code == InputError.code
 
 # Tests invalid channel id and valid user id
 def test_invalid_channel_id(register_create):
@@ -206,7 +219,7 @@ def test_invalid_channel_id(register_create):
     }
 
     channel_messages = requests.get(config.url + '/channel/messages/v2', params=channel_messages_input).json()
-    assert channel_messages.status_code == 400
+    assert channel_messages.status_code == InputError.code
 
 # Tests valid channel id and invalid user id
 def test_invalid_user_id(register_create):
@@ -217,7 +230,7 @@ def test_invalid_user_id(register_create):
     }
 
     channel_messages = requests.get(config.url + '/channel/messages/v2', params=channel_messages_input).json()
-    assert channel_messages.status_code == 403
+    assert channel_messages.status_code == AccessError.code
 
 
 # Tests invalid start and invalid user id
@@ -229,7 +242,7 @@ def test_invalid_start_invalid_id(register_create):
     }
 
     channel_messages = requests.get(config.url + '/channel/messages/v2', params=channel_messages_input).json()
-    assert channel_messages.status_code == 403
+    assert channel_messages.status_code == AccessError.code
 
 # Tests invalid start and invalid channel id
 def test_invalid_start_invalid_channel(register_create):
@@ -240,7 +253,7 @@ def test_invalid_start_invalid_channel(register_create):
     }
 
     channel_messages = requests.get(config.url + '/channel/messages/v2', params=channel_messages_input).json()
-    assert channel_messages.status_code == 403
+    assert channel_messages.status_code == AccessError.code
 
 
 
