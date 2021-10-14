@@ -117,7 +117,7 @@ def test_invalid_message_id(register_create):
 
     status = requests.delete(config.url + '/message/remove/v1', params=message_remove_input)
 
-    assert status.status_code == InputError
+    assert status.status_code == InputError.code
 
 # Tests the owners permission to delete another persons message
 def test_owner_delete(register_create):
@@ -167,7 +167,7 @@ def test_invalid_token(register_create):
 
     status = requests.delete(config.url + '/message/remove/v1', params=message_remove_input)
 
-    assert status.status_code == AccessError
+    assert status.status_code == AccessError.code
 
 # Tests invalid token and invalid message id
 def test_invalid_token_invalid_message_id(register_create):
@@ -180,7 +180,7 @@ def test_invalid_token_invalid_message_id(register_create):
 
     status = requests.delete(config.url + '/message/remove/v1', params=message_remove_input)
 
-    assert status.status_code == AccessError
+    assert status.status_code == AccessError.code
 
 
 
