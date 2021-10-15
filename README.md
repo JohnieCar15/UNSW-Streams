@@ -18,6 +18,7 @@
 ## 0. Change log:
 * 07/10: Fixed automarking formula
 * 08/10: Added instructions to run coverage locally
+* 15/10: Updated coverage and pylint configurations
 
 ## 1. Aims:
 
