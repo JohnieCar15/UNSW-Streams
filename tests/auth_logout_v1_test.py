@@ -26,17 +26,6 @@ def test_auth_logout_v1():
 def test_invalid_token():
     requests.delete(config.url + '/clear/v1')
 
-    auth_register_input = {
-        'email':'valid@gmail.com',
-        'password':'password',
-        'name_first':'First',
-        'name_last':'Last'
-    }
-
-    token = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['token']
-
-    requests.delete(config.url + '/clear/v1')
-
-    logout_return = requests.post(config.url + 'auth/logout/v1', params={'token': token})
+    logout_return = requests.post(config.url + 'auth/logout/v1', params={'token': ''})
 
     assert register_return.status_code == AccessError.code 
