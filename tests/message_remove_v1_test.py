@@ -1,6 +1,5 @@
 import pytest
 import requests
-from datetime import datetime
 from src import config
 from src.error import AccessError, InputError
 
@@ -45,7 +44,7 @@ def send_message(register_create, length):
     message_id_list = []
 
     for x in range (length):
-        message_id_list.append(requests.post(config.url + '/message/send/v1', json=send_message_input)['message_id'])
+        message_id_list.insert(0, requests.post(config.url + '/message/send/v1', json=send_message_input)['message_id'])
     
     return {
         'message_id_list' : message_id_list
