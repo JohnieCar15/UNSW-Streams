@@ -1,7 +1,7 @@
 import pytest
 import requests
-from datetime import datetime
 from src import config
+from src.error import InputError, AccessError
 
 # Clears datastore, registers user and creates a channel (making the user a member)
 @pytest.fixture
@@ -43,7 +43,7 @@ def send_message(register_create, length):
     message_id_list = []
 
     for x in range (length):
-        message_id_list.append(requests.post(config.url + '/message/send/v1', json=send_message_input)['message_id'])
+        message_id_list.insert(0, requests.post(config.url + '/message/send/v1', json=send_message_input)['message_id'])
     
     return {
         'message_id_list' : message_id_list
@@ -78,7 +78,7 @@ def test_message_edit(register_create):
 
     channel_messages = get_messages(register_create, 0)
 
-    assert(channel_messages['messages']['message']) == 'World!'
+    assert channel_messages['messages'][0]['message'] == 'World!'
 
 # Tests normal functionality of editing multiple messages
 def test_message_edit_multiple_messages(register_create):
@@ -103,8 +103,8 @@ def test_message_edit_multiple_messages(register_create):
 
     channel_messages = get_messages(register_create, 0)
 
-    assert(channel_messages['messages'][0]['message']) == 'World!'
-    assert(channel_messages['messages'][1]['message']) == 'Universe!'
+    assert channel_messages['messages'][0]['message'] == 'World!'
+    assert channel_messages['messages'][1]['message'] == 'Universe!'
 
 # Tests deleting of message using empty string
 def test_message_delete(register_create):
@@ -120,7 +120,7 @@ def test_message_delete(register_create):
 
     channel_messages = get_messages(register_create, 0)
 
-    assert(channel_messages['messages']) == []
+    assert channel_messages['messages'] == []
 
 # Tests editing message with message over 1000 characters
 def test_length_over_1000(register_create):
@@ -134,7 +134,7 @@ def test_length_over_1000(register_create):
 
     status = requests.put(config.url + 'message/edit/v1', params=message_edit_input)
 
-    assert status.status_code == 400
+    assert status.status_code == InputError.code
 
 # Tests invalid message id
 def test_invalid_message_id(register_create):
@@ -148,7 +148,7 @@ def test_invalid_message_id(register_create):
 
     status = requests.put(config.url + 'message/edit/v1', params=message_edit_input)
 
-    assert status.status_code == 400
+    assert status.status_code == InputError.code
 
 # Tests invalid token attempting to access message
 def test_invalid_user(register_create):
@@ -157,12 +157,12 @@ def test_invalid_user(register_create):
     message_edit_input = {
         'token' : register_create['valid_token'] + 1,
         'message_id' : messagedict['message_id_list'][0],
-        'message' : 'a' * 1000
+        'message' : 'a' * 1001
     }
 
     status = requests.put(config.url + 'message/edit/v1', params=message_edit_input)
 
-    assert status.status_code == 403
+    assert status.status_code == AccessError.code
 
 # Tests that the owner of the channel is able to edit message
 def test_owner_edit(register_create):
@@ -201,7 +201,7 @@ def test_owner_edit(register_create):
 
     channel_messages = get_messages(register_create, 0)
 
-    assert(channel_messages['messages'][0]) == 'World!'
+    assert channel_messages['messages'][0]['message'] == 'World!'
 
 
 
