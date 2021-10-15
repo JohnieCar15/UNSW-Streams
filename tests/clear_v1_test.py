@@ -1,57 +1,174 @@
 import pytest
+import requests
+from src import config
+from src.error import AccessError, InputError
 
 from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1
 from src.channels import channels_create_v1
 from src.channel import channel_details_v1, channel_join_v1, channel_messages_v1
-from src.error import InputError
+
 
 # Tests logging in after clearing data store
 def test_register_login():
-    clear_v1()
-    auth_register_v1("valid@gmail.com", "password", "First", "Last")
-    clear_v1()
-    
-    with pytest.raises(InputError):
-        auth_login_v1("valid@gmail.com", "password")
+    requests.delete(config.url + '/clear/v1')
+
+    auth_register_input = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
+
+    requests.delete(config.url + '/clear/v1')
+
+    auth_login_input = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+    }
+
+    assert requests.post(config.url + '/auth/login/v2', json=auth_login_input) == InputError.code
+
 
 # Tests if registering again after clearing works
 def test_register_twice():
-    clear_v1()
-    auth_register_v1("valid@gmail.com", "password", "First", "Last")
-    clear_v1()
-    auth_register_v1("valid@gmail.com", "password", "First", "Last")
+    requests.delete(config.url + '/clear/v1')
+
+    auth_register_input = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
+
+    auth_register_input = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    assert requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
 
 # Tests checking channel details after clearing data store
 def test_channel_details():
-    clear_v1()
-    user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
-    channel_id = channels_create_v1(user_id, "channel", True)['channel_id']
+    requests.delete(config.url + '/clear/v1')
 
-    clear_v1()
-    user_id_2 = auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
-    with pytest.raises(InputError):
-        channel_details_v1(user_id_2, channel_id)
+    auth_register_input1 = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    token1 = requests.post(config.url + '/auth/register/v2', json=auth_register_input1).json()['token']
+
+    channel_create_input = {
+        'token' : token1,
+        'name' : "channel",
+        'is_public' : True
+    }
+
+    channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input)['channel_id']
+
+    requests.delete(config.url + '/clear/v1')
+
+    auth_register_input2 = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    token2 = requests.post(config.url + '/auth/register/v2', json=auth_register_input2).json()['token']
+
+    channel_details_input = {
+        'token' : token2,
+        'channel_id' : channel_id
+    }
+
+    assert requests.get(config.url + '/channel/details/v2', params = channel_details_input) == InputError.code
 
 # Tests checking channel joining after clearing data store
 def test_channel_join():
-    clear_v1()
-    user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
-    channel_id = channels_create_v1(user_id, "channel", True)['channel_id']
+    requests.delete(config.url + '/clear/v1')
 
-    clear_v1()
-    user_id_2 = auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
-    with pytest.raises(InputError):
-        channel_join_v1(user_id_2, channel_id)
+    auth_register_input1 = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    token1 = requests.post(config.url + '/auth/register/v2', json=auth_register_input1).json()['token']
+
+    channel_create_input = {
+        'token' : token1,
+        'name' : "channel",
+        'is_public' : True
+    }
+
+    channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input)['channel_id']
+
+    requests.delete(config.url + '/clear/v1')
+
+    auth_register_input2 = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    token2 = requests.post(config.url + '/auth/register/v2', json=auth_register_input2).json()['token']
+
+    channel_join_input = {
+        'token' : token2,
+        'channel_id' : channel_id
+    }
+
+    assert requests.get(config.url + '/channel/join/v2', params = channel_join_input) == InputError.code
 
 # Tests checking channel messages after clearing data store
 def test_channel_message():
-    clear_v1()
-    user_id = auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
-    channel_id = channels_create_v1(user_id, "channel", True)['channel_id']
+    requests.delete(config.url + '/clear/v1')
 
-    clear_v1()
-    user_id_2 = auth_register_v1("valid@gmail.com", "password", "First", "Last")['auth_user_id']
-    with pytest.raises(InputError):
-        channel_messages_v1(user_id_2, channel_id, 0)
+    auth_register_input1 = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    token1 = requests.post(config.url + '/auth/register/v2', json=auth_register_input1).json()['token']
+
+    channel_create_input = {
+        'token' : token1,
+        'name' : "channel",
+        'is_public' : True
+    }
+
+    channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input)['channel_id']
+
+    requests.delete(config.url + '/clear/v1')
+
+    auth_register_input2 = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    token2 = requests.post(config.url + '/auth/register/v2', json=auth_register_input2).json()['token']
+
+    channel_message_input = {
+        'token' : token2,
+        'channel_id' : channel_id,
+        'start' : 0
+    }
+
+    assert requests.get(config.url + '/channel/messages/v2', params = channel_message_input) == InputError.code
 
