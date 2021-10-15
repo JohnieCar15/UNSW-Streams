@@ -104,8 +104,8 @@ def test_one_message(register_create):
             'time_created' : time_in_range(messagedict['timelist'][0], channel_messages, 0)
         }
     ]
-    assert(channel_messages['start']) == 0
-    assert(channel_messages['end']) == -1
+    assert channel_messages['start'] == 0
+    assert channel_messages['end'] == -1
 
 # Tests case for two messages, starting at the 0th index, less than 50 messages
 def test_two_messages(register_create):
@@ -143,8 +143,8 @@ def test_more_than_50_messages_first_index(register_create):
             'message' : "Hello!",
             'time_created' : time_in_range(messagedict['timelist'][i], channel_messages, i)
         }
-    assert(channel_messages['start']) == 0
-    assert(channel_messages['end']) == 50
+    assert channel_messages['start'] == 0
+    assert channel_messages['end'] == 50
 
 # Tests case for more than 50 messages, starting at different index
 def test_more_than_50_messages_different_index(register_create):
@@ -159,8 +159,8 @@ def test_more_than_50_messages_different_index(register_create):
             'message' : "Hello!",
             'time_created' : time_in_range(messagedict['timelist'][i + 6], channel_messages, i + 6)
         }
-    assert(channel_messages['start']) == 6
-    assert(channel_messages['end']) == 56
+    assert channel_messages['start'] == 6
+    assert channel_messages['end'] == 56
 
 # Tests case for less than 50 messages, starting at first index
 def test_less_than_50_messages_first_index(register_create):
@@ -175,8 +175,8 @@ def test_less_than_50_messages_first_index(register_create):
             'message' : "Hello!",
             'time_created' : time_in_range(messagedict['timelist'][i], channel_messages, i)
         }
-    assert(channel_messages['start']) == 0
-    assert(channel_messages['end']) == -1
+    assert channel_messages['start'] == 0
+    assert channel_messages['end'] == -1
 
 # Tests case for less than 50 messages, starting at different index
 def test_less_than_50_messages_different_index(register_create):
@@ -191,8 +191,8 @@ def test_less_than_50_messages_different_index(register_create):
             'message' : "Hello!",
             'time_created' : time_in_range(messagedict['timelist'][i + 7], channel_messages, i + 7)
         }
-    assert(channel_messages['start']) == 7
-    assert(channel_messages['end']) == -1
+    assert channel_messages['start'] == 7
+    assert channel_messages['end'] == -1
 
 # Tests invalid start with no messages in datastore
 def test_invalid_start_no_messages(register_create):
