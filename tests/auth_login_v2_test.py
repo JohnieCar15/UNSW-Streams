@@ -1,5 +1,7 @@
 import pytest
+import requests
 
+from src import config
 from src.auth import auth_login_v1
 from src.auth import auth_register_v1
 from src.other import clear_v1
