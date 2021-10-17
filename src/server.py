@@ -6,6 +6,8 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config
 
+from src.admin import admin_userpermission_change_v1
+
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -38,6 +40,11 @@ def echo():
     return dumps({
         'data': data
     })
+
+@APP.route("/admin/userpermission/change/v1", methods=['POST'])
+def admin_userpermission_change_v1_ep():
+    data = request.json
+    return dumps(admin_userpermission_change_v1(data['token'], data['u_id'], data['permission_id']))
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
