@@ -6,6 +6,8 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config
 
+from src.admin import admin_user_remove_v1
+
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -39,6 +41,10 @@ def echo():
         'data': data
     })
 
+@APP.route("/admin/user/remove/v1", methods=['DELETE'])
+def admin_user_remove_v1_ep():
+    data = request.json
+    return dumps(admin_user_remove_v1(data['token'], data['u_id']))
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
