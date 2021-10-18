@@ -6,6 +6,8 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config
 
+from src.channel import channel_invite_v2
+
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -38,6 +40,11 @@ def echo():
     return dumps({
         'data': data
     })
+
+@APP.route("/channel/invite/v2", methods=['POST'])
+def channel_invite_v2_ep():
+    data = request.json
+    return dumps(channel_invite_v2(data['token'], data['channel_id'], data['u_id']))
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
