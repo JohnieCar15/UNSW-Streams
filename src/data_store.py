@@ -38,6 +38,7 @@ user = {
     'name_last': str,
     'handle_str': str,
     'permission_id': int
+    'session_ids': [int id]
 }
 
 channel = {
