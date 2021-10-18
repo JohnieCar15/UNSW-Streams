@@ -1,8 +1,6 @@
 import jwt
 from src.error import AccessError
 from src.data_store import data_store
-#from error import AccessError
-#from data_store import data_store
 
 SESSION_TRACKER = 0
 SECRET = 'COMP1531'
@@ -45,20 +43,26 @@ def validate_token(encoded_jwt):
         decoded_jwt = None
 
     ### Not sure if we need to check if valid auth_user_id is passed ###
-    #if decoded_jwt is None or decoded_jwt['user_id'] not in user_id_list:
-    if decoded_jwt is None:
+    if decoded_jwt is None or decoded_jwt['user_id'] not in user_id_list:
         raise AccessError(description='Invalid Token')
+    else:
+        session_id_list = filter_data_store(list='users', key='id', key=decoded_jwt['user_id'])
+        if decoded_jwt['session_id'] not in session_id_list:
+            raise AccessError(description='Invalid Token')
     
     return decoded_jwt
+    #return decoded_jwt['user_id']
 
-
+# Used to replace list comprehensions when filtering the data store
 def filter_data_store(list, key=None, value=None):
     store = data_store.get()
+
     if value is not None and key is not None:
         filtered_list = [item for item in store[list] if item[key] == value]
         if len(filtered_list) == 0:
             return None
         return filtered_list[0]
+        
     elif key is not None:
         return [item[key] for item in store[list]]
 
