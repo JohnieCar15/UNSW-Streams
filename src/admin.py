@@ -14,10 +14,9 @@ def check_valid_permission_id(permission_id):
         raise InputError(description='permission_id is invalid')
 
 # Helper Function
-def check_demoting_only_global_owner(u_id, permission_id):
+def is_last_global_owner(u_id):
     global_owner_list = filter_data_store(list='users', key='permission_id', value=1)
-    if len(global_owner_list) == 1 and global_owner_list[0]['id'] == u_id and permission_id == 2:
-        raise InputError(description='u_id refers the only global owner and they are being demoted to a user')
+    return len(global_owner_list) == 1 and global_owner_list[0]['id'] == u_id
 
 
 def admin_userpermission_change_v1(token, u_id, permission_id):
@@ -32,7 +31,8 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
         raise InputError(description='u_id does not refer to a valid user')
 
     check_valid_permission_id(permission_id)
-    check_demoting_only_global_owner(u_id, permission_id)
+    if is_last_global_owner(u_id) and permission_id == 2:
+        raise InputError(description='u_id refers the only global owner and they are being demoted to a user')
 
     changed_user_dict['permission_id'] = permission_id
     
