@@ -1,5 +1,6 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
+from src.helpers import validate_token, filter_data_store
 
 '''
 channel_invite_v1: Invites a user with ID u_id to join a channel with ID channel_id.
@@ -18,15 +19,11 @@ Return Value:
     Returns {} on successful auth_user_id and channel_id
 
 '''
-def channel_invite_v1(auth_user_id, channel_id, u_id):
+def channel_invite_v2(token, channel_id, u_id):
     store = data_store.get()
-    
-    # Checking if the auth_user_id is valid
-    user_id_list = [user['id'] for user in store['users']]
-    if auth_user_id not in user_id_list:
-        raise AccessError("Invalid auth_user_id")
+    auth_user_id = validate_token(token)['user_id']
 
-    channel_list = [channel for channel in store['channels'] if channel['id'] == channel_id]
+    channel_list = filter_data_store(list='channels', key='id', value=channel_id)
     # Checking if the channel_id is valid
     if len(channel_list) == 0:
         raise InputError("Invalid channel_id")
@@ -34,13 +31,13 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     elif auth_user_id not in channel_list[0]['members']:
         raise AccessError('Auth user is not a member of channel')
     # Checking if the u_id is valid
-    elif u_id not in user_id_list:
+    elif filter_data_store(list='users', key='id', value=u_id) is None:
         raise InputError("Invalid u_id")
     # Checking if the u_id is already a member of the channel
     elif u_id in channel_list[0]['members']:
         raise InputError('User already member of channel')
-    else:
-        channel_list[0]['members'].append(u_id)
+    
+    channel_list[0]['members'].append(u_id)
     
     data_store.set(store)
     return {}
