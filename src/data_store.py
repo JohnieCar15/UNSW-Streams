@@ -38,6 +38,7 @@ user = {
     'name_last': str,
     'handle_str': str,
     'permission_id': int
+    'is_removed': bool
 }
 
 channel = {
