@@ -28,6 +28,9 @@ def message_send_v1(token, channel_id, message):
     new_message['time_created'] = datetime.datetime.utcnow()
 
     channel_dict['messages'].insert(0, new_message)
+
+    new_message['channel_id'] = channel_id
+
     store['messages'].insert(0, new_message)
 
     data_store.set(store)
