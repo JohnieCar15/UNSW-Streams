@@ -2,14 +2,10 @@ import pytest
 import requests
 
 from src import config
-from src.auth import auth_register_v1, auth_login_v1
-from src.channel import channel_details_v1
-from src.channels import channels_create_v1
-from src.other import clear_v1
 from src.error import InputError
 
 # Test if function works when given correct input
-def test_auth_register_v1():
+def test_auth_register_v2():
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
