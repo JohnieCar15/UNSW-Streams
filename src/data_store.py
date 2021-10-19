@@ -28,6 +28,7 @@ Example usage:
 initial_object = {
     'users': [],
     'channels': [],
+    'messages' : []
 }
 '''
 user = {
