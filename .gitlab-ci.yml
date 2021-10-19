@@ -12,4 +12,21 @@ stages:
 pytest:
   stage: checks
   script:
-    - pytest
+    - SERVER_LOG=$(mktemp)
+    - coverage run -m src.server >& $SERVER_LOG &
+    - pytest tests/
+    - kill -SIGINT %1
+    - cat $SERVER_LOG
+    - coverage report
+    - coverage html
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+  artifacts:
+    paths:
+      - htmlcov/
+    expose_as: Coverage Report
+    expire_in: 1 week
+
+pylint:
+  stage: checks
+  script:
+    - find . -type f -name "*.py" | xargs pylint
