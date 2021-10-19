@@ -2,10 +2,6 @@ import pytest
 import requests
 import json
 from src import config
-from src.other import clear_v2
-from src.auth import auth_register_v2
-from src.channels import channels_create_v2
-from src.channel import channel_details_v2, channel_invite_v2
 from src.error import InputError, AccessError
 
 @pytest.fixture
@@ -31,26 +27,25 @@ def test_valid_id_invalid_short_channel_name_public(clear_and_register):
     token = clear_and_register
     channels_create = requests.post(config.url + 'channels/create/v2', params={'token': token, 'name':"" , 'is_public': True})
     # input error 
-    assert channels_create.status_code == 400
+    assert channels_create.status_code == InputError.code
 
 def test_valid_id_invalid_long_channel_name_public(clear_and_register):
     token = clear_and_register
     channels_create = requests.post(config.url + 'channels/create/v2', params={'token': token, 'name': 'aaaaaaaaaaaaaaaaaaaaa', 'is_public': True})
     # input error
-    assert channels_create.status_code == 400
+    assert channels_create.status_code == InputError.code
 
-def test_invalid_id_invalid_short_channel_name_public(clear_and_register):
+def test_invalid_token_invalid_short_channel_name_public():
     channels_create = requests.post(config.url + 'channels/create/v2', params={'token': 1, 'name':"" , 'is_public': True})
     # access error
-    assert channels_create.status_code == 403 
+    assert channels_create.status_code == AccessError.code
 
-def test_invalid_id_invalid_long_channel_name_public(clear_and_register):
-    token = clear_and_register
+def test_invalid_token_invalid_long_channel_name_public():
     channels_create = requests.post(config.url + 'channels/create/v2', params={'token': 1, 'name': 'aaaaaaaaaaaaaaaaaaaaa', 'is_public': True})
     # access error
-    assert channels_create.status_code == 403 
+    assert channels_create.status_code == AccessError.code
 
 def test_invalid_id_valid_name_public():
     channels_create = requests.post(config.url + 'channels/create/v2', params={'token': 1, 'name': 'name', 'is_public': True})
     # access error 
-    assert channels_create.status_code == 403
+    assert channels_create.status_code == AccessError.code
