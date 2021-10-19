@@ -5,6 +5,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
+from src.channel import channel_messages_v2
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -38,6 +39,14 @@ def echo():
     return dumps({
         'data': data
     })
+
+@APP.route("/channel/messages/v2", methods=['GET'])
+def channel_messages_v2_ep():
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
+    start = request.args.get('start')
+
+    return dumps(channel_messages_v2(token, channel_id, start))
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
