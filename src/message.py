@@ -32,4 +32,4 @@ def message_send_v1(token, channel_id, message):
 
     data_store.set(store)
 
-    return len(store['messages']) + 1
+    return new_message['message_id']
