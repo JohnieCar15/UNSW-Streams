@@ -1,6 +1,6 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
-
+from src.helpers import validate_token, filter_data_store
 '''
 channel_invite_v1: Invites a user with ID u_id to join a channel with ID channel_id.
 Arguments:
@@ -124,6 +124,64 @@ def channel_details_v1(auth_user_id, channel_id):
         'all_members': all_members_list
     }
 
+def channel_details_v2(token, channel_id):
+    store = data_store.get()
+
+    # check if token is valid
+    auth_user_id = validate_token(token)
+
+    # check if channel_id refers to a valid id
+    if channel_id not in [channel['id'] for channel in store['channels']]:
+        raise InputError(description="Invalid channel_id")
+
+    # check if user is member of channel
+    channel_dict =  [channel for channel in store['channels'] if channel_id == channel['id']][0]
+    if auth_user_id not in channel_dict['members']:
+        raise AccessError(description="Not a member of channel")
+
+    # get variables for channel details from store['channels']
+    channel_name = channel_dict['name']
+    channel_is_public = channel_dict['is_public']
+    channel_members = channel_dict['members']
+    channel_owner_id = channel_dict['owner']
+            
+    # get variables for channel details - owner from store['users']
+    for user in store['users']:
+        if channel_owner_id == user['id']:
+            owner_email = user['email']
+            owner_name_f = user['name_first']
+            owner_name_l = user['name_last']
+            owner_handle = user['handle_str']
+
+    # initialise members list of dictionaries
+    all_members_list = []
+
+    # create dictionary for each member
+    for member in store['users']:
+        if member['id'] in channel_members:
+            member_dict = {
+                'u_id': member['id'],
+                'email': member['email'],
+                'name_first': member['name_first'],
+                'name_last': member['name_last'],
+                'handle_str': member['handle_str']
+            }
+            all_members_list.append(member_dict)
+
+    return {
+        'name': channel_name,
+        'is_public': channel_is_public,
+        'owner_members': [
+            {
+                'u_id': channel_owner_id ,
+                'email': owner_email ,
+                'name_first': owner_name_f ,
+                'name_last': owner_name_l ,
+                'handle_str': owner_handle ,
+            }
+        ],
+        'all_members': all_members_list
+    }
 '''
 channel_messages_v1: Given a channel_id and start, returns up to 50 messages from start to start + 50,
 as well as the start and finishing indexes
