@@ -1,5 +1,6 @@
 from src.data_store import data_store
 from src.error import InputError
+from src import helpers
 
 import re
 
@@ -55,7 +56,7 @@ Exceptions:
 Return Value:
     Returns auth_user_id on valid email, password, name_first and name_last
 '''
-def auth_register_v1(email, password, name_first, name_last):
+def auth_register_v2(email, password, name_first, name_last):
     # Checking if email is valid
     if not re.fullmatch(regex, email):
         raise InputError("Invalid email")
@@ -99,6 +100,8 @@ def auth_register_v1(email, password, name_first, name_last):
     permission_id = 2
     if len(store['users']) == 0:
         permission_id = 1
+        
+    session_id = helpers.generate_new_session_id()
 
     # Add user to data store
     auth_user_id = len(store['users']) + 1
@@ -110,11 +113,13 @@ def auth_register_v1(email, password, name_first, name_last):
         'name_last': name_last,
         'handle_str': handle_str,
         'permission_id': permission_id
+        'session_list': [session_id]
     }
 
     store['users'].append(user_dict)
     data_store.set(store)
     
     return {
-        'auth_user_id': auth_user_id
+        'auth_user_id': auth_user_id,
+        'token': helpers.generate_jwt(auth_user_id, session_id)
     }

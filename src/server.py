@@ -5,6 +5,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
+from src.auth import auth_register_v2
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -38,6 +39,12 @@ def echo():
     return dumps({
         'data': data
     })
+
+@APP.route("/auth/register/v2", methods=['POST'])
+def auth_register_v2_ep():
+    data = request.get__json()
+
+    return dumps(auth_register_v2(data['email'], data['password'], data['name_first'], data['name_last']))
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
