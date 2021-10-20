@@ -5,6 +5,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
+from src.dm import dm_details_v1
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -39,6 +40,11 @@ def echo():
         'data': data
     })
 
+@APP.route("/dm/details/v1", methods=['GET'])
+def echo():
+    token = request.args.get('token')
+    dm_id = request.args.get('dm_id')
+    return dumps (dm_details_v1(token, dm_id))
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
