@@ -5,6 +5,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
+from src.dm import dm_messages_v1
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -38,6 +39,15 @@ def echo():
     return dumps({
         'data': data
     })
+
+@APP.route("/dm/messages/v1", methods=['GET'])
+def dm_messages_v1_ep():
+    token = request.args.get('token')
+    dm_id = request.args.get('channel_id')
+    start = request.args.get('start')
+
+    return dumps(dm_messages_v1(token, dm_id, start))
+
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
