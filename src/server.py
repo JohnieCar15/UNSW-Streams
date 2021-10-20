@@ -5,6 +5,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
+from src.message import message_remove_v1
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -38,6 +39,13 @@ def echo():
     return dumps({
         'data': data
     })
+
+@APP.route("/message/remove/v1", methods=['DELETE'])
+def message_remove_v1():
+    data = request.get__json()
+    message_id = int(data['message_id'])
+
+    return dumps(message_remove_v1(data['token'], message_id))
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
