@@ -119,6 +119,22 @@ def channels_create_v1(auth_user_id, name, is_public):
     }
 
 def channels_create_v2(token, name, is_public):
+    '''
+    channels_create_v2: creates a new channel with the given name and is set to either public or private. Also user who created it is made the owner.
+
+    Arguments:
+        token (int) - user_id of the user who called the function 
+        name (string) - name of the channel id to be made
+        is_public (bool) - Sets the channel to public or private 
+
+    Exceptions:
+        InputError  - Length of name is less than 1 or more than 20 characters
+        AccessError - Occurs when token is invalid
+
+    Return Value:
+        Returns {channel_id} on successful run 
+
+'''
     store = data_store.get()
 
     # check if token is valid
