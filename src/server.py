@@ -43,13 +43,11 @@ def echo():
         'data': data
     })
 
-<<<<<<< HEAD
 @APP.route('/channels/create/v2', methods=['POST'])
 def channels_create():
     data = request.get_json()
     return dumps(channels_create_v2(data['token'], data['name'], data['is_public']))
 
-=======
 @APP.route("/auth/register/v2", methods=['POST'])
 def auth_register_v2_ep():
     data = request.get_json()
@@ -67,7 +65,6 @@ def clear():
     clear_v1()
     return dumps({})
     
->>>>>>> origin
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
