@@ -228,3 +228,27 @@ def channel_join_v1(auth_user_id, channel_id):
     data_store.set(store)
 
     return {}
+
+def channel_leave_v1(token, channel_id):
+    store = data_store.get()
+
+    # check if token is valid
+    auth_user_id = validate_token['user_id']
+
+    # check if channel_id is valid
+    if channel_id not in [channel['id'] for channel in store['channels']]:
+        raise InputError("Invalid channel_id")
+    
+    # check if auth_user_id member of channel
+    channel_dict =  [channel for channel in store['channels'] if channel_id == channel['id']][0]
+    if auth_user_id not in channel_dict['members']:
+        raise AccessError("Not a member of channel")
+    
+    # remove auth_user_id from owner list if owner
+    if auth_user_id in channel_dict['owner']:
+        channel_dict['owner'].remove(auth_user_id)
+   
+    # remove auth_user_id from members list
+    channel_dict['member'].remove(auth_user_id)
+    
+    data_store.set(store)
