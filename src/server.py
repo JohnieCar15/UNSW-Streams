@@ -6,6 +6,10 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config
 from src.channel import channel_details_v2
+from src.channels import channels_create_v2
+from src.auth import auth_register_v2
+from src.auth import auth_login_v2
+from src.other import clear_v1
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -45,6 +49,29 @@ def channel_details_endpoint():
     token = requests.arg.get('token')
     channel_id = requests.arg.get('channel_id')
     return dumps(channel_details_v2(token, channel_id))
+    
+@APP.route('/channels/create/v2', methods=['POST'])
+def channels_create():
+    data = request.get_json()
+    return dumps(channels_create_v2(data['token'], data['name'], data['is_public']))
+
+@APP.route("/auth/register/v2", methods=['POST'])
+def auth_register_v2_ep():
+    data = request.get_json()
+
+    return dumps(auth_register_v2(data['email'], data['password'], data['name_first'], data['name_last']))
+
+@APP.route("/auth/login/v2", methods=['POST'])
+def auth_login_v2_ep():
+    data = request.get_json()
+
+    return dumps(auth_login_v2(data['email'], data['password']))
+
+@APP.route("/clear/v1", methods=['DELETE'])
+def clear():
+    clear_v1()
+    return dumps({})
+    
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
