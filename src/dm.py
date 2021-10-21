@@ -6,7 +6,7 @@ def dm_create_v1(token, u_ids):
     store = data_store.get()
 
     # check if token is valid
-    auth_user_id = validate_token(token)
+    auth_user_id = validate_token(token)['user_id']
 
     # check if any u_id in u_ids not valid
     for id in u_ids:
@@ -16,10 +16,11 @@ def dm_create_v1(token, u_ids):
     # generate dm id
     new_id = len(store['dms']) + 1
     names = []
+    u_ids.append(auth_user_id)
     for id in u_ids:
         names.append(user['handle_str']) if user['id'] == id for user in store['users']:
 
-    u_ids.append(auth_user_id)
+    
     names.sort()
     name_str = ", ".join(names)
     
