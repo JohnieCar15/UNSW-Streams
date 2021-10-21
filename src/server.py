@@ -6,7 +6,9 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config
 from src.auth import auth_register_v2
+from src.auth import auth_login_v2
 from src.other import clear_v1
+from src.user import user_profile_v1
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -46,6 +48,20 @@ def auth_register_v2_ep():
     data = request.get_json()
 
     return dumps(auth_register_v2(data['email'], data['password'], data['name_first'], data['name_last']))
+
+@APP.route("/auth/login/v2", methods=['POST'])
+def auth_login_v2_ep():
+    data = request.get_json()
+
+    return dumps(auth_login_v2(data['email'], data['password']))
+
+@APP.route("/user/profile/v1", methods=['GET'])
+def user_profile():
+    token = request.args.get('token')
+    u_id = int(request.args.get('u_id'))
+    user_profile = user_profile_v1(token, u_id)
+    print(user_profile)
+    return dumps(user_profile)
 
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear():

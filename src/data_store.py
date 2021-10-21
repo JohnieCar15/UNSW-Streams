@@ -39,7 +39,9 @@ user = {
     'name_first': str,
     'name_last': str,
     'handle_str': str,
-    'permission_id': int
+    'permission_id': int,
+    'session_list': list[int],
+    'is_removed': bool
 }
 
 channel = {

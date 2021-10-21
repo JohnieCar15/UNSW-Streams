@@ -15,18 +15,18 @@ def test_auth_register_v2():
         'name_last':'Last'
     }
 
-    register_auth_user_id = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
+    register_return = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
 
     auth_login_input = {
         'email':'valid@gmail.com',
         'password':'password'
     }
 
-    login_auth_user_id = requests.post(config.url + 'auth/login/v2', json=auth_login_input).json()
+    login_return = requests.post(config.url + 'auth/login/v2', json=auth_login_input).json()
 
-    assert register_auth_user_id['auth_user_id'] == login_auth_user_id['auth_user_id']
+    assert register_return['auth_user_id'] == login_return['auth_user_id']
 
-    assert register_auth_user_id['token'] != login_auth_user_id['token']
+    assert register_return['token'] != login_return['token']
 
 # Test if function is given an invalid email
 def test_invalid_email():
@@ -149,7 +149,7 @@ def test_no_alphanumeric_characters():
     register_return = requests.post(config.url + 'auth/register/v2', json=auth_register_input)
 
     assert register_return.status_code == InputError.code
-'''
+
 # Test if function generates correct handle
 def test_handle():
     requests.delete(config.url + '/clear/v1')
@@ -161,11 +161,9 @@ def test_handle():
         'name_last':'Last'
     }
 
-    token = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['token']
+    register_return = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
 
-    channel_id = requests.post(config.url + 'channels/create/v2', params={'token': token, 'name': 'name', 'is_public': True}).json()['channel_id']
-
-    handle = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': channel_id}).json()['all_members'][0]['handle_str']
+    handle = requests.get(config.url + 'user/profile/v1', params={'token': register_return['token'], 'u_id': register_return['auth_user_id']}).json()['user']['handle_str']
 
     assert handle == "firstlast"
 
@@ -180,11 +178,9 @@ def test_handle_numeric():
         'name_last':'12345'
     }
 
-    token = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['token']
+    register_return = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
 
-    channel_id = requests.post(config.url + 'channels/create/v2', params={'token': token, 'name': 'name', 'is_public': True}).json()['channel_id']
-
-    handle = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': channel_id}).json()['all_members'][0]['handle_str']
+    handle = requests.get(config.url + 'user/profile/v1', params={'token': register_return['token'], 'u_id': register_return['auth_user_id']}).json()['user']['handle_str']
 
     assert handle == "1234512345"
 
@@ -199,11 +195,9 @@ def test_handle_uppercase():
         'name_last':'LAST'
     }
 
-    token = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['token']
+    register_return = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
 
-    channel_id = requests.post(config.url + 'channels/create/v2', params={'token': token, 'name': 'name', 'is_public': True}).json()['channel_id']
-
-    handle = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': channel_id}).json()['all_members'][0]['handle_str']
+    handle = requests.get(config.url + 'user/profile/v1', params={'token': register_return['token'], 'u_id': register_return['auth_user_id']}).json()['user']['handle_str']
 
     assert handle == "firstlast"
 
@@ -211,7 +205,7 @@ def test_handle_uppercase():
 def test_double_handles():
     requests.delete(config.url + '/clear/v1')
 
-    requests.post(config.url + 'auth/register/v2', params={'email': 'valid@gmail.com', 'password': 'password', 'name_first': 'First', 'name_last': 'Last'})
+    requests.post(config.url + 'auth/register/v2', json={'email': 'valid@gmail.com', 'password': 'password', 'name_first': 'First', 'name_last': 'Last'})
 
     auth_register_input = {
         'email':'other@gmail.com',
@@ -220,11 +214,9 @@ def test_double_handles():
         'name_last':'Last'
     }
 
-    token = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['token']
+    register_return = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
 
-    channel_id = requests.post(config.url + 'channels/create/v2', params={'token': token, 'name': 'name', 'is_public': True}).json()['channel_id']
-
-    handle = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': channel_id}).json()['all_members'][0]['handle_str']
+    handle = requests.get(config.url + 'user/profile/v1', params={'token': register_return['token'], 'u_id': register_return['auth_user_id']}).json()['user']['handle_str']
 
     assert handle == "firstlast0"
 
@@ -232,8 +224,8 @@ def test_double_handles():
 def test_multiple_handles():
     requests.delete(config.url + '/clear/v1')
 
-    requests.post(config.url + 'auth/register/v2', params={'email': 'valid@gmail.com', 'password': 'password', 'name_first': 'First', 'name_last': 'Last'})
-    requests.post(config.url + 'auth/register/v2', params={'email': 'other@gmail.com', 'password': 'password', 'name_first': 'First', 'name_last': 'Last'})
+    requests.post(config.url + 'auth/register/v2', json={'email': 'valid@gmail.com', 'password': 'password', 'name_first': 'First', 'name_last': 'Last'})
+    requests.post(config.url + 'auth/register/v2', json={'email': 'other@gmail.com', 'password': 'password', 'name_first': 'First', 'name_last': 'Last'})
 
     auth_register_input = {
         'email':'final@gmail.com',
@@ -242,11 +234,9 @@ def test_multiple_handles():
         'name_last':'Last'
     }
 
-    token = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['token']
+    register_return = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
 
-    channel_id = requests.post(config.url + 'channels/create/v2', params={'token': token, 'name': 'name', 'is_public': True}).json()['channel_id']
-
-    handle = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': channel_id}).json()['all_members'][0]['handle_str']
+    handle = requests.get(config.url + 'user/profile/v1', params={'token': register_return['token'], 'u_id': register_return['auth_user_id']}).json()['user']['handle_str']
 
     assert handle == "firstlast1"
 
@@ -254,8 +244,8 @@ def test_multiple_handles():
 def test_numeric_last_char():
     requests.delete(config.url + '/clear/v1')
 
-    requests.post(config.url + 'auth/register/v2', params={'email': 'valid@gmail.com', 'password': 'password', 'name_first': 'First', 'name_last': 'Last'})
-    requests.post(config.url + 'auth/register/v2', params={'email': 'other@gmail.com', 'password': 'password', 'name_first': 'First', 'name_last': 'Last'})
+    requests.post(config.url + 'auth/register/v2', json={'email': 'valid@gmail.com', 'password': 'password', 'name_first': 'First', 'name_last': 'Last'})
+    requests.post(config.url + 'auth/register/v2', json={'email': 'other@gmail.com', 'password': 'password', 'name_first': 'First', 'name_last': 'Last'})
 
     auth_register_input = {
         'email':'final@gmail.com',
@@ -264,21 +254,19 @@ def test_numeric_last_char():
         'name_last':'Last0'
     }
 
-    token = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['token']
+    register_return = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
 
-    channel_id = requests.post(config.url + 'channels/create/v2', params={'token': token, 'name': 'name', 'is_public': True}).json()['channel_id']
-
-    handle = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': channel_id}).json()['all_members'][0]['handle_str']
+    handle = requests.get(config.url + 'user/profile/v1', params={'token': register_return['token'], 'u_id': register_return['auth_user_id']}).json()['user']['handle_str']
 
     assert handle == "firstlast00"
 
 # Test if function generates correct handle when more than 10 of the same handle exist
 def test_13_duplicate_handles():
     requests.delete(config.url + '/clear/v1')
-    requests.post(config.url + 'auth/register/v2', params={'email': 'valid@gmail.com', 'password': 'password', 'name_first': 'First', 'name_last': 'Last'})
+    requests.post(config.url + 'auth/register/v2', json={'email': 'valid@gmail.com', 'password': 'password', 'name_first': 'First', 'name_last': 'Last'})
     for i in range(11):
         email = str(i) + "@gmail.com"
-        requests.post(config.url + 'auth/register/v2', params={'email': email, 'password': 'password', 'name_first': 'First', 'name_last': 'Last'})
+        requests.post(config.url + 'auth/register/v2', json={'email': email, 'password': 'password', 'name_first': 'First', 'name_last': 'Last'})
 
     auth_register_input = {
         'email':'11@gmail.com',
@@ -287,11 +275,8 @@ def test_13_duplicate_handles():
         'name_last':'Last'
     }
 
-    token = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['token']
+    register_return = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
 
-    channel_id = requests.post(config.url + 'channels/create/v2', params={'token': token, 'name': 'name', 'is_public': True}).json()['channel_id']
-
-    handle = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': channel_id}).json()['all_members'][0]['handle_str']
+    handle = requests.get(config.url + 'user/profile/v1', params={'token': register_return['token'], 'u_id': register_return['auth_user_id']}).json()['user']['handle_str']
 
     assert handle == "firstlast11"
-'''
