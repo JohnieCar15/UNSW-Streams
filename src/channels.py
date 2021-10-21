@@ -8,7 +8,7 @@ def channels_create_v2(token, name, is_public):
     channels_create_v2: creates a new channel with the given name and is set to either public or private. Also user who created it is made the owner.
 
     Arguments:
-        token (int) - user_id of the user who called the function 
+        token (string) - token string used to authorise and authenticate the user 
         name (string) - name of the channel id to be made
         is_public (bool) - Sets the channel to public or private 
 
