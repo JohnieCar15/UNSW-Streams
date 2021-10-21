@@ -29,20 +29,31 @@ def admin_user_remove_v1(token, u_id):
         raise InputError(description='u_id refers the only global owner')
 
 
-    # remove from dm and channel (could replace lines with channel/list and dm/list)
-    filtered_channel_list = [channel['id'] for channel in store['channel'] if u_id in channel['members']]
-    filtered_dm_list = [dm['id'] for dm in store['dm'] if u_id in dm['members']]
 
-    for channel_id in filtered_channel_list:
-        channel_dict = filter_data_store(list='channels', key='id', value=channel_id)
+    # remove from dm and channel (could replace lines with channel/list and dm/list)
+    filtered_channel_list = [channel for channel in store['channel'] if u_id in channel['members']]
+    filtered_dm_list = [dm for dm in store['dm'] if u_id in dm['members']]
+
+    for channel_dict in filtered_channel_list:
+        # Replacing contents of messages with 'Removed user'
+        for message_dict in channel_dict['messages']:
+            if message_dict['u_id'] == u_id:
+                message_dict['message'] = 'Removed user'
+        
+        # Removing user from channel_dict
         channel_dict['members'].remove(u_id)
         # Need to change this to deal with iteration 2 multiple owners
         if u_id in channel_dict['owner']:
             channel_dict['owner'].remove(u_id)
 
-    for dm_id in filtered_dm_list:
-        dm_dict = filter_data_store(list='dms', key='id', value=dm_id)
+    for dm_dict in filtered_dm_list:
+
         dm_dict['members'].remove(u_id)
+        # Replacing contents of messages with 'Removed user'
+        for message_dict in dm_dict['messages']:
+            if message_dict['u_id'] == u_id:
+                message_dict['message'] = 'Removed user'
+
         # Not sure about this code and what happens to owners after profile is deleted
         '''if u_id in dm_dict['owner']:
             dm_dict['owner'].remove(u_id)'''
