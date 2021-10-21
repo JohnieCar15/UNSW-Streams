@@ -149,7 +149,7 @@ def test_no_alphanumeric_characters():
     register_return = requests.post(config.url + 'auth/register/v2', json=auth_register_input)
 
     assert register_return.status_code == InputError.code
-
+'''
 # Test if function generates correct handle
 def test_handle():
     requests.delete(config.url + '/clear/v1')
@@ -280,3 +280,4 @@ def test_13_duplicate_handles():
     handle = requests.get(config.url + 'user/profile/v1', params={'token': register_return['token'], 'u_id': register_return['auth_user_id']}).json()['user']['handle_str']
 
     assert handle == "firstlast11"
+'''

@@ -21,7 +21,6 @@ def decode_jwt(encoded_jwt):
     
 
 def validate_token(encoded_jwt):
-    store = data_store.get()
     user_id_list = filter_data_store(list='users', key='id')
     try:
         decoded_jwt = decode_jwt(encoded_jwt)
