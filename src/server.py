@@ -6,6 +6,7 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config
 from src.channels import channels_create_v2
+from src.channel import channel_addowner_v1
 from src.auth import auth_register_v2
 from src.auth import auth_login_v2
 from src.other import clear_v1
@@ -47,6 +48,11 @@ def echo():
 def channels_create():
     data = request.get_json()
     return dumps(channels_create_v2(data['token'], data['name'], data['is_public']))
+
+@APP.route('/channel/addowner/v1', methods=['POST'])
+def channel_addowner_endpoint():
+    data = request.get_json()
+    return dumps(channel_addowner_v1(data['token'], data['channel_id'], data['u_id']))
 
 @APP.route("/auth/register/v2", methods=['POST'])
 def auth_register_v2_ep():
