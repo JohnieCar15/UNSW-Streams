@@ -47,13 +47,13 @@ def admin_user_remove_v1(token, u_id):
             channel_dict['owner'].remove(u_id)
 
     for dm_dict in filtered_dm_list:
-
-        dm_dict['members'].remove(u_id)
         # Replacing contents of messages with 'Removed user'
         for message_dict in dm_dict['messages']:
             if message_dict['u_id'] == u_id:
                 message_dict['message'] = 'Removed user'
 
+        # Removing user from dm_dict
+        dm_dict['members'].remove(u_id)
         # Not sure about this code and what happens to owners after profile is deleted
         '''if u_id in dm_dict['owner']:
             dm_dict['owner'].remove(u_id)'''
