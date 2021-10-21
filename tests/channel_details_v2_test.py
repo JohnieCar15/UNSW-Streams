@@ -8,12 +8,12 @@ from src.error import InputError, AccessError
 def clear_and_register():
     # clear then register a user 
     requests.delete(config.url + 'clear/v2')
-    register = requests.post(config.url + 'auth/register/v2', params={'email': "yes@yes.com", 'password': "aaaaaa", 'name_first': "firstname", "name_last": "lastname"})
+    register = requests.post(config.url + 'auth/register/v2', json={'email': "yes@yes.com", 'password': "aaaaaa", 'name_first': "firstname", "name_last": "lastname"})
     register_data = register.json()
     token = register_data['token']
 
     # create a channel and get its channel id
-    channel_create = requests.post(config.url + 'channels/create/v2', params={'token': token, 'name': "name", 'is_public': True})
+    channel_create = requests.post(config.url + 'channels/create/v2', json={'token': token, 'name': "name", 'is_public': True})
     channel_create_data = channel_create.json()
     channel_create_data["channel_id"]
 
@@ -28,7 +28,7 @@ def test_valid_channel_authorised(clear_and_register):
     # token for 1st user and channel_id 
     token = clear_and_register['token']
     id_num = clear_and_register['u_id']
-    channel_id = channel_create_data['channel_id']
+    channel_id = clear_and_register['channel_id']
 
     # call channel details and check it works 
     channel_details = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': channel_id})
@@ -63,11 +63,11 @@ def test_valid_channel_2_members(clear_and_register):
     channel_id = clear_and_register['channel_id']
     id_num = clear_and_register['u_id']
     # get token for 2nd user
-    register = requests.post(config.url + 'auth/register/v2', params={'email': "yes2@yes.com", 'password': "aaaaaa", 'name_first': "name", "name_last": "name"})
+    register = requests.post(config.url + 'auth/register/v2', json={'email': "yes2@yes.com", 'password': "aaaaaa", 'name_first': "name", "name_last": "name"})
     register_data = register.json()
     id_num_2 = register_data["u_id"]
 
-    register = requests.post(config.url + 'channel/invite/v2', params={'token': token, 'channel_id': channel_id, 'u_id': u_id})
+    register = requests.post(config.url + 'channel/invite/v2', json={'token': token, 'channel_id': channel_id, 'u_id': id_num_2})
 
     # call channel details and check it matches
     channel_details = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': channel_id})
@@ -105,12 +105,13 @@ def test_valid_channel_2_members(clear_and_register):
     }
 
 # def test_valid_channel_two_owners
+
 def test_valid_channel_unauthorised(clear_and_register):
 
     channel_id = clear_and_register['channel_id']
 
     # get token for 2nd user
-    register = requests.post(config.url + 'auth/register/v2', params={'email': "yes2@yes.com", 'password': "aaaaaa", 'name_first': "name", "name_last": "name"})
+    register = requests.post(config.url + 'auth/register/v2', json={'email': "yes2@yes.com", 'password': "aaaaaa", 'name_first': "name", "name_last": "name"})
     register_data = register.json()
     token_2 = register_data["token"]
 
@@ -127,7 +128,7 @@ def test_valid_channel_invalid_token(clear_and_register):
 
 def test_invalid_channel_unauthorised_valid_id():
     requests.delete(config.url + 'clear/v2')
-    register = requests.post(config.url + 'auth/register/v2', params={'email': "yes@yes.com", 'password': "aaaaaa", 'name_first': "firstname", "name_last": "lastname"})
+    register = requests.post(config.url + 'auth/register/v2', json={'email': "yes@yes.com", 'password': "aaaaaa", 'name_first': "firstname", "name_last": "lastname"})
     register_data = register.json()
     token = register_data['token']
 
