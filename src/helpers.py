@@ -32,7 +32,7 @@ def validate_token(encoded_jwt):
     if decoded_jwt is None or decoded_jwt['user_id'] not in user_id_list:
         raise AccessError(description='Invalid Token')
     else:
-        session_id_list = filter_data_store(list='users', key='id', key=decoded_jwt['user_id'])
+        session_id_list = filter_data_store(list='users', key='id', value=decoded_jwt['user_id'])
         if decoded_jwt['session_id'] not in session_id_list:
             raise AccessError(description='Invalid Token')
     

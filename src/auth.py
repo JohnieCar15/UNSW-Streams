@@ -112,8 +112,9 @@ def auth_register_v2(email, password, name_first, name_last):
         'name_first': name_first,
         'name_last': name_last,
         'handle_str': handle_str,
-        'permission_id': permission_id
-        'session_list': [session_id]
+        'permission_id': permission_id,
+        'session_list': [session_id],
+        'is_removed': False
     }
 
     store['users'].append(user_dict)

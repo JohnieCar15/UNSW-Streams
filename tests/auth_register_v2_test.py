@@ -15,16 +15,18 @@ def test_auth_register_v2():
         'name_last':'Last'
     }
 
-    register_auth_user_id = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['auth_user_id']
+    register_auth_user_id = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
 
     auth_login_input = {
         'email':'valid@gmail.com',
         'password':'password'
     }
 
-    login_auth_user_id = requests.post(config.url + 'auth/login/v2', json=auth_login_input).json()['auth_user_id']
+    login_auth_user_id = requests.post(config.url + 'auth/login/v2', json=auth_login_input).json()
 
-    assert register_auth_user_id == login_auth_user_id
+    assert register_auth_user_id['auth_user_id'] == login_auth_user_id['auth_user_id']
+
+    assert register_auth_user_id['token'] != login_auth_user_id['token']
 
 # Test if function is given an invalid email
 def test_invalid_email():
@@ -147,7 +149,7 @@ def test_no_alphanumeric_characters():
     register_return = requests.post(config.url + 'auth/register/v2', json=auth_register_input)
 
     assert register_return.status_code == InputError.code
-
+'''
 # Test if function generates correct handle
 def test_handle():
     requests.delete(config.url + '/clear/v1')
@@ -292,3 +294,4 @@ def test_13_duplicate_handles():
     handle = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': channel_id}).json()['all_members'][0]['handle_str']
 
     assert handle == "firstlast11"
+'''
