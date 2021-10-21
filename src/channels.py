@@ -141,9 +141,7 @@ def channels_create_v2(token, name, is_public):
         'messages': []
     }
     store['channels'].append(channel_dictionary)
-
     data_store.set(store)
-
     return {
         'channel_id': new_id
     }
