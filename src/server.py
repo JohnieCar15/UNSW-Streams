@@ -5,6 +5,9 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
+from src.auth import auth_register_v2
+from src.auth import auth_login_v2
+from src.other import clear_v1
 
 from src.channel import channel_invite_v2
 
@@ -41,11 +44,29 @@ def echo():
         'data': data
     })
 
+
+@APP.route("/auth/register/v2", methods=['POST'])
+def auth_register_v2_ep():
+    data = request.get_json()
+
+    return dumps(auth_register_v2(data['email'], data['password'], data['name_first'], data['name_last']))
+
+@APP.route("/auth/login/v2", methods=['POST'])
+def auth_login_v2_ep():
+    data = request.get_json()
+
+    return dumps(auth_login_v2(data['email'], data['password']))
+
 @APP.route("/channel/invite/v2", methods=['POST'])
 def channel_invite_v2_ep():
     data = request.json
     return dumps(channel_invite_v2(data['token'], data['channel_id'], data['u_id']))
-
+    
+@APP.route("/clear/v1", methods=['DELETE'])
+def clear():
+    clear_v1()
+    return dumps({})
+    
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
