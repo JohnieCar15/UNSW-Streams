@@ -143,15 +143,20 @@ def channel_details_v2(token, channel_id):
     channel_name = channel_dict['name']
     channel_is_public = channel_dict['is_public']
     channel_members = channel_dict['members']
-    channel_owner_id = channel_dict['owner']
-            
+    channel_owners = channel_dict['owner']
+
+    all_owners_list = []
     # get variables for channel details - owner from store['users']
-    for user in store['users']:
-        if channel_owner_id == user['id']:
-            owner_email = user['email']
-            owner_name_f = user['name_first']
-            owner_name_l = user['name_last']
-            owner_handle = user['handle_str']
+    for owner in store['users']:
+        if owner['id'] in channel_owners:
+            owner_dict = {
+                'u_id': owner['id'],
+                'email': owner['email'],
+                'name_first': owner['name_first'],
+                'name_last': owner['name_last'],
+                'handle_str': owner['handle_str']
+            }
+            all_owners_list.append(owner_dict)
 
     # initialise members list of dictionaries
     all_members_list = []
@@ -171,15 +176,7 @@ def channel_details_v2(token, channel_id):
     return {
         'name': channel_name,
         'is_public': channel_is_public,
-        'owner_members': [
-            {
-                'u_id': channel_owner_id ,
-                'email': owner_email ,
-                'name_first': owner_name_f ,
-                'name_last': owner_name_l ,
-                'handle_str': owner_handle ,
-            }
-        ],
+        'owner_members': all_owners_list,
         'all_members': all_members_list
     }
 '''

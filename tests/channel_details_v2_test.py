@@ -104,6 +104,7 @@ def test_valid_channel_2_members(clear_and_register):
         ],
     }
 
+# def test_valid_channel_two_owners
 def test_valid_channel_unauthorised(clear_and_register):
 
     channel_id = clear_and_register['channel_id']
