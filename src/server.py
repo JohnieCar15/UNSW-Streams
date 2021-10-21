@@ -46,10 +46,10 @@ def echo():
 
 @APP.route('/channel/details/v2', methods=['GET'])
 def channel_details_endpoint():
-    token = requests.arg.get('token')
-    channel_id = requests.arg.get('channel_id')
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
     return dumps(channel_details_v2(token, channel_id))
-    
+
 @APP.route('/channels/create/v2', methods=['POST'])
 def channels_create():
     data = request.get_json()
