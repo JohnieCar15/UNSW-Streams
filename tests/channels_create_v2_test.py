@@ -22,8 +22,6 @@ def test_valid_id_valid_name_public(clear_and_register):
     channels_list_id = channels_list_data['channel_id']
     '''
     assert channels_create_id == 1
-    
-
 
 def test_valid_id_invalid_short_channel_name_public(clear_and_register):
     token = clear_and_register
