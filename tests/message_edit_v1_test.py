@@ -42,7 +42,7 @@ def send_message(register_create, length):
 
     message_id_list = []
 
-    for x in range (length):
+    for _ in range (length):
         message_id_list.insert(0, requests.post(config.url + '/message/send/v1', json=send_message_input).json()['message_id'])
     
     return {
@@ -158,7 +158,29 @@ def test_invalid_user(register_create):
     message_edit_input = {
         'token' : " ",
         'message_id' : messagedict['message_id_list'][0],
-        'message' : 'a' * 1001
+        'message' : 'World!'
+    }
+
+    status = requests.put(config.url + 'message/edit/v1', json=message_edit_input)
+
+    assert status.status_code == AccessError.code
+
+def test_not_member(register_create):
+    messagedict = send_message(register_create, 1)
+
+    auth_register_input = {
+        'email' : "person@gmail.com",
+        'password' : "password123",
+        'name_first' : "new",
+        'name_last' : "person",
+    }
+
+    user = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
+
+    message_edit_input = {
+        'token' : user['token'],
+        'message_id' : messagedict['message_id_list'][0],
+        'message' : 'World!'
     }
 
     status = requests.put(config.url + 'message/edit/v1', json=message_edit_input)
