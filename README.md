@@ -19,6 +19,7 @@
 * 07/10: Fixed automarking formula
 * 08/10: Added instructions to run coverage locally
 * 15/10: Updated coverage and pylint configurations
+* 16/10: Reiterating from lectures that hashing passwords is expected in iteration 2
 
 ## 1. Aims:
 
@@ -74,7 +75,7 @@ In this iteration, you are expected to:
 
     * Part of this section may be automarked.
 
-    * Your implementation should build upon your work in iteration 1, and ideally your HTTP layer is just a wrapper for underlying functions you've written that handle the logic. Your implementation will rely on topics taught in week 4 (HTTP servers and testing) as well as week 5 (authentication and authorisation).
+    * Your implementation should build upon your work in iteration 1, and ideally your HTTP layer is just a wrapper for underlying functions you've written that handle the logic. Your implementation will rely on topics taught in week 4 (HTTP servers and testing) as well as week 5 (authentication and authorisation). There is an expectation that you implement your solution with password hashing, and JWTs for tokens.
 
     * Your implementation will need to implement persistence of data (see section 4.6).
 
