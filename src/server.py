@@ -5,12 +5,10 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
-from src.channel import channel_details_v2
+from src.channel import channel_details_v2, channel_invite_v2, channel_join_v2
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.channels import channels_create_v2
 from src.other import clear_v1
-
-from src.channel import channel_join_v2
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -73,6 +71,11 @@ def channel_join_v2_ep():
     data = request.json
     return dumps(channel_join_v2(data['token'], data['channel_id']))
 
+@APP.route("/channel/invite/v2", methods=['POST'])
+def channel_invite_v2_ep():
+    data = request.json
+    return dumps(channel_invite_v2(data['token'], data['channel_id'], data['u_id']))
+    
 @APP.route("/auth/logout/v1", methods=['POST'])
 def auth_logout_v1_ep():
     data = request.get_json()
