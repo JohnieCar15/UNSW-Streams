@@ -27,7 +27,6 @@ def validate_token(encoded_jwt):
     except Exception:
         decoded_jwt = None
 
-    ### Not sure if we need to check if valid auth_user_id is passed ###
     if decoded_jwt is None or decoded_jwt['user_id'] not in user_id_list:
         raise AccessError(description='Invalid Token')
     else:
@@ -36,7 +35,6 @@ def validate_token(encoded_jwt):
             raise AccessError(description='Invalid Token')
     
     return decoded_jwt
-    #return decoded_jwt['user_id']
 
 # Used to replace list comprehensions when filtering the data store
 def filter_data_store(store_list, key=None, value=None):
@@ -46,3 +44,8 @@ def filter_data_store(store_list, key=None, value=None):
     elif key is not None:
         return [item[key] for item in store[store_list]]
     return [item for item in store[store_list]]
+
+# For a given user_id, checks to see if the user is a global owner
+def is_global_owner(u_id):
+    user_dict = filter_data_store(store_list='users', key='id',value=u_id)
+    return user_dict[0]['permission_id'] == 1
