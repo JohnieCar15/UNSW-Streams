@@ -57,7 +57,7 @@ def channels_list(user):
 # then return all users and channels created by it
 @pytest.fixture
 def clear_then_crete_public0_and_private0():
-    requests.delete(config.url + 'clear/v2')
+    requests.delete(config.url + 'clear/v1')
     # register public_0_owner and create channel public_0
 
     public_0_owner = user_register("0000@unsw.edu.au", "password", "firstname0", "lastname0")
@@ -102,12 +102,12 @@ def clear_then_crete_public0_and_private0():
 
 # test invalid token and this should raise AccessError 
 def test_invalid_user_id():
-    requests.delete(config.url + 'clear/v2')
+    requests.delete(config.url + 'clear/v1')
     assert requests.get(config.url + 'channels/list/v2', params={"token": "invalid"}).status_code == AccessError.code
 
 def test_valid_user_not_in_any_channel():
     # create a user who is not in any channel
-    requests.delete(config.url + 'clear/v2')
+    requests.delete(config.url + 'clear/v1')
     user_in_no_channels = user_register("0000@unsw.edu.au", "password", "firstname0", "lastname0")
     assert channels_list(user_in_no_channels) == {'channels': []}
 
@@ -154,7 +154,7 @@ def test_member_of_one_private_channel(clear_then_crete_public0_and_private0):
     assert channels_list(private_0_member) == {
         'channels':
             [ 
-                {'channel_id': private_0["channel_id"], 'name': "public_0"},
+                {'channel_id': private_0["channel_id"], 'name': "private_0"},
             ],
     }
 
@@ -243,7 +243,7 @@ def test_complex_case(clear_then_crete_public0_and_private0):
         {'channel_id': public_1["channel_id"], 'name': 'public_1'}
         ])
 
-    assert sort_list(channels_list(public_0_owner)['channels']) == sort_list([
+    assert sort_list(channels_list(public_0_member)['channels']) == sort_list([
         {'channel_id': public_0["channel_id"], 'name': 'public_0'},        
         {'channel_id': public_1["channel_id"], 'name': 'public_1'},
         {'channel_id': public_2["channel_id"], 'name': 'public_2'},

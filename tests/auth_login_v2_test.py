@@ -1,4 +1,4 @@
-"""import pytest
+import pytest
 import requests
 
 from src import config
@@ -68,4 +68,3 @@ def test_incorrect_password():
     login_return = requests.post(config.url + 'auth/login/v2', json=auth_login_input)
 
     assert login_return.status_code == InputError.code
-"""

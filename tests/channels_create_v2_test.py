@@ -1,4 +1,4 @@
-"""import pytest
+import pytest
 import requests
 import json
 from src import config
@@ -49,4 +49,3 @@ def test_invalid_id_valid_name_public():
     channels_create = requests.post(config.url + 'channels/create/v2', json={'token': 1, 'name': 'name', 'is_public': True})
     # access error 
     assert channels_create.status_code == AccessError.code
-"""

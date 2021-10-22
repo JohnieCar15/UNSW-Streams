@@ -1,4 +1,4 @@
-"""import pytest
+import pytest
 import requests
 from src import config
 from src.error import AccessError
@@ -27,7 +27,7 @@ def user_register(email, password, name_first, name_last):
         "name_first" : name_first,
         "name_last" : name_last
     }
-    return requests.post(config.url + '/auth/register/v2', data=input).json()
+    return requests.post(config.url + 'auth/register/v2', json=input).json()
 
 # create a channel and return {"channel_id": channel_id}
 def channel_create(creator, name, is_public):
@@ -36,7 +36,7 @@ def channel_create(creator, name, is_public):
         'name': name,
         "is_public": is_public
     }
-    return requests.post(config.url + 'channels/create/v2', data=input).json()
+    return requests.post(config.url + 'channels/create/v2', json=input).json()
 
 # invite a user to channel
 def channel_invite(inviter, channel, invitee):
@@ -45,11 +45,11 @@ def channel_invite(inviter, channel, invitee):
         "channel_id": channel["channel_id"],
         "u_id": invitee["auth_user_id"]
     }
-    requests.post(config.url + 'channel/invite/v2', data=input)
+    requests.post(config.url + 'channel/invite/v2', json=input)
 
 # invite a user to channel, return {channels that user belongs to}
 def channels_listall(user):
-    return requests.get(config.url + '/channels/listall/v2/', params={"token": user["token"]}).json()
+    return requests.get(config.url + 'channels/listall/v2', params={"token": user["token"]}).json()
 
 
 # this function will create two channels: public_0 and private_0
@@ -60,7 +60,7 @@ def channels_listall(user):
 
 @pytest.fixture
 def clear_then_crete_public0_and_private0():
-    requests.delete(config.url + '/clear/v2')
+    requests.delete(config.url + 'clear/v1')
     # register public_0_owner and create channel public_0
 
     public_0_owner = user_register("0000@unsw.edu.au", "password", "firstname0", "lastname0")
@@ -103,13 +103,13 @@ def clear_then_crete_public0_and_private0():
 
 # test invalid token and this should raise AccessError
 def test_invalid_user_id():
-    requests.delete(config.url + '/clear/v2')
-    assert requests.get(config.url + '/channels/listall/v2/', params={"token": "invalid"}).status_code == AccessError.code
+    requests.delete(config.url + 'clear/v1')
+    assert requests.get(config.url + 'channels/listall/v2', params={"token": "invalid"}).status_code == AccessError.code
 
 
 def test_valid_user_but_no_channels_have_been_created():
     # create a user without any channels have be created
-    requests.delete(config.url + '/clear/v2')
+    requests.delete(config.url + 'clear/v1')
     user_in_no_channels = user_register("0000@unsw.edu.au", "password", "firstname0", "lastname0")
     assert channels_listall(user_in_no_channels) == {'channels': []}
 
@@ -209,4 +209,3 @@ def test_complex_case(clear_then_crete_public0_and_private0):
     assert sort_list(channels_listall(public_1_owner)['channels']) == list_of_all_channels
     assert sort_list(channels_listall(public_2_owner)['channels']) == list_of_all_channels
     assert sort_list(channels_listall(private_1_owner)['channels']) == list_of_all_channels
-"""
