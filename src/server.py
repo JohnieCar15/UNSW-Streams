@@ -5,11 +5,21 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
+from src.channel import channel_details_v2, channel_invite_v2, channel_join_v2
+from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.channels import channels_create_v2
+<<<<<<< HEAD
 from src.channel import channel_invite_v2
 from src.auth import auth_register_v2
 from src.auth import auth_login_v2
 from src.channels import channels_list_v2, channels_listall_v2
+=======
+from src.user import users_all_v1, user_profile_v1
+from src.user import user_profile_setname_v1
+from src.user import user_profile_setemail_v1
+from src.user import user_profile_sethandle_v1
+
+>>>>>>> master
 from src.other import clear_v1
 
 def quit_gracefully(*args):
@@ -45,6 +55,12 @@ def echo():
         'data': data
     })
 
+@APP.route('/channel/details/v2', methods=['GET'])
+def channel_details_endpoint():
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+    return dumps(channel_details_v2(token, channel_id))
+
 @APP.route('/channels/create/v2', methods=['POST'])
 def channels_create():
     data = request.get_json()
@@ -64,8 +80,60 @@ def auth_register_v2_ep():
 @APP.route("/auth/login/v2", methods=['POST'])
 def auth_login_v2_ep():
     data = request.get_json()
-
     return dumps(auth_login_v2(data['email'], data['password']))
+    
+@APP.route("/channel/join/v2", methods=['POST'])
+def channel_join_v2_ep():
+    data = request.json
+    return dumps(channel_join_v2(data['token'], data['channel_id']))
+
+@APP.route("/channel/invite/v2", methods=['POST'])
+def channel_invite_v2_ep():
+    data = request.json
+    return dumps(channel_invite_v2(data['token'], data['channel_id'], data['u_id']))
+    
+@APP.route("/auth/logout/v1", methods=['POST'])
+def auth_logout_v1_ep():
+    data = request.get_json()
+    return dumps(auth_logout_v1(data['token']))
+
+@APP.route("/user/users/all/v1", methods=['GET'])
+def users_all():
+    token = request.args.get('token')
+    users_profile = users_all_v1(token)
+    return dumps(users_profile)
+
+@APP.route("/user/profile/v1", methods=['GET'])
+def user_profile():
+    token = request.args.get('token')
+    u_id = int(request.args.get('u_id'))
+    user_profile = user_profile_v1(token, u_id)
+    return dumps(user_profile)
+
+@APP.route("/user/profile/setname/v1", methods=['PUT'])
+def user_setname():
+    data = request.get_json()
+    token = data['token']
+    name_first = data['name_first']
+    name_last = data['name_last']
+    user_profile_setname_v1(token, name_first, name_last)
+    return dumps({})
+
+@APP.route("/user/profile/setemail/v1", methods=['PUT'])
+def user_setemail():
+    data = request.get_json()
+    token = data['token']
+    email = data['email']
+    user_profile_setemail_v1(token, email)
+    return dumps({})
+
+@APP.route("/user/profile/sethandle/v1", methods=['PUT'])
+def user_sethandle():
+    data = request.get_json()
+    token = data['token']
+    handle = data['handle_str']
+    user_profile_sethandle_v1(token, handle)
+    return dumps({})
 
 @APP.route("/channels/list/v2", methods=['GET'])
 def channels_list():
@@ -82,10 +150,13 @@ def clear():
     clear_v1()
     return dumps({})
 
+<<<<<<< HEAD
 @APP.route("/clear/v2", methods=['DELETE'])
 def clear2():
     clear_v1()
     return dumps({})
+=======
+>>>>>>> master
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
