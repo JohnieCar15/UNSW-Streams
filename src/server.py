@@ -49,4 +49,4 @@ def clear():
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port) # Do not edit this port
+    APP.run(debug=True, port=config.port) # Do not edit this port

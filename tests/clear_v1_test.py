@@ -3,11 +3,10 @@ import requests
 from src import config
 from src.error import InputError
 
-'''
+
 # Tests logging in after clearing data store
 def test_register_login():
     requests.delete(config.url + '/clear/v1')
-
     auth_register_input = {
         'email' : "valid@gmail.com",
         'password' : "password",
@@ -25,7 +24,6 @@ def test_register_login():
     }
 
     assert requests.post(config.url + '/auth/login/v2', json=auth_login_input) == InputError.code
-
 
 # Tests if registering again after clearing works
 def test_register_twice():
@@ -49,6 +47,7 @@ def test_register_twice():
 
     assert requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
 
+'''
 # Tests checking channel details after clearing data store
 def test_channel_details():
     requests.delete(config.url + '/clear/v1')
