@@ -3,18 +3,17 @@ import requests
 from src import config
 from src.error import AccessError, InputError
 
-
 # clear and registers first user
 @pytest.fixture
 def clear_and_register_user0():
-    requests.delete(config.url + '/clear/v2')
+    requests.delete(config.url + 'clear/v2')
     user0_register = {
         "email" : "0000@unsw.edu.au",
         "password" : "password",
         "name_first" : "firstname0",
         "name_last" : "lastname0",
     }
-    user0 = requests.post(config.url + '/auth/register/v2', data=user0_register).json()
+    user0 = requests.post(config.url + 'auth/register/v2', json=user0_register).json()
 
     return {
         "token_valid": user0['token'],
@@ -25,38 +24,38 @@ def clear_and_register_user0():
 # test invalid token with invalid uid, this should raise AccessError
 def test_invalid_token_and_invalid_uid(clear_and_register_user0):
     user0 = clear_and_register_user0
-    input = {
+    info = {
         "token": user0['token_valid'] + "1",
         "u_id": user0['u_id'] + 1
     }
-    assert requests.get(config.url + '/user/profile/v1/', params=input).status_code == AccessError.code
+    assert requests.get(config.url + 'user/profile/v1', params=info).status_code == AccessError.code
     
 # test invalid token with valid uid, and this should raise AccessError
 def test_invaild_token_and_valid_uid(clear_and_register_user0):
     user0 = clear_and_register_user0
-    input = {
+    info = {
         "token": user0['token_valid'] + "1",
         "u_id": user0['u_id']
     }
-    assert requests.get(config.url + '/user/profile/v1/', params=input).status_code == AccessError.code
+    assert requests.get(config.url + 'user/profile/v1', params=info).status_code == AccessError.code
 
 # test invalid uid and this should raise InputError
 def test_vaild_token_and_invalid_uid(clear_and_register_user0):
     user0 = clear_and_register_user0
-    input = {
+    info = {
         "token": user0['token_valid'],
         "u_id": user0['u_id'] + 1
     }
-    assert requests.get(config.url + '/user/profile/v1/', params=input).status_code == InputError.code
+    assert requests.get(config.url + 'user/profile/v1', params=info).status_code == InputError.code
 
 # test a user with valid token and valid uid
 def test_vaild_token_with_one_user_registered(clear_and_register_user0):
     user0 = clear_and_register_user0
-    input = {
+    info = {
         "token": user0['token_valid'],
         "u_id": user0['u_id']
     }
-    requests.get(config.url + '/user/profile/v1/', params=input).json() == {'user':
+    assert requests.get(config.url + 'user/profile/v1', params=info).json() == {'user':
         {'u_id': user0['u_id'],
         'email': "0000@unsw.edu.au",
         "name_first": "firstname0",
@@ -73,14 +72,14 @@ def test_call_others_uid(clear_and_register_user0):
         "name_first" : "firstname1",
         "name_last" : "lastname1",
     }
-    user1 = requests.post(config.url + '/auth/register/v2', data=user1_register).json()
+    user1 = requests.post(config.url + 'auth/register/v2', json=user1_register).json()
     
-    input = {
+    info = {
         "token": user1['token'],
         "u_id": user0['u_id']
     }
 
-    requests.get(config.url + '/user/profile/v1/', params=input).json() == {
+    assert requests.get(config.url + 'user/profile/v1', params=info).json() == {
         'user': {
             'u_id': user0['u_id'],
             'email': "0000@unsw.edu.au",
@@ -92,7 +91,7 @@ def test_call_others_uid(clear_and_register_user0):
 
 
 def test_many_vaild_users():
-    requests.delete(config.url + '/clear/v2')
+    requests.delete(config.url + 'clear/v2')
     users_register = [
         {   "email" : "0000@unsw.edu.au",
             "password" : "password",
@@ -109,16 +108,16 @@ def test_many_vaild_users():
         }
     ]
     
-    user0 = requests.post(config.url + '/auth/register/v2', data=users_register[0]).json()
-    user1 = requests.post(config.url + '/auth/register/v2', data=users_register[1]).json()
-    user2 = requests.post(config.url + '/auth/register/v2', data=users_register[2]).json()
+    user0 = requests.post(config.url + 'auth/register/v2', json=users_register[0]).json()
+    user1 = requests.post(config.url + 'auth/register/v2', json=users_register[1]).json()
+    user2 = requests.post(config.url + 'auth/register/v2', json=users_register[2]).json()
 
-    input = {
+    info = {
         "token": user0['token'],
         "u_id": user0['auth_user_id']
     }
 
-    assert requests.get(config.url + '/user/profile/v1/', params=input).json() == {
+    assert requests.get(config.url + 'user/profile/v1', params=info).json() == {
         'user': {
             'u_id': user0['auth_user_id'],
             'email': "0000@unsw.edu.au",
@@ -128,8 +127,8 @@ def test_many_vaild_users():
         }
     }
 
-    input['u_id'] = user1['auth_user_id']
-    assert requests.get(config.url + '/user/profile/v1/', params=input).json() == {
+    info['u_id'] = user1['auth_user_id']
+    assert requests.get(config.url + 'user/profile/v1', params=info).json() == {
         'user': {
             'u_id': user1['auth_user_id'],
             'email': "0001@unsw.edu.au",
@@ -139,14 +138,14 @@ def test_many_vaild_users():
         }
     }
 
-    input['token'] = user1['token']
-    input['u_id'] = user2['auth_user_id']
-    assert requests.get(config.url + '/user/profile/v1/', params=input).json() == {
+    info['token'] = user1['token']
+    info['u_id'] = user2['auth_user_id']
+    assert requests.get(config.url + 'user/profile/v1', params=info).json() == {
         'user': {
             'u_id': user2['auth_user_id'],
             'email': "0002@unsw.edu.au",
-            "name_first": "firstname0",
-            "name_last": "lastname0",
-            "handle_str": "firstname0lastname00"
+            "name_first": "firstname2",
+            "name_last": "lastname2",
+            "handle_str": "firstname2lastname2"
         }
     }
