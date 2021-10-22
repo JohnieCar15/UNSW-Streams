@@ -21,7 +21,7 @@ def decode_jwt(encoded_jwt):
     
 
 def validate_token(encoded_jwt):
-    user_id_list = filter_data_store(list='users', key='id')
+    user_id_list = filter_data_store(store_list='users', key='id')
     try:
         decoded_jwt = decode_jwt(encoded_jwt)
     except Exception:
@@ -31,13 +31,13 @@ def validate_token(encoded_jwt):
     if decoded_jwt is None or decoded_jwt['user_id'] not in user_id_list:
         raise AccessError(description='Invalid Token')
     else:
-        session_id_list = filter_data_store(list='users', key='id', value=decoded_jwt['user_id'])
+        session_id_list = filter_data_store(store_list='users', key='id', value=decoded_jwt['user_id'])
         if decoded_jwt['session_id'] not in session_id_list[0]['session_list']:
             raise AccessError(description='Invalid Token')
     
     return decoded_jwt
     #return decoded_jwt['user_id']
-
+'''
 # Used to replace list comprehensions when filtering the data store
 def filter_data_store(list, key=None, value=None):
     store = data_store.get()
@@ -52,3 +52,13 @@ def filter_data_store(list, key=None, value=None):
         return [item[key] for item in store[list]]
 
     return [item for item in store[list]]
+    '''
+    
+# Used to replace list comprehensions when filtering the data store
+def filter_data_store(store_list, key=None, value=None):
+    store = data_store.get()
+    if value is not None and key is not None:
+        return [item for item in store[store_list] if (isinstance(item[key], list) and value in item[key]) or item[key] == value]
+    elif key is not None:
+        return [item[key] for item in store[store_list]]
+    return [item for item in store[store_list]]

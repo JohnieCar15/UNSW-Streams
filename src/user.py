@@ -32,7 +32,7 @@ def users_all_v1(token):
     # raise AccessError("Invalid token")
     validate_token(token)
     # get a list of user
-    user_list = filter_data_store(list='users', key='is_removed', value=False)
+    user_list = filter_data_store(store_list='users', key='is_removed', value=False)
 
     list_of_user = []
     for user in user_list:
@@ -77,7 +77,7 @@ def user_profile_v1(token, u_id):
     # if token can not be decoded
     # raise AccessError("Invalid token")
     validate_token(token)
-    user = filter_data_store(list='users', key='id', value=u_id)
+    user = filter_data_store(store_list='users', key='id', value=u_id)
     if user == []:
         raise InputError("Invalid u_id")
 
@@ -160,11 +160,11 @@ def user_profile_setemail_v1(token, email):
     if not re.fullmatch(regex, email):
         raise InputError("Invalid email")
 
-    email_of_current_user = filter_data_store(list='users', key='id', value = u_id)[0]['email']
+    email_of_current_user = filter_data_store(store_list='users', key='id', value = u_id)[0]['email']
     if email_of_current_user == email:
         raise InputError ("email is the same as previous")
 
-    email_list = filter_data_store(list='users', key='email')
+    email_list = filter_data_store(store_list='users', key='email')
     # if email_list == None:
     #    raise InputError("No valid email yet")
     if email in email_list:
@@ -210,11 +210,11 @@ def user_profile_sethandle_v1(token, handle):
         raise InputError("handle contains char that are not alphanumeric")
 
 
-    handle_of_current_user = filter_data_store(list='users', key='id', value = u_id)[0]['handle_str']
+    handle_of_current_user = filter_data_store(store_list='users', key='id', value = u_id)[0]['handle_str']
     if handle_of_current_user == handle:
         raise InputError ("handle is the same as previous")
 
-    handle_list = filter_data_store(list='users', key='handle_str')
+    handle_list = filter_data_store(store_list='users', key='handle_str')
     # if handle_list == None:
     #   raise InputError("No valid handle_str yet")
     if handle in handle_list:

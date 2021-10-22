@@ -114,10 +114,6 @@ def clear():
     clear_v1()
     return dumps({})
 
-@APP.route("/clear/v2", methods=['DELETE'])
-def clear2():
-    clear_v1()
-    return dumps({})
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
