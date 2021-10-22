@@ -59,6 +59,7 @@ def channel_messages_v2(token, channel_id, start):
         messages_dict['end'] = start + 50
         messages_dict['messages'] = new_channel['messages'][start:start + 50]
 
+    data_store.set(store)
         
     return messages_dict
 
