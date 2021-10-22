@@ -173,7 +173,7 @@ def test_private_channel_without_global_owner(channel_join_url, clear_and_regist
 
 
 # Testing the general case of a global owner joining a private channel
-def test_private_channel_with_global_owner(clear_and_register):
+def test_private_channel_with_global_owner(channel_join_url, clear_and_register):
     creator_token = clear_and_register['user2_token']
     global_owner_token = clear_and_register['user1_token']
     global_owner_id = clear_and_register['user1_id']

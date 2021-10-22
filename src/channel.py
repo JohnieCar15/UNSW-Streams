@@ -45,7 +45,6 @@ def channel_join_v2(token, channel_id):
     return {}
 
 
-    
 def channel_details_v2(token, channel_id):
     '''
     channel_details_v2: Given a valid authroised token and valid channel_id displays details for that channel 
