@@ -7,14 +7,10 @@ from src.error import InputError
 from src import config
 from src.channel import channel_details_v2, channel_invite_v2, channel_join_v2
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
-<<<<<<< HEAD
-from src.channels import channels_create_v2
 from src.dm import dm_list_v1
-=======
 from src.channels import channels_create_v2, channels_list_v2, channels_listall_v2
 from src.user import users_all_v1, user_profile_v1
 from src.user import user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
->>>>>>> master
 from src.other import clear_v1
 
 from src.admin import admin_userpermission_change_v1
