@@ -180,3 +180,4 @@ def test_not_member_of_channel(message_send_url, clear_and_register):
 
     # Throws AccessError
     assert r.status_code == AccessError.code
+
