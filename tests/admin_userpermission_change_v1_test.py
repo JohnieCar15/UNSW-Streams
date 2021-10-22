@@ -38,7 +38,7 @@ def clear_and_register():
 def test_change_to_member(admin_userpermission_change_url, clear_and_register):
     owner_token = clear_and_register['user1_token']
     owner_id = clear_and_register['user1_id']
-    new_owner_token = clear_and_register['user1_token']
+    new_owner_token = clear_and_register['user2_token']
     new_owner_id = clear_and_register['user2_id']
     
     # Changing the second user to an owner

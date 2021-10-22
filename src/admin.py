@@ -1,12 +1,7 @@
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helpers import validate_token, filter_data_store
+from src.helpers import validate_token, filter_data_store, is_global_owner
 
-
-# Helper Function
-def is_global_owner(u_id):
-    user_dict = filter_data_store(store='users', key='id',value=u_id)
-    return user_dict['permission_id'] == 1
 
 # Helper Function
 def check_valid_permission_id(permission_id):
@@ -15,7 +10,7 @@ def check_valid_permission_id(permission_id):
 
 # Helper Function
 def is_last_global_owner(u_id):
-    global_owner_list = filter_data_store(store='users', key='permission_id', value=1)
+    global_owner_list = filter_data_store(store_list='users', key='permission_id', value=1)
     return len(global_owner_list) == 1 and global_owner_list[0]['id'] == u_id
 
 
@@ -49,8 +44,8 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
         raise AccessError(description='The authorised user is not a global owner')
 
     # Checking the u_id entered is valid
-    changed_user_dict = filter_data_store(list='users', key='id', value=u_id)
-    if changed_user_dict is None:
+    changed_user_dict = filter_data_store(store_list='users', key='id', value=u_id)
+    if changed_user_dict == []:
         raise InputError(description='u_id does not refer to a valid user')
 
     # Checking if the u_id refers to the last global owner and they are demoted
@@ -58,8 +53,7 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     if is_last_global_owner(u_id) and permission_id == 2:
         raise InputError(description='u_id refers the only global owner and they are being demoted to a user')
 
-    changed_user_dict['permission_id'] = permission_id
-    
+    changed_user_dict[0]['permission_id'] = permission_id
     data_store.set(store)
     return {}
 
