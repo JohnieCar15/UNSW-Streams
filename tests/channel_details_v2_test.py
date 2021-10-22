@@ -54,6 +54,44 @@ def test_valid_channel_authorised(clear_and_register):
             }
         ],
     }
+
+def test_user_not_a_member(clear_and_register):
+    '''
+    A test to check channel_details when channel id is valid and called by authorised member and there are users not part of the channel
+    '''
+    # token for 1st user and channel_id 
+    token = clear_and_register['token']
+    id_num = clear_and_register['u_id']
+    channel_id = clear_and_register['channel_id']
+
+    # register another user who isn't in channel
+    requests.post(config.url + 'auth/register/v2', json={'email': "yes3@yes.com", 'password': "aaaaaa", 'name_first': "firstname", "name_last": "lastname"})
+
+    # call channel details and check it works 
+    channel_details = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': channel_id})
+    channel_details_data = channel_details.json()
+    assert channel_details_data == {
+        'name': 'name',
+        'is_public': True,
+        'owner_members': [
+            {
+                'u_id': id_num,
+                'email': 'yes@yes.com',
+                'name_first': 'firstname',
+                'name_last': 'lastname',
+                'handle_str': 'firstnamelastname',
+            }
+        ],
+        'all_members': [
+            {
+                'u_id': id_num,
+                'email': 'yes@yes.com',
+                'name_first': 'firstname',
+                'name_last': 'lastname',
+                'handle_str': 'firstnamelastname',
+            }
+        ],
+    }
 '''
 def test_valid_channel_2_members(clear_and_register):
     
@@ -118,9 +156,6 @@ def test_valid_channel_unauthorised(clear_and_register):
     assert channel_details.status_code == AccessError.code
 
 def test_valid_channel_invalid_token(clear_and_register):
-
-    #get token for 1st user
-    token = clear_and_register['token']
     channel_id = clear_and_register['channel_id']
     channel_details = requests.get(config.url + 'channel/details/v2', params={'token': "", 'channel_id': channel_id})
     assert channel_details.status_code == AccessError.code
@@ -138,4 +173,3 @@ def test_invalid_channel_invalid_id():
     requests.delete(config.url + 'clear/v1')
     channel_details = requests.get(config.url + 'channel/details/v2', params={'token': 1, 'channel_id': 1})
     assert channel_details.status_code == AccessError.code
-
