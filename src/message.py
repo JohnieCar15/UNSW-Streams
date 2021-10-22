@@ -13,7 +13,7 @@ def message_send_v1(token, channel_id, message):
     if channel_id not in [channel['id'] for channel in store['channels']]:
         raise InputError(description="Invalid channel_id")
 
-    channel_dict = [channel for channel in store['channels'] if channel_id == channel['id']][0]
+    channel_dict = [channel for channel in store['channels'] if channel['id'] == channel_id][0]
 
     if auth_user_id not in channel_dict['members']:
         raise AccessError(description="Not a member of channel")

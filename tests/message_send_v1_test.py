@@ -1,103 +1,183 @@
 import pytest
+import requests
+from src import config
+from src.error import AccessError, InputError
 
-from src.message import message_send_v1
-from src.channel import channel_join_v1, channel_messages_v1
-from src.channels import channels_create_v1
-from src.auth import auth_register_v1
-from src.other import clear_v1
-from src.error import InputError, AccessError
+@pytest.fixture
+def message_send_url():
+    return config.url + 'message/send/v1'
 
-def test_normal():
-    clear_v1()
-    user_info = auth_register_v1("registered@gmail.com", "password", "First", "Last")
-    user_token = user_info['token']
-    user_id = user_info['auth_user_id']
-    
-    channel_id = channels_create_v1(user_token, "name", True)
-    channel_join_v1(user_token, channel_id)
+@pytest.fixture
+def clear_and_register():
+    requests.delete(config.url + 'clear/v1')
 
-    message_id = message_send_v1(user_token, channel_id, "Hello!")['message_id']
-
-    assert(channel_messages_v1(user_token, channel_id, 0)) == {
-        'messages' == [{'message_id': message_id, 'u_id': user_id, 'message': "Hello!", 'time_created': 1200}],
-        'start' == 0,
-        'end' == 1,
+    auth_register_input = {
+        'email':'user@gmail.com',
+        'password':'password',
+        'name_first':'First',
+        'name_last': 'Last'
     }
+    token = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['token']
 
-def test_multiple_messages():
-    clear_v1()
-    user_info = auth_register_v1("registered@gmail.com", "password", "First", "Last")
-    user_token = user_info['token']
-    user_id = user_info['auth_user_id']
-    
-    channel_id = channels_create_v1(user_token, "name", True)
-    channel_join_v1(user_token, channel_id)
-
-    message_id = message_send_v1(user_token, channel_id, "Hello!")['message_id']
-
-
-    message_id2 = message_send_v1(user_token, channel_id, "World!")['message_id']
-
-    assert(channel_messages_v1(user_token, channel_id, 0)) == {
-        'messages' == [{'message_id': message_id, 'u_id': user_id, 'message': "Hello!", 'time_created': 1200},
-        {'message_id': message_id2, 'message': "World!", 'time_created': 1200}],
-        'start' == 0,
-        'end' == 2,
+    channels_create_input = {
+        'token': token,
+        'name': "channel",
+        'is_public': True
     }
+    channel_id = requests.post(config.url + 'channels/create/v2', json=channels_create_input).json()['channel_id']
 
-def test_invalid_channel_id():
-    clear_v1()
-    user_info = auth_register_v1("registered@gmail.com", "password", "First", "Last")
-    user_token = user_info['token']
-    user_id = user_info['auth_user_id']
+    return {'token': token, 'channel_id': channel_id}
 
-    with pytest.raises(InputError):
-        message_id = message_send_v1(user_token, 0, "Hello!")['message_id']
+'''
+# Testing the general case of sending a single message
+def test_single_message(message_send_url, clear_and_register):
+    token = clear_and_register['token']
+    channel_id = clear_and_register['channel_id']
 
-def test_invalid_message():
-    clear_v1()
-    user_info = auth_register_v1("registered@gmail.com", "password", "First", "Last")
-    user_token = user_info['token']
-    user_id = user_info['auth_user_id']
-    
-    channel_id = channels_create_v1(user_token, "name", True)
-    channel_join_v1(user_token, channel_id)
+    message_send_input = {
+        'token': token,
+        'channel_id': channel_id,
+        'message': "message"
+    }
+    requests.post(message_send_url, json=message_send_input)
 
-    with pytest.raises(InputError):
-        message_id = message_send_v1(user_token, channel_id, "")['message_id']
+    channel_messages_input = {
+        'token': token,
+        'channel_id': channel_id,
+        'start': 0
+    }
+    channel_messages = requests.get(config.url + 'channel/messages/v2', params=channel_messages_input).json()['messages']
+    channel_messages = [message['message'] for message in channel_messages]
+    assert channel_messages == ["message"]
 
-def test_invalid_message():
-    clear_v1()
-    user_info = auth_register_v1("registered@gmail.com", "password", "First", "Last")
-    user_token = user_info['token']
-    user_id = user_info['auth_user_id']
-    
-    channel_id = channels_create_v1(user_token, "name", True)
-    channel_join_v1(user_token, channel_id)
+# Testing the case of sending multiple messages
+def test_multiple_messages(message_send_url, clear_and_register):
+    token = clear_and_register['token']
+    channel_id = clear_and_register['channel_id']
 
-    with pytest.raises(InputError):
-        message_id = message_send_v1(user_token, channel_id, 'a' * 1000)['message_id']
+    message_send_input1 = {
+        'token': token,
+        'channel_id': channel_id,
+        'message': "message1"
+    }
+    requests.post(message_send_url, json=message_send_input1)
 
-def test_invalid_user_valid_message():
-    clear_v1()
-    user_info = auth_register_v1("registered@gmail.com", "password", "First", "Last")
-    user_token = user_info['token']
-    user_id = user_info['auth_user_id']
-    
-    channel_id = channels_create_v1(user_token, "name", True)
+    message_send_input2 = {
+        'token': token,
+        'channel_id': channel_id,
+        'message': "message2"
+    }
+    requests.post(message_send_url, json=message_send_input2)
 
-    with pytest.raises(AccessError):
-        message_id = message_send_v1(user_token, channel_id, "Hello!")['message_id']
+    channel_messages_input = {
+        'token': token,
+        'channel_id': channel_id,
+        'start': 0
+    }
+    channel_messages = requests.get(config.url + 'channel/messages/v2', params=channel_messages_input).json()['messages']
+    channel_messages = [message['message'] for message in channel_messages]
+    assert channel_messages == ["message2", "message1"]
+'''
 
-def test_invalid_user_invalid_message():
-    clear_v1()
-    user_info = auth_register_v1("registered@gmail.com", "password", "First", "Last")
-    user_token = user_info['token']
-    user_id = user_info['auth_user_id']
-    
-    channel_id = channels_create_v1(user_token, "name", True)
+# Testing the error case of passing in an invalid token
+def test_invalid_token(message_send_url, clear_and_register):
+    channel_id = clear_and_register['channel_id']
 
-    with pytest.raises(AccessError):
-        message_id = message_send_v1(user_token, channel_id, "")['message_id']
+    # Generating an invalid token that does not match existing tokens
+    message_send_input = {
+        'token': None,
+        'channel_id': channel_id,
+        'message': "message"
+    }
+    r = requests.post(message_send_url, json=message_send_input)
 
+    # Throws AccessError
+    assert r.status_code == AccessError.code
 
+# Testing the error case of passing in an invalid channel_id
+def test_invalid_channel_id(message_send_url, clear_and_register):
+    token = clear_and_register['token']
+    valid_channel_id = clear_and_register['channel_id']
+
+    # Generating an invalid channel_id that does not match existing channel_ids
+    invalid_channel_id = valid_channel_id + 1
+
+    message_send_input = {
+        'token': token,
+        'channel_id': invalid_channel_id,
+        'message': "message"
+    }
+    r = requests.post(message_send_url, json=message_send_input)
+
+    # Throws InputError
+    assert r.status_code == InputError.code
+
+# Testing the error case of sending a message that is too short
+def test_message_too_short(message_send_url, clear_and_register):
+    token = clear_and_register['token']
+    channel_id = clear_and_register['channel_id']
+
+    message_send_input = {
+        'token': token,
+        'channel_id': channel_id,
+        'message': ""
+    }
+    r = requests.post(message_send_url, json=message_send_input)
+
+    # Throws InputError
+    assert r.status_code == InputError.code
+
+# Testing the error case of sending a message that is too long
+def test_message_too_long(message_send_url, clear_and_register):
+    token = clear_and_register['token']
+    channel_id = clear_and_register['channel_id']
+
+    message_send_input = {
+        'token': token,
+        'channel_id': channel_id,
+        'message': "a" * 1001
+    }
+    r = requests.post(message_send_url, json=message_send_input)
+
+    # Throws InputError
+    assert r.status_code == InputError.code
+
+# Testing the error case of passing in an invalid token, channel_id and message
+def test_all_invalid_inputs(message_send_url, clear_and_register):
+    valid_channel_id = clear_and_register['channel_id']
+
+    # Generating an invalid token that does not match existing tokens
+
+    # Generating an invalid channel_id that does not match existing channel_ids
+    invalid_channel_id = valid_channel_id + 1
+
+    message_send_input = {
+        'token': None,
+        'channel_id': invalid_channel_id,
+        'message': "message"
+    }
+    r = requests.post(message_send_url, json=message_send_input)
+
+    # Throws AccessError
+    assert r.status_code == AccessError.code
+
+# Testing the error case of sending a message when not a member of the channel
+def test_not_member_of_channel(message_send_url, clear_and_register):
+    channel_id = clear_and_register['channel_id']
+    auth_register_input = {
+        'email':'new@gmail.com',
+        'password':'password',
+        'name_first':'First',
+        'name_last': 'Last'
+    }
+    non_member_id = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['token']
+
+    message_send_input = {
+        'token': non_member_id,
+        'channel_id': channel_id,
+        'message': "message"
+    }
+    r = requests.post(message_send_url, json=message_send_input)
+
+    # Throws AccessError
+    assert r.status_code == AccessError.code
