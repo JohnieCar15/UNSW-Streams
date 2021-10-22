@@ -12,13 +12,12 @@ def dm_leave_v1(token, dm_id):
     print('Store', store)
 
     for dm in store['dms']:
-        u_ids = dm['members']
         if dm['dm_id'] == dm_id:
             found = True
-            if auth_user_id not in u_ids:
+            if auth_user_id not in dm['members']:
                 raise AccessError(description='User is not a member of the DM')
             else:
-                u_ids.remove(auth_user_id)
+                dm['members'].remove(auth_user_id)
 
     if not found:
         raise InputError(description='dm_id does not refere to valid DM')
