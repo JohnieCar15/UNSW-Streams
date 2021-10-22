@@ -5,6 +5,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
+from src.channel import channel_details_v2
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.channels import channels_create_v2
 from src.other import clear_v1
@@ -44,6 +45,16 @@ def echo():
         'data': data
     })
 
+@APP.route('/channel/details/v2', methods=['GET'])
+def channel_details_endpoint():
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+    return dumps(channel_details_v2(token, channel_id))
+
+@APP.route('/channels/create/v2', methods=['POST'])
+def channels_create():
+    data = request.get_json()
+    return dumps(channels_create_v2(data['token'], data['name'], data['is_public']))
 
 @APP.route("/auth/register/v2", methods=['POST'])
 def auth_register_v2_ep():
@@ -56,11 +67,6 @@ def auth_login_v2_ep():
     data = request.get_json()
 
     return dumps(auth_login_v2(data['email'], data['password']))
-
-@APP.route('/channels/create/v2', methods=['POST'])
-def channels_create():
-    data = request.get_json()
-    return dumps(channels_create_v2(data['token'], data['name'], data['is_public']))
     
 @APP.route("/channel/join/v2", methods=['POST'])
 def channel_join_v2_ep():
