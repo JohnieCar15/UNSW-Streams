@@ -7,6 +7,7 @@ from src.error import InputError
 from src import config
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.channels import channels_create_v2
+from src.dm import dm_leave_v1
 from src.other import clear_v1
 
 def quit_gracefully(*args):
@@ -64,6 +65,12 @@ def auth_logout_v1_ep():
     data = request.get_json()
 
     return dumps(auth_logout_v1(data['token']))
+
+@APP.route("/dm/leave/v1", methods=['POST'])
+def dm_leave_v1_ep():
+    data = request.get_json()
+
+    return dumps(dm_leave_v1(data['token'], data['dm_id']))
 
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear():
