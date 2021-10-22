@@ -109,7 +109,7 @@ def test_invalid_channel_id(channel_join_url, clear_and_register):
 
 # Testing the error case of passing an invalid token and channel_id
 def test_all_ids_invalid(channel_join_url, clear_and_register):
-    valid_user_token = clear_and_register['user1_id']
+    valid_user_token = clear_and_register['user1_token']
 
     channels_create_input = {
         'token': valid_user_token,
@@ -151,7 +151,7 @@ def test_duplicate(channel_join_url, clear_and_register):
     assert r.status_code == InputError.code
 
 # Testing the error case of a non-global owner joining a private channel
-def test_private_channel_without_global_owner(clear_and_register):
+def test_private_channel_without_global_owner(channel_join_url, clear_and_register):
     creator_token = clear_and_register['user1_token']
     user_token = clear_and_register['user2_token']
 
