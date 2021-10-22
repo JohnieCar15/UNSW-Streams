@@ -2,26 +2,26 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store
 
-'''
-channel_messages_v2: Given a channel_id and start, returns up to 50 messages from start to start + 50,
-as well as the start and finishing indexes
-
-Arguments:
-    auth_user_id (int)    - id of a user
-    channel_id (int)    - id of a channel
-    start (int) - starting index of the messages to be returned
-    ...
-
-Exceptions:
-    InputError  - Occurs when invalid channel id is entered
-                - Occurs when start is greater than total number of messages
-    AccessError - Occurs when user is not part of channel members
-
-Return Value:
-    Returns {messages, 'start', 'end'} on successful auth_user_id, channel_id and start
-
-'''
 def channel_messages_v2(token, channel_id, start):
+    '''
+    channel_messages_v2: Given a channel_id and start, returns up to 50 messages from start to start + 50,
+    as well as the start and finishing indexes
+
+    Arguments:
+        auth_user_id (int)    - id of a user
+        channel_id (int)    - id of a channel
+        start (int) - starting index of the messages to be returned
+        ...
+
+    Exceptions:
+        InputError  - Occurs when invalid channel id is entered
+                    - Occurs when start is greater than total number of messages
+        AccessError - Occurs when user is not part of channel members
+
+    Return Value:
+        Returns {messages, 'start', 'end'} on successful auth_user_id, channel_id and start
+
+    '''
     store = data_store.get()
 
   # check if token is valid
