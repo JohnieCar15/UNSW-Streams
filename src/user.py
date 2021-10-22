@@ -130,7 +130,6 @@ def user_profile_setname_v1(token, name_first, name_last):
                 raise InputError("same name_as previous")
             store['users'][user_index]['name_first'] = name_first
             store['users'][user_index]['name_last'] = name_last
-            break
     data_store.set(store)
     return {}
 

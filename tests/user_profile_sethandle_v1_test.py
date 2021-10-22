@@ -17,6 +17,13 @@ def clear_and_register_user0():
         "name_last" : "lastname0",
     }
     user0 = requests.post(config.url + 'auth/register/v2', json=user0_register).json()
+    user2_register = {
+        "email" : "0002@unsw.edu.au",
+        "password" : "password",
+        "name_first" : "firstname2",
+        "name_last" : "lastname2",
+    }
+    user2 = requests.post(config.url + 'auth/register/v2', json=user2_register).json()
     return {
         "token": user0['token'],
         "u_id": user0['auth_user_id']

@@ -18,6 +18,13 @@ def clear_and_register_user0():
         "name_last" : "lastname0",
     }
     user0 = requests.post(config.url + 'auth/register/v2', json=user0_register).json()
+    user2_register = {
+        "email" : "0002@unsw.edu.au",
+        "password" : "password",
+        "name_first" : "firstname2",
+        "name_last" : "lastname2",
+    }
+    user2 = requests.post(config.url + 'auth/register/v2', json=user2_register).json()
     return {
         "token": user0['token'],
         "u_id": user0['auth_user_id']
@@ -85,20 +92,20 @@ def test_same_name_with_others(clear_and_register_user0):
         "name_last" : "lastname1",
     }
 
-    requests.post(config.url + 'auth/register/v2', json=user1_register).json()
+    user1 = requests.post(config.url + 'auth/register/v2', json=user1_register).json()
     input = {
-        "token": user0['token'],
-        "name_first": "firstname1",
-        "name_last": "lastname1"
+        "token": user1['token'],
+        "name_first": "firstname0",
+        "name_last": "lastname0"
     }
     requests.put(config.url + 'user/profile/setname/v1', json=input)
     input = {
         "token": user0['token'],
-        "u_id": user0['u_id']
+        "u_id": user1['auth_user_id']
     }
-    profile_user0 = requests.get(config.url + 'user/profile/v1', params=input).json()
-    assert profile_user0["user"]["name_first"] == "firstname1"
-    assert profile_user0["user"]["name_last"] == "lastname1"
+    profile_user1 = requests.get(config.url + 'user/profile/v1', params=input).json()
+    assert profile_user1["user"]["name_first"] == "firstname0"
+    assert profile_user1["user"]["name_last"] == "lastname0"
 
 
 # test valid token with valid name
