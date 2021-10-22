@@ -9,6 +9,9 @@ from src.channels import channels_create_v2
 from src.auth import auth_register_v2
 from src.auth import auth_login_v2
 from src.user import users_all_v1, user_profile_v1
+from src.user import user_profile_setname_v1
+from src.user import user_profile_setemail_v1
+from src.user import user_profile_sethandle_v1
 from src.other import clear_v1
 
 
