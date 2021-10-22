@@ -107,10 +107,10 @@ def admin_user_remove_v1(token, u_id):
         raise InputError(description='u_id refers the only global owner')
 
     # Remove user from all dms and channels and replacing messages sent
-    filtered_channel_list = filter_data_store(store='channels', key='members', value=u_id)
+    filtered_channel_list = filter_data_store(store_list='channels', key='members', value=u_id)
     remove_user_from_all_channels(filtered_channel_list, u_id)
 
-    filtered_dm_list = filter_data_store(store='dms', key='members', value=u_id)
+    filtered_dm_list = filter_data_store(store_list='dms', key='members', value=u_id)
     remove_user_from_all_channels(filtered_dm_list, u_id)
 
 
