@@ -44,6 +44,48 @@ def channel_join_v2(token, channel_id):
     data_store.set(store)
     return {}
 
+def channel_invite_v2(token, channel_id, u_id):
+    '''
+    channel_invite_v2: Invites a user with ID u_id to join a channel with ID channel_id.
+    Arguments:
+        token (str)         - Token string used to authorise and authenticate the user
+        channel_id (int)    - Channel id of the channel the auth_user wishes to invite to
+        u_id (int)          - User id of the user the auth_user wishes to invite
+
+    Exceptions:
+        InputError  - Occurs when channel_id does not refer to a valid channel
+                    - Occurs when u_id does not refer to a valid user
+                    - Occurs when u_id refers to a user who is already a member of the channel
+        AccessError - Occurs when channel_id is valid and the authorised user is 
+                      not a member of the channel
+                    - Occurs when the token passed in is not a valid token
+                    
+    Return Value:
+        Returns {} on successful token, channel_id and
+
+    '''
+    store = data_store.get()
+    # Checking that the token is valid and returning the auth_user_id
+    auth_user_id = validate_token(token)['user_id']
+
+    channel_list = filter_data_store(store_list='channels', key='id', value=channel_id)
+    # Checking if the channel_id is valid
+    if channel_list == []:
+        raise InputError(description="Invalid channel_id")
+    # Checking if the auth_user_id is a member of the channel
+    elif auth_user_id not in channel_list[0]['members']:
+        raise AccessError(description='Auth user is not a member of channel')
+    # Checking if the u_id is valid
+    elif filter_data_store(store_list='users', key='id', value=u_id) == []:
+        raise InputError(description="Invalid u_id")
+    # Checking if the u_id is already a member of the channel
+    elif u_id in channel_list[0]['members']:
+        raise InputError(description='User already member of channel')
+    
+    channel_list[0]['members'].append(u_id)
+    
+    data_store.set(store)
+    return {}
 
 def channel_details_v2(token, channel_id):
     '''
