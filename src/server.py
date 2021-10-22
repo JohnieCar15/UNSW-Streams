@@ -12,6 +12,8 @@ from src.user import users_all_v1, user_profile_v1
 from src.user import user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 from src.other import clear_v1
 
+from src.admin import admin_userpermission_change_v1
+
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -45,6 +47,7 @@ def channel_details_endpoint():
 def channels_create():
     data = request.get_json()
     return dumps(channels_create_v2(data['token'], data['name'], data['is_public']))
+
 
 @APP.route("/auth/register/v2", methods=['POST'])
 def auth_register_v2_ep():
@@ -119,6 +122,11 @@ def channels_listall():
     token = request.args.get('token')
     return dumps(channels_listall_v2(token))
 
+@APP.route("/admin/userpermission/change/v1", methods=['POST'])
+def admin_userpermission_change_v1_ep():
+    data = request.json
+    return dumps(admin_userpermission_change_v1(data['token'], data['u_id'], data['permission_id']))
+    
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear():
     clear_v1()
