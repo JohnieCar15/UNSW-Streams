@@ -70,7 +70,7 @@ def channel_invite_v2(token, channel_id, u_id):
 
     channel_list = filter_data_store(list='channels', key='id', value=channel_id)
     # Checking if the channel_id is valid
-    if len(channel_list) == 0:
+    if channel_list is None:
         raise InputError(description="Invalid channel_id")
     # Checking if the auth_user_id is a member of the channel
     elif auth_user_id not in channel_list[0]['members']:

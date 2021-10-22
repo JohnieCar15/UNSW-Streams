@@ -226,7 +226,6 @@ def test_duplicate_invite(channel_invite_url, clear_and_register):
 def test_inviter_not_in_channel(channel_invite_url, clear_and_register):
     owner_token = clear_and_register['user1_token']
     inviter_token = clear_and_register['user2_token']
-    inviter_id = clear_and_register['user2_id']
 
     channels_create_input = {
         'token': owner_token,
