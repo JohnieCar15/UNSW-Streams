@@ -5,19 +5,20 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
-from src.channel import channel_details_v2, channel_invite_v2, channel_join_v2
+from src.channel import channel_details_v2, channel_invite_v2, channel_join_v2, channel_messages_v2
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.channels import channels_create_v2, channels_list_v2, channels_listall_v2
 from src.user import users_all_v1, user_profile_v1
 from src.user import user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 from src.other import clear_v1
+from src.message import message_send_v1
 
 from src.admin import admin_userpermission_change_v1
 
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
-
+    
 def defaultHandler(err):
     response = err.get_response()
     print('response', err, err.get_response())
@@ -42,6 +43,14 @@ def channel_details_endpoint():
     token = request.args.get('token')
     channel_id = int(request.args.get('channel_id'))
     return dumps(channel_details_v2(token, channel_id))
+
+@APP.route("/channel/messages/v2", methods=['GET'])
+def channel_messages_v2_ep():
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
+    start = request.args.get('start')
+
+    return dumps(channel_messages_v2(token, int(channel_id), int(start)))
 
 @APP.route('/channels/create/v2', methods=['POST'])
 def channels_create():
@@ -126,6 +135,12 @@ def channels_listall():
 def admin_userpermission_change_v1_ep():
     data = request.json
     return dumps(admin_userpermission_change_v1(data['token'], data['u_id'], data['permission_id']))
+
+@APP.route("/message/send/v1", methods=['POST'])
+def message_send_v1_ep():
+    data = request.get_json()
+
+    return dumps(message_send_v1(data['token'], data['channel_id'], data['message']))
     
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear():
