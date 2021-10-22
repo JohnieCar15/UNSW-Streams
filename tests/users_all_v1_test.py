@@ -25,13 +25,13 @@ def clear_and_register_user0():
 def test_invalid_token(clear_and_register_user0):
     user0 = clear_and_register_user0
     input_token = {"token": user0['token_valid'] + "1"}
-    assert requests.get(config.url + 'user/users/all/v1', params=input_token).status_code == AccessError.code
+    assert requests.get(config.url + 'users/all/v1', params=input_token).status_code == AccessError.code
 
 
 def test_vaild_token_with_one_user_registered(clear_and_register_user0):
     user0 = clear_and_register_user0
     input_token = {"token": user0['token_valid']}
-    assert requests.get(config.url + 'user/users/all/v1', params=input_token).json() == {
+    assert requests.get(config.url + 'users/all/v1', params=input_token).json() == {
         'users':[
             {'u_id': user0['u_id'], 
             'email': "0000@unsw.edu.au", 
@@ -85,4 +85,4 @@ def test_vaild_token_with_many_user_registered():
             "name_last": "lastname2",
             "handle_str": "firstname2lastname2"}
     ]}
-    assert requests.get(config.url + 'user/users/all/v1', params=input_token).json() == result
+    assert requests.get(config.url + 'users/all/v1', params=input_token).json() == result
