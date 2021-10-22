@@ -5,12 +5,16 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
-from src.message import message_edit_v1
+from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
+from src.channel import channel_messages_v2
+from src.channels import channels_create_v2
+from src.message import message_send_v1, message_edit_v1
+from src.other import clear_v1
 
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
-
+    
 def defaultHandler(err):
     response = err.get_response()
     print('response', err, err.get_response())
@@ -40,13 +44,54 @@ def echo():
         'data': data
     })
 
+@APP.route("/channel/messages/v2", methods=['GET'])
+def channel_messages_v2_ep():
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
+    start = request.args.get('start')
+
+    return dumps(channel_messages_v2(token, int(channel_id), int(start)))
+
+@APP.route('/channels/create/v2', methods=['POST'])
+def channels_create():
+    data = request.get_json()
+    return dumps(channels_create_v2(data['token'], data['name'], data['is_public']))
+
+@APP.route("/auth/register/v2", methods=['POST'])
+def auth_register_v2_ep():
+    data = request.get_json()
+
+    return dumps(auth_register_v2(data['email'], data['password'], data['name_first'], data['name_last']))
+
+@APP.route("/auth/login/v2", methods=['POST'])
+def auth_login_v2_ep():
+    data = request.get_json()
+
+    return dumps(auth_login_v2(data['email'], data['password']))
+
+@APP.route("/auth/logout/v1", methods=['POST'])
+def auth_logout_v1_ep():
+    data = request.get_json()
+
+    return dumps(auth_logout_v1(data['token']))
+
+@APP.route("/message/send/v1", methods=['POST'])
+def message_send_v1_ep():
+    data = request.get_json()
+
+    return dumps(message_send_v1(data['token'], data['channel_id'], data['message']))
+
 @APP.route("/message/edit/v1", methods=['PUT'])
 def message_edit_v1_ep():
-    data = request.get__json()
-    message_id = int(data['message_id'])
+    data = request.get_json()
 
-    return dumps(message_edit_v1(data['token'], message_id, data['message']))
+    return dumps(message_edit_v1(data['token'], data['message_id'], data['message']))
 
+@APP.route("/clear/v1", methods=['DELETE'])
+def clear():
+    clear_v1()
+    return dumps({})
+    
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
