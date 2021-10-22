@@ -8,6 +8,7 @@ from src import config
 from src.channels import channels_create_v2
 from src.auth import auth_register_v2
 from src.auth import auth_login_v2
+from src.channels import channels_list_v2, channels_listall_v2
 from src.other import clear_v1
 
 def quit_gracefully(*args):
@@ -59,6 +60,16 @@ def auth_login_v2_ep():
     data = request.get_json()
 
     return dumps(auth_login_v2(data['email'], data['password']))
+
+@APP.route("/channels/list/v2", methods=['GET'])
+def channels_list():
+    token = request.args.get('token')
+    return dumps(channels_list_v2(token))
+
+@APP.route("/channels/listall/v2", methods=['GET'])
+def channels_listall():
+    token = request.args.get('token')
+    return dumps(channels_listall_v2(token))
 
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear():
