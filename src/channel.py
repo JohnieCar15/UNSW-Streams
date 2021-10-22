@@ -69,6 +69,7 @@ def channel_invite_v2(token, channel_id, u_id):
     auth_user_id = validate_token(token)['user_id']
 
     channel_list = filter_data_store(store_list='channels', key='id', value=channel_id)
+
     # Checking if the channel_id is valid
     if channel_list == []:
         raise InputError(description="Invalid channel_id")

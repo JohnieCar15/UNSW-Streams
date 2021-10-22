@@ -11,7 +11,7 @@ from src.channels import channels_create_v2, channels_list_v2, channels_listall_
 from src.user import users_all_v1, user_profile_v1
 from src.user import user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 from src.other import clear_v1
-from src.message import message_send_v1
+from src.message import message_send_v1, message_edit_v1
 
 from src.admin import admin_userpermission_change_v1
 
@@ -135,17 +135,23 @@ def channels_listall():
 def admin_userpermission_change_v1_ep():
     data = request.json
     return dumps(admin_userpermission_change_v1(data['token'], data['u_id'], data['permission_id']))
+    
+@APP.route("/clear/v1", methods=['DELETE'])
+def clear():
+    clear_v1()
+    return dumps({})
 
 @APP.route("/message/send/v1", methods=['POST'])
 def message_send_v1_ep():
     data = request.get_json()
 
     return dumps(message_send_v1(data['token'], data['channel_id'], data['message']))
-    
-@APP.route("/clear/v1", methods=['DELETE'])
-def clear():
-    clear_v1()
-    return dumps({})
+
+@APP.route("/message/edit/v1", methods=['PUT'])
+def message_edit_v1_ep():
+    data = request.get_json()
+
+    return dumps(message_edit_v1(data['token'], data['message_id'], data['message']))
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
