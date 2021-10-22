@@ -25,7 +25,7 @@ def clear_and_register():
         'name_first':'First',
         'name_last': 'Last'
     }
-    user2_payload = requests.post(config.url + 'auth/register/v2', json=auth_register_input2).json()['auth_user_id']
+    user2_payload = requests.post(config.url + 'auth/register/v2', json=auth_register_input2).json()
 
     return {
         'user1_token': user1_payload['token'],
