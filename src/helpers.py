@@ -39,16 +39,16 @@ def validate_token(encoded_jwt):
     #return decoded_jwt['user_id']
 
 # Used to replace list comprehensions when filtering the data store
-def filter_data_store(store, key=None, value=None):
+def filter_data_store(store_list, key=None, value=None):
     store = data_store.get()
 
     if value is not None and key is not None:
-        filtered_list = [item for item in store[store] if (isinstance(item[key], list) and value in item[key]) or item[key] == value]
+        filtered_list = [item for item in store[store_list] if (isinstance(item[key], list) and value in item[key]) or item[key] == value]
         if len(filtered_list) == 0:
             return None
         return filtered_list
         
     elif key is not None:
-        return [item[key] for item in store[store]]
+        return [item[key] for item in store[store_list]]
 
-    return [item for item in store[store]]
+    return [item for item in store[store_list]]
