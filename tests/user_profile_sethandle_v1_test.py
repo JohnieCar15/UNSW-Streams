@@ -9,7 +9,7 @@ from src.error import AccessError, InputError
 # clear and registers first user
 @pytest.fixture
 def clear_and_register_user0():
-    requests.delete(config.url + 'clear/v2')
+    requests.delete(config.url + 'clear/v1')
     user0_register = {
         "email" : "0000@unsw.edu.au",
         "password" : "password",

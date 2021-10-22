@@ -6,7 +6,7 @@ from src.error import AccessError
 # clear and registers first user
 @pytest.fixture
 def clear_and_register_user0():
-    requests.delete(config.url + 'clear/v2')
+    requests.delete(config.url + 'clear/v1')
 
     user0_register = {
         "email" : "0000@unsw.edu.au",
@@ -43,7 +43,7 @@ def test_vaild_token_with_one_user_registered(clear_and_register_user0):
 
 
 def test_vaild_token_with_many_user_registered():
-    requests.delete(config.url + 'clear/v2')
+    requests.delete(config.url + 'clear/v1')
     users_register = [
         {   "email" : "0000@unsw.edu.au",
             "password" : "password",
