@@ -106,11 +106,13 @@ def auth_register_v2(email, password, name_first, name_last):
     permission_id = 2
     if len(store['users']) == 0:
         permission_id = 1
-        
-    session_id = helpers.generate_new_session_id()
+
+    auth_user_id = len(helpers.filter_data_store(store_list = 'users', key=None, value=None)) + 1
+    token = helpers.generate_jwt(auth_user_id, session_id=None)
+    session_id = helpers.decode_jwt(token)['session_id']
 
     # Add user to data store
-    auth_user_id = len(store['users']) + 1
+    
     user_dict = {
         'id': auth_user_id,
         'email': email,
@@ -128,5 +130,33 @@ def auth_register_v2(email, password, name_first, name_last):
     
     return {
         'auth_user_id': auth_user_id,
-        'token': helpers.generate_jwt(auth_user_id, session_id)
+        'token': token
     }
+
+'''
+auth_logout_v1: Given an active token, invalidates the token to log the user out
+
+Arguments:
+    token (str)     - token of a user
+
+Exceptions:
+    AccessError     - Occurs when an invalid token is passed
+
+Return Value:
+    Returns {} on valid token
+'''
+def auth_logout_v1(token):
+    store = data_store.get()
+
+    validate_return = helpers.validate_token(token)
+
+    user_id = validate_return['user_id']
+    session_id = validate_return['session_id']
+
+    for user in store['users']:
+        if user['id'] == user_id:
+            user['session_list'].remove(session_id)
+
+    data_store.set(store)
+
+    return {}
