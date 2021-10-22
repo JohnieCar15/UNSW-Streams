@@ -1,6 +1,6 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
-from src.helpers import validate_token
+from src.helpers import validate_token, filter_data_store
 
 '''
 channel_messages_v2: Given a channel_id and start, returns up to 50 messages from start to start + 50,
@@ -28,13 +28,11 @@ def channel_messages_v2(token, channel_id, start):
     auth_user_id = validate_token(token)['user_id']
 
   # Checks if channel id is valid
-    if channel_id not in [channel['id'] for channel in store['channels']]:
+    if channel_id not in filter_data_store(list='channels', key='id'):
         raise InputError(description="Invalid channel_id")
   # Finds the channel with the correct id
-    for channel in store['channels']:
-        if channel['id'] == channel_id:
-            new_channel = channel
-            break
+    new_channel = filter_data_store(list='channels', key='id', value=channel_id)[0]
+
   # Check if user is in channel members
     if auth_user_id not in new_channel['members']:
         raise AccessError(description="Invalid user_id")
@@ -56,10 +54,10 @@ def channel_messages_v2(token, channel_id, start):
     elif length <= 50:
         messages_dict['end'] = -1
         # Create a copy of all messages from start up to final index
-        messages_dict['messages'] = new_channel['messages'][start:start + length - 1]
+        messages_dict['messages'] = new_channel['messages'][start:start + length]
     else:
         messages_dict['end'] = start + 50
-        messages_dict['messages'] = new_channel['messages'][start:start + 49]
+        messages_dict['messages'] = new_channel['messages'][start:start + 50]
 
         
     return messages_dict
