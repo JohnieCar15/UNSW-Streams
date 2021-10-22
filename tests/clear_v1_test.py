@@ -23,7 +23,7 @@ def test_register_login():
         'password' : "password",
     }
 
-    assert requests.post(config.url + '/auth/login/v2', json=auth_login_input) == InputError.code
+    assert requests.post(config.url + '/auth/login/v2', json=auth_login_input).status_code == InputError.code
 
 # Tests if registering again after clearing works
 def test_register_twice():
@@ -37,6 +37,8 @@ def test_register_twice():
     }
 
     requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
+
+    requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
         'email' : "valid@gmail.com",
@@ -85,7 +87,7 @@ def test_channel_details():
         'channel_id' : channel_id
     }
 
-    assert requests.get(config.url + '/channel/details/v2', params = channel_details_input) == InputError.code
+    assert requests.get(config.url + '/channel/details/v2', params = channel_details_input).status_code == InputError.code
 
 # Tests checking channel joining after clearing data store
 def test_channel_join():
@@ -124,7 +126,7 @@ def test_channel_join():
         'channel_id' : channel_id
     }
 
-    assert requests.get(config.url + '/channel/join/v2', params = channel_join_input) == InputError.code
+    assert requests.get(config.url + '/channel/join/v2', params = channel_join_input).status_code == InputError.code
 
 # Tests checking channel messages after clearing data store
 def test_channel_message():
@@ -164,5 +166,5 @@ def test_channel_message():
         'start' : 0
     }
 
-    assert requests.get(config.url + '/channel/messages/v2', params = channel_message_input) == InputError.code
+    assert requests.get(config.url + '/channel/messages/v2', params = channel_message_input).status_code == InputError.code
 '''
