@@ -28,7 +28,7 @@ def clear_and_register():
 
     return {'token': token, 'channel_id': channel_id}
 
-'''
+
 # Testing the general case of sending a single message
 def test_single_message(message_send_url, clear_and_register):
     token = clear_and_register['token']
@@ -77,7 +77,6 @@ def test_multiple_messages(message_send_url, clear_and_register):
     channel_messages = requests.get(config.url + 'channel/messages/v2', params=channel_messages_input).json()['messages']
     channel_messages = [message['message'] for message in channel_messages]
     assert channel_messages == ["message2", "message1"]
-'''
 
 # Testing the error case of passing in an invalid token
 def test_invalid_token(message_send_url, clear_and_register):
