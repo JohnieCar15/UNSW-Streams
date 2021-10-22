@@ -45,7 +45,7 @@ def filter_data_store(list, key=None, value=None):
     if value is not None and key is not None:
         filtered_list = [item for item in store[list] if item[key] == value]
         if len(filtered_list) == 0:
-            return None
+            return []
         return filtered_list
         
     elif key is not None:
