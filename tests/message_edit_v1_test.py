@@ -187,15 +187,14 @@ def test_not_member(register_create):
 
     assert status.status_code == AccessError.code
 
-'''
 # Tests that the owner of the channel is able to edit message
 def test_owner_edit(register_create):
 
     auth_register_input = {
-        'email' : "valid@gmail.com",
-        'password' : "password",
-        'name_first' : "First",
-        'name_last' : "Last",
+        'email' : "newperson@gmail.com",
+        'password' : "password123",
+        'name_first' : "new",
+        'name_last' : "person",
     }
 
     member = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
@@ -213,7 +212,7 @@ def test_owner_edit(register_create):
         'message': "Hello!"
     }
 
-    message_info = requests.post(config.url + '/message/send/v1', json=send_message_input)
+    message_info = requests.post(config.url + '/message/send/v1', json=send_message_input).json()
 
     message_edit_input = {
         'token' : register_create['valid_token'],
@@ -221,9 +220,44 @@ def test_owner_edit(register_create):
         'message' : 'World!'
     }
 
-    requests.put(config.url + 'message/edit/v1', params=message_edit_input)
+    requests.put(config.url + 'message/edit/v1', json=message_edit_input)
 
     channel_messages = get_messages(register_create, 0)
 
     assert channel_messages['messages'][0]['message'] == 'World!'
-'''
+
+def test_not_owner_edit(register_create):
+ 
+    auth_register_input = {
+        'email' : "newperson@gmail.com",
+        'password' : "password123",
+        'name_first' : "new",
+        'name_last' : "person",
+    }
+
+    member = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
+
+    join_channel_input = {
+        'token' : member['token'],
+        'channel_id' : register_create['valid_channel_id']
+    }
+
+    requests.post(config.url + 'channel/join/v2', json=join_channel_input).json()
+
+    send_message_input = {
+        'token' : register_create['valid_token'],
+        'channel_id': register_create['valid_channel_id'],
+        'message': "Hello!"
+    }
+
+    message_info = requests.post(config.url + '/message/send/v1', json=send_message_input).json()
+
+    message_edit_input = {
+        'token' : member['token'],
+        'message_id' : message_info['message_id'],
+        'message' : 'World!'
+    }
+
+    status = requests.put(config.url + 'message/edit/v1', json=message_edit_input)
+
+    assert status.status_code == AccessError.code 

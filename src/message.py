@@ -26,7 +26,7 @@ def message_edit_v1(token, message_id, message):
     if auth_user_id not in channel_dict['members']:
         raise AccessError(description="Not a member of channel")
     
-    if auth_user_id != messagedict['message']['u_id'] and auth_user_id not in  channel_dict['owner']:
+    if auth_user_id != messagedict['message']['u_id'] and auth_user_id not in channel_dict['owner']:
         raise AccessError(description="Permission denied")
 
     if len(message) > 1000:
@@ -52,10 +52,10 @@ def message_send_v1(token, channel_id, message):
     auth_user_id = validate_token(token)['user_id']
 
     # Checks if channel id is valid
-    if channel_id not in filter_data_store(list='channels', key='id'):
+    if channel_id not in [channel['id'] for channel in store['channels']]:
         raise InputError(description="Invalid channel_id")
 
-    channel_dict = filter_data_store(list='channels', key='id', value=channel_id)[0]
+    channel_dict = [channel for channel in store['channels'] if channel['id'] == channel_id][0]
 
     if auth_user_id not in channel_dict['members']:
         raise AccessError(description="Not a member of channel")
