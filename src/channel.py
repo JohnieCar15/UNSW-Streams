@@ -126,14 +126,15 @@ def channel_details_v1(auth_user_id, channel_id):
 
 def channel_details_v2(token, channel_id):
     store = data_store.get()
-
+    channel_id = int(channel_id)
     # check if token is valid
     auth_user_id = validate_token(token)
-
+    
     # check if channel_id refers to a valid id
-    if channel_id not in [channel['id'] for channel in store['channels']]:
+    channel_list = [channel['id'] for channel in store['channels']]
+    if len(channel_list) == 0:
         raise InputError(description="Invalid channel_id")
-
+    
     # check if user is member of channel
     channel_dict =  [channel for channel in store['channels'] if channel_id == channel['id']][0]
     if auth_user_id not in channel_dict['members']:
@@ -144,10 +145,11 @@ def channel_details_v2(token, channel_id):
     channel_is_public = channel_dict['is_public']
     channel_members = channel_dict['members']
     channel_owners = channel_dict['owner']
-
+    print(channel_owners)
     all_owners_list = []
     # get variables for channel details - owner from store['users']
     for owner in store['users']:
+        print(owner['id'])
         if owner['id'] in channel_owners:
             owner_dict = {
                 'u_id': owner['id'],
