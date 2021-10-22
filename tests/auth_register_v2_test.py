@@ -1,4 +1,4 @@
-import pytest
+"""import pytest
 import requests
 
 from src import config
@@ -280,4 +280,4 @@ def test_13_duplicate_handles():
     handle = requests.get(config.url + 'user/profile/v1', params={'token': register_return['token'], 'u_id': register_return['auth_user_id']}).json()['user']['handle_str']
 
     assert handle == "firstlast11"
-'''
+'''"""
