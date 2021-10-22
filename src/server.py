@@ -74,7 +74,7 @@ def auth_logout_v1_ep():
     data = request.get_json()
     return dumps(auth_logout_v1(data['token']))
 
-@APP.route("/user/users/all/v1", methods=['GET'])
+@APP.route("/users/all/v1", methods=['GET'])
 def users_all():
     token = request.args.get('token')
     users_profile = users_all_v1(token)
