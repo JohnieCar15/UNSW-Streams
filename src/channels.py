@@ -23,7 +23,7 @@ def channels_create_v2(token, name, is_public):
     store = data_store.get()
 
     # check if token is valid
-    auth_user_id = validate_token(token)
+    auth_user_id = validate_token(token)['user_id']
 
     # check if name is valid
     if len(name) < 1 or len(name) > 20:

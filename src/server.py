@@ -5,13 +5,15 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
+from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.channels import channels_create_v2
 from src.auth import auth_register_v2
-from src.auth import auth_login_v2
+from src.auth import auth_login_v2, auth_logout_v1
 from src.user import users_all_v1, user_profile_v1
 from src.user import user_profile_setname_v1
 from src.user import user_profile_setemail_v1
 from src.user import user_profile_sethandle_v1
+
 from src.other import clear_v1
 
 
@@ -62,8 +64,12 @@ def auth_register_v2_ep():
 @APP.route("/auth/login/v2", methods=['POST'])
 def auth_login_v2_ep():
     data = request.get_json()
-
     return dumps(auth_login_v2(data['email'], data['password']))
+
+@APP.route("/auth/logout/v1", methods=['POST'])
+def auth_logout_v1_ep():
+    data = request.get_json()
+    return dumps(auth_logout_v1(data['token']))
 
 @APP.route("/user/users/all/v1", methods=['GET'])
 def users_all():

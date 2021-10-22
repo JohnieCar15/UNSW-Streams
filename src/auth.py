@@ -130,3 +130,31 @@ def auth_register_v2(email, password, name_first, name_last):
         'auth_user_id': auth_user_id,
         'token': helpers.generate_jwt(auth_user_id, session_id)
     }
+
+'''
+auth_logout_v1: Given an active token, invalidates the token to log the user out
+
+Arguments:
+    token (str)     - token of a user
+
+Exceptions:
+    AccessError     - Occurs when an invalid token is passed
+
+Return Value:
+    Returns {} on valid token
+'''
+def auth_logout_v1(token):
+    store = data_store.get()
+
+    validate_return = helpers.validate_token(token)
+
+    user_id = validate_return['user_id']
+    session_id = validate_return['session_id']
+
+    for user in store['users']:
+        if user['id'] == user_id:
+            user['session_list'].remove(session_id)
+
+    data_store.set(store)
+
+    return {}
