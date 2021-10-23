@@ -45,34 +45,45 @@ def test_remove_user(admin_user_remove_url, clear_and_register):
     removed_user_email = removed_user_info['user']['email']
     removed_user_handle = removed_user_info['user']['handle_str']
 
-    # Creating a new dm and channel to test admin_user_remove success
+    # Creating a new dm to test admin_user_remove success
     dm_id = requests.post(config.url + 'dm/create/v1', json={
         'token': auth_user_token,
         'u_ids': [user_id]
     }).json()['dm_id']
+
+    # Creating a new channel to test admin_user_remove success
     channel_id = requests.post(config.url + 'channels/create/v2', json={
         'token': auth_user_token,
         'name': 'Channel',
         'is_public': True
     }).json()['channel_id']
     requests.post(config.url + 'channel/join/v2', json={
-        'token': str(user_id),
+        'token': user_token,
         'channel_id': channel_id,
+    })
+    requests.post(config.url + 'channel/addowner/v1', json={
+        'token': auth_user_token,
+        'channel_id': channel_id,
+        'u_id': user_id
     })
 
 
-    #Sending a message in both the channel and dm
-    requests.post(config.url + 'message/send/v1', json={
-        'token': user_token,
-        'channel_id': channel_id,
-        'message': 'message'
+    #Sending a message in both the channel and dm to check if later removed
+    requests.post(config.url + 'message/senddm/v1', json={
+        'token': auth_user_token,
+        'dm_id': dm_id,
+        'message': 'existing message'
     })
     requests.post(config.url + 'message/senddm/v1', json={
         'token': user_token,
         'dm_id': dm_id,
         'message': 'message'
     })
-
+    requests.post(config.url + 'message/send/v1', json={
+        'token': user_token,
+        'channel_id': channel_id,
+        'message': 'message'
+    })
 
     # Removing the user from Streams
     admin_user_remove_input = {
