@@ -49,3 +49,4 @@ def filter_data_store(store_list, key=None, value=None):
 def is_global_owner(u_id):
     user_dict = filter_data_store(store_list='users', key='id',value=u_id)
     return user_dict[0]['permission_id'] == 1
+
