@@ -21,11 +21,11 @@ def test_auth_login_v1():
         'password':'password'
     }
 
-    login_auth_user_id = requests.post(config.url + 'auth/login/v2', json=auth_login_input).json()
+    login_auth_user_id = requests.post(config.url + 'auth/login/v2', json=auth_login_input)
 
-    assert login_auth_user_id['code'] == 200
-    assert register_auth_user_id['auth_user_id'] == login_auth_user_id['auth_user_id']
-    assert register_auth_user_id['token'] != login_auth_user_id['token']
+    assert login_auth_user_id.status_code == 200
+    assert register_auth_user_id['auth_user_id'] == login_auth_user_id.json()['auth_user_id']
+    assert register_auth_user_id['token'] != login_auth_user_id.json()['token']
 
 def test_unregistered_email():
     requests.delete(config.url + '/clear/v1')

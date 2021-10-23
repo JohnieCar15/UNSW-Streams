@@ -15,7 +15,7 @@ def test_auth_register_v2():
         'name_last':'Last'
     }
 
-    register_return = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
+    register_return = requests.post(config.url + 'auth/register/v2', json=auth_register_input)
 
     auth_login_input = {
         'email':'valid@gmail.com',
@@ -24,9 +24,9 @@ def test_auth_register_v2():
 
     login_return = requests.post(config.url + 'auth/login/v2', json=auth_login_input).json()
 
-    assert register_return['code'] == 200
-    assert register_return['auth_user_id'] == login_return['auth_user_id']
-    assert register_return['token'] != login_return['token']
+    assert register_return.status_code == 200
+    assert register_return.json()['auth_user_id'] == login_return['auth_user_id']
+    assert register_return.json()['token'] != login_return['token']
 
 # Test if function is given an invalid email
 def test_invalid_email():
