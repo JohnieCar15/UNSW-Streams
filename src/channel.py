@@ -90,7 +90,7 @@ def channel_invite_v2(token, channel_id, u_id):
 
 def channel_details_v2(token, channel_id):
     '''
-    channel_details_v2: Given a valid authroised token and valid channel_id displays details for that channel 
+    channel_details_v2: Given a valid authorised token and valid channel_id displays details for that channel 
 
     Arguments:
         token (string) - token string used to authorise and authenticate the user 
@@ -110,12 +110,12 @@ def channel_details_v2(token, channel_id):
     auth_user_id = validate_token(token)['user_id']
     
     # check if channel_id refers to a valid id
-    channel_list = [channel['id'] for channel in store['channels']]
+    channel_list = filter_data_store(store_list='channels', key='id')
     if len(channel_list) == 0:
         raise InputError(description="Invalid channel_id")
     
     # check if user is member of channel
-    channel_dict =  [channel for channel in store['channels'] if channel_id == channel['id']][0]
+    channel_dict =  filter_data_store(store_list='channels', key='id', value=channel_id)[0]
     if auth_user_id not in channel_dict['members']:
         raise AccessError(description="Not a member of channel")
 
@@ -185,7 +185,7 @@ def channel_messages_v2(token, channel_id, start):
     auth_user_id = validate_token(token)['user_id']
 
   # Checks if channel id is valid
-    if channel_id not in filter_data_store(store_list='channels', key='id', value=None):
+    if channel_id not in filter_data_store(store_list='channels', key='id'):
         raise InputError(description="Invalid channel_id")
   # Finds the channel with the correct id
     new_channel = filter_data_store(store_list='channels', key='id', value=channel_id)[0]
@@ -244,12 +244,12 @@ def channel_leave_v1(token, channel_id):
     auth_user_id = validate_token(token)['user_id']
 
     # check if channel_id is valid
-    channel_list = [channel['id'] for channel in store['channels']]
+    channel_list = filter_data_store(store_list='channels', key='id')
     if len(channel_list) == 0:
         raise InputError(description="Invalid channel_id")
     
     # check if auth_user_id member of channel
-    channel_dict =  [channel for channel in store['channels'] if channel_id == channel['id']][0]
+    channel_dict =  filter_data_store(store_list='channels', key='id', value=channel_id)[0]
     if auth_user_id not in channel_dict['members']:
         raise AccessError(description="Not a member of channel")
     
