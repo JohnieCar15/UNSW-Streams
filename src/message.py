@@ -1,7 +1,7 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store
-from datetime import datetime, timezone
+from datetime import datetime
 
 def message_edit_v1(token, message_id, message):
     '''
