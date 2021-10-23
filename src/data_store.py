@@ -30,6 +30,7 @@ initial_object = {
     'users': [],
     'channels': [],
     'messages': [],
+    'deleted_messages': [],
     'dms': []
 }
 '''

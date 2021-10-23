@@ -12,8 +12,8 @@ from src.channels import channels_create_v2, channels_list_v2, channels_listall_
 from src.user import users_all_v1, user_profile_v1
 from src.user import user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 from src.other import clear_v1
-from src.message import message_send_v1, message_edit_v1, message_remove_v1
-
+from src.message import message_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1
+from src.dm import dm_messages_v1
 from src.admin import admin_userpermission_change_v1
 
 def quit_gracefully(*args):
@@ -165,6 +165,12 @@ def message_send_v1_ep():
 
     return dumps(message_send_v1(data['token'], data['channel_id'], data['message']))
 
+@APP.route("/message/senddm/v1", methods=['POST'])
+def message_senddm_v1_ep():
+    data = request.get_json()
+
+    return dumps(message_senddm_v1(data['token'], data['dm_id'], data['message']))
+
 @APP.route("/message/edit/v1", methods=['PUT'])
 def message_edit_v1_ep():
     data = request.get_json()
@@ -181,6 +187,16 @@ def message_remove_v1_ep():
 def channel_leave_endpoint():
     data = request.get_json()
     return dumps(channel_leave_v1(data['token'], data['channel_id']))
+
+@APP.route("/dm/messages/v1", methods=['GET'])
+def dm_messages_v1_ep():
+    token = request.args.get('token')
+    dm_id = request.args.get('dm_id')
+    start = request.args.get('start')
+
+    return dumps(dm_messages_v1(token, int(dm_id), int(start)))
+
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
