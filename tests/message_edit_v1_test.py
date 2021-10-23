@@ -91,7 +91,8 @@ def test_message_edit_multiple_messages(register_create):
         'message' : "World!"
     }
 
-    requests.put(config.url + '/message/edit/v1', json=message_edit_input1)
+    status1 = requests.put(config.url + '/message/edit/v1', json=message_edit_input1)
+    assert status1.status_code == 200
 
     message_edit_input2 = {
         'token' : register_create['valid_token'],
@@ -99,7 +100,8 @@ def test_message_edit_multiple_messages(register_create):
         'message' : "Universe!"
     }
 
-    requests.put(config.url + '/message/edit/v1', json=message_edit_input2)
+    status2 = requests.put(config.url + '/message/edit/v1', json=message_edit_input2)
+    assert status2.status_code == 200
 
     channel_messages = get_messages(register_create, 0)
 
@@ -116,7 +118,8 @@ def test_message_delete(register_create):
         'message' : ""
     }
 
-    requests.put(config.url + 'message/edit/v1', json=message_edit_input)
+    status = requests.put(config.url + 'message/edit/v1', json=message_edit_input)
+    status.status_code == 200
 
     channel_messages = get_messages(register_create, 0)
 
@@ -220,7 +223,8 @@ def test_owner_edit(register_create):
         'message' : 'World!'
     }
 
-    requests.put(config.url + 'message/edit/v1', json=message_edit_input)
+    status = requests.put(config.url + 'message/edit/v1', json=message_edit_input)
+    status.status_code == 200
 
     channel_messages = get_messages(register_create, 0)
 
@@ -261,3 +265,50 @@ def test_not_owner_edit(register_create):
     status = requests.put(config.url + 'message/edit/v1', json=message_edit_input)
 
     assert status.status_code == AccessError.code 
+
+
+# Tests normal functionality of editing one message
+def test_dmmessage_edit():
+    requests.delete(config.url + '/clear/v1')
+
+    auth_register_input = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    token = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()['token']
+
+    dms_create_input = {
+        'token': token,
+        'u_ids': []
+    }
+
+    dm_id = requests.post(config.url + 'dm/create/v1', json=dms_create_input).json()['dm_id']
+
+    message_senddm_input = {
+        'token': token,
+        'dm_id': dm_id,
+        'message': "message"
+    }
+
+    message_id = requests.post(config.url + 'message/senddm/v1', json=message_senddm_input).json()['message_id']
+
+    message_edit_input = {
+        'token' : token,
+        'message_id' : message_id,
+        'message' : "Universe!"
+    }
+
+    requests.put(config.url + '/message/edit/v1', json=message_edit_input)
+
+    dm_messages_input = {
+        'token' : token,
+        'dm_id' : dm_id,
+        'start' : 0
+    }
+
+    dm_messages = requests.get(config.url + 'dm/messages/v1', params=dm_messages_input).json()
+
+    assert dm_messages['messages'][0]['message'] == "Universe!"
