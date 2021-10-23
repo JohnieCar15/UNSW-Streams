@@ -39,9 +39,9 @@ def auth_login_v2(email, password):
                     'token': helpers.generate_jwt(user['id'], session_id)
                 }
             else:
-                raise InputError("Incorrect password")
+                raise InputError(description="Incorrect password")
     
-    raise InputError("Email is not registered")
+    raise InputError(description="Email is not registered")
 
 def auth_register_v2(email, password, name_first, name_last):
     '''

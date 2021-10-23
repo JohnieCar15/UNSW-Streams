@@ -23,8 +23,8 @@ def test_auth_login_v1():
 
     login_auth_user_id = requests.post(config.url + 'auth/login/v2', json=auth_login_input).json()
 
+    assert login_auth_user_id['code'] == 200
     assert register_auth_user_id['auth_user_id'] == login_auth_user_id['auth_user_id']
-
     assert register_auth_user_id['token'] != login_auth_user_id['token']
 
 def test_unregistered_email():
