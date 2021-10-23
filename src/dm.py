@@ -32,7 +32,6 @@ def dm_details_v1(token, dm_id):
     
     # check if user is part of dm
     dm_dict = [dm for dm in store['dms'] if dm_id == dm['id']][0]
-    print (dm_dict)
     if auth_user_id not in dm_dict['members']:
         raise AccessError(description="Not a member of DM")
 
