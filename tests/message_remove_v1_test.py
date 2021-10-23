@@ -74,6 +74,7 @@ def test_message_remove(register_create):
     }
 
     response = requests.delete(config.url + '/message/remove/v1', json=message_remove_input)
+    assert response.status_code == 200
 
     channel_messages = get_messages(register_create, 0)
 
@@ -88,7 +89,8 @@ def test_message_remove_multiple(register_create):
         'message_id' : messagedict['message_id_list'][1]
     }
 
-    requests.delete(config.url + '/message/remove/v1', json=message_remove_input)
+    response = requests.delete(config.url + '/message/remove/v1', json=message_remove_input)
+    assert response.status_code == 200
 
     channel_messages = get_messages(register_create, 0)
 
@@ -141,7 +143,8 @@ def test_owner_delete(register_create):
         'message_id' : message_info['message_id']
     }
 
-    requests.delete(config.url + '/message/remove/v1', json=message_remove_input)
+    response = requests.delete(config.url + '/message/remove/v1', json=message_remove_input)
+    assert response.status_code == 200
 
     channel_messages = get_messages(register_create, 0)
 
@@ -229,5 +232,49 @@ def test_invalid_token_invalid_message_id(register_create):
 
     assert status.status_code == AccessError.code
 
+# Tests normal functionality of editing one message
+def test_dmmessage_edit():
+    requests.delete(config.url + '/clear/v1')
+
+    auth_register_input = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    token = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()['token']
+
+    dms_create_input = {
+        'token': token,
+        'u_ids': []
+    }
+
+    dm_id = requests.post(config.url + 'dm/create/v1', json=dms_create_input).json()['dm_id']
+
+    message_senddm_input = {
+        'token': token,
+        'dm_id': dm_id,
+        'message': "message"
+    }
+
+    message_id = requests.post(config.url + 'message/senddm/v1', json=message_senddm_input).json()['message_id']
+
+    message_remove_input = {
+        'token' : token,
+        'message_id' : message_id,
+    }
+
+    requests.delete(config.url + '/message/remove/v1', json=message_remove_input)
+
+    dm_messages_input = {
+        'token' : token,
+        'dm_id' : dm_id,
+        'start' : 0
+    }
+
+    dm_messages = requests.get(config.url + 'dm/messages/v1', params=dm_messages_input).json()
+
+    assert dm_messages['messages'] == []
 
 

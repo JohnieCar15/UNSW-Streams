@@ -14,7 +14,7 @@ def dm_create_v1(token, u_ids):
             raise InputError(description="Invalid user_id")
     
     # generate dm id
-    new_id = len(store['dms']) + 1
+    new_id = len(store['dms']) + len(store['channels']) + 1
     names = []
     u_ids.append(auth_user_id)
     for uid in u_ids:
@@ -25,7 +25,7 @@ def dm_create_v1(token, u_ids):
     name_str = ", ".join(names)
 
     dm_dictionary = {
-        'dm_id': new_id,
+        'id': new_id,
         'name': name_str,
         'owner': [auth_user_id],
         'members': u_ids,
@@ -47,7 +47,7 @@ def dm_list_v1(token):
     for dm in store['dms']:
         if auth_user_id in dm['members']:
             dm_dictionary = {
-                'dm_id': dm['dm_id'],
+                'dm_id': dm['id'],
                 'name': dm['name']
             }
             dms.append(dm_dictionary)
@@ -82,7 +82,7 @@ def dm_messages_v1(token, dm_id, start):
     auth_user_id = validate_token(token)['user_id']
 
   # Checks if dm id is valid
-    if dm_id not in filter_data_store(store_list='dms', key='id', value=None):
+    if dm_id not in filter_data_store(store_list='dms', key='id'):
         raise InputError(description="Invalid dm_id")
   # Finds the dm with the correct id
     new_dm = filter_data_store(store_list='dms', key='id', value=dm_id)[0]
