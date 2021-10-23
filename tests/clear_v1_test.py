@@ -49,7 +49,6 @@ def test_register_twice():
 
     assert requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
 
-'''
 # Tests checking channel details after clearing data store
 def test_channel_details():
     requests.delete(config.url + '/clear/v1')
@@ -69,7 +68,7 @@ def test_channel_details():
         'is_public' : True
     }
 
-    channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input)['channel_id']
+    channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input).json()['channel_id']
 
     requests.delete(config.url + '/clear/v1')
 
@@ -108,7 +107,7 @@ def test_channel_join():
         'is_public' : True
     }
 
-    channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input)['channel_id']
+    channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input).json()['channel_id']
 
     requests.delete(config.url + '/clear/v1')
 
@@ -126,7 +125,7 @@ def test_channel_join():
         'channel_id' : channel_id
     }
 
-    assert requests.get(config.url + '/channel/join/v2', params = channel_join_input).status_code == InputError.code
+    assert requests.post(config.url + '/channel/join/v2', json=channel_join_input).status_code == InputError.code
 
 # Tests checking channel messages after clearing data store
 def test_channel_message():
@@ -147,7 +146,7 @@ def test_channel_message():
         'is_public' : True
     }
 
-    channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input)['channel_id']
+    channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input).json()['channel_id']
 
     requests.delete(config.url + '/clear/v1')
 
@@ -167,4 +166,3 @@ def test_channel_message():
     }
 
     assert requests.get(config.url + '/channel/messages/v2', params = channel_message_input).status_code == InputError.code
-'''
