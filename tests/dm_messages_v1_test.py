@@ -5,7 +5,7 @@ from src import config
 from src.error import AccessError, InputError
 
 # Note that the 0th index is the newest message
-'''
+
 # Clears datastore, registers two users and creates a dm towards another user
 @pytest.fixture
 def register_create():
@@ -21,17 +21,17 @@ def register_create():
     user_id1 = requests.post(config.url + '/auth/register/v2', json=auth_register_input1).json()
 
     auth_register_input2 = {
-        'email' : "valid@gmail.com",
-        'password' : "password",
-        'name_first' : "First",
-        'name_last' : "Last",
+        'email' : "newperson@gmail.com",
+        'password' : "password123",
+        'name_first' : "new",
+        'name_last' : "person",
     }
 
     user_id2 = requests.post(config.url + '/auth/register/v2', json=auth_register_input2).json()
 
     dm_create_input = {
         'token' : user_id1['token'],
-        'u_id' : [user_id2]
+        'u_ids' : [user_id2['auth_user_id']]
     }
 
     dm_id = requests.post(config.url + '/dm/create/v1', json=dm_create_input).json()['dm_id']
@@ -55,9 +55,9 @@ def send_message(register_create, length):
     timelist = []
     message_id_list = []
 
-    for x in range (length):
+    for _ in range (length):
+        timelist.insert(0, int(datetime.utcnow().timestamp()))
         message_id_list.insert(0, requests.post(config.url + 'message/senddm/v1', json=send_messagedm_input)['message_id'])
-        timelist.insert(0, datetime.datetime.now())
     
     return {
         'timelist' : timelist,
@@ -74,7 +74,9 @@ def get_messages(register_create, start):
         'start' : start
     }
 
-    dm_messages = requests.get(config.url + '/dm/messages/v2', params=dm_messages_input).json()
+    dm_messages = requests.get(config.url + '/dm/messages/v1', params=dm_messages_input).json()
+
+    print(dm_messages)
 
     return dm_messages
 
@@ -98,6 +100,7 @@ def test_empty(register_create):
     assert dm_messages['start'] == 0
     assert dm_messages['end'] == -1
 
+'''
 # Tests case for one message, starting at 0th index, less than 50 messages
 def test_one_message(register_create):
 
