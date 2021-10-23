@@ -5,7 +5,7 @@ from src import config
 from src.error import AccessError, InputError
 
 # Note that the 0th index is the newest message
-
+'''
 # Clears datastore, registers two users and creates a dm towards another user
 @pytest.fixture
 def register_create():
@@ -264,4 +264,4 @@ def test_invalid_start_invalid_dm(register_create):
     dm_messages = requests.get(config.url + '/dm/messages/v2', params=dm_messages_input).json()
     assert dm_messages.status_code == AccessError.code
 
-
+'''
