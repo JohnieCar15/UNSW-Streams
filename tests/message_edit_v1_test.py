@@ -1,7 +1,7 @@
 import pytest
 import requests
 from src import config
-from src.error import AccessError, InputError
+from src.error import InputError, AccessError
 
 # Clears datastore, registers user and creates a channel (making the user a member)
 @pytest.fixture
@@ -33,7 +33,6 @@ def register_create():
 
 # HELPER FUNCTION
 # Sends a number of messages to specific endpoint
-# Returns a list of message ids, from oldest to newest
 def send_message(register_create, length):
     send_message_input = {
         'token' : register_create['valid_token'],
@@ -64,55 +63,133 @@ def get_messages(register_create, start):
 
     return channel_messages
 
-# Test normal functionality of removing one message
-def test_message_remove(register_create):
+# Tests normal functionality of editing one message
+def test_message_edit(register_create):
+
     messagedict = send_message(register_create, 1)
 
-    message_remove_input = {
+    message_edit_input = {
         'token' : register_create['valid_token'],
-        'message_id' : messagedict['message_id_list'][0]
+        'message_id' : messagedict['message_id_list'][0],
+        'message' : "Universe!"
     }
 
-    response = requests.delete(config.url + '/message/remove/v1', json=message_remove_input)
-    print(response.status_code)
+    requests.put(config.url + '/message/edit/v1', json=message_edit_input)
+
+    channel_messages = get_messages(register_create, 0)
+
+    assert channel_messages['messages'][0]['message'] == "Universe!"
+
+# Tests normal functionality of editing multiple messages
+def test_message_edit_multiple_messages(register_create):
+
+    messagedict = send_message(register_create, 2)
+
+    message_edit_input1 = {
+        'token' : register_create['valid_token'],
+        'message_id' : messagedict['message_id_list'][0],
+        'message' : "World!"
+    }
+
+    requests.put(config.url + '/message/edit/v1', json=message_edit_input1)
+
+    message_edit_input2 = {
+        'token' : register_create['valid_token'],
+        'message_id' : messagedict['message_id_list'][1],
+        'message' : "Universe!"
+    }
+
+    requests.put(config.url + '/message/edit/v1', json=message_edit_input2)
+
+    channel_messages = get_messages(register_create, 0)
+
+    assert channel_messages['messages'][0]['message'] == 'World!'
+    assert channel_messages['messages'][1]['message'] == 'Universe!'
+
+# Tests deleting of message using empty string
+def test_message_delete(register_create):
+    messagedict = send_message(register_create, 1)
+
+    message_edit_input = {
+        'token' : register_create['valid_token'],
+        'message_id' : messagedict['message_id_list'][0],
+        'message' : ""
+    }
+
+    requests.put(config.url + 'message/edit/v1', json=message_edit_input)
 
     channel_messages = get_messages(register_create, 0)
 
     assert channel_messages['messages'] == []
 
-# Tests removing one message with multiple messages saved
-def test_message_remove_multiple(register_create):
-    messagedict = send_message(register_create, 3)
-
-    message_remove_input = {
-        'token' : register_create['valid_token'],
-        'message_id' : messagedict['message_id_list'][1]
-    }
-
-    requests.delete(config.url + '/message/remove/v1', json=message_remove_input)
-
-    channel_messages = get_messages(register_create, 0)
-
-    assert(len(channel_messages['messages'])) == 2
-    assert channel_messages['messages'][0]['message_id'] == messagedict['message_id_list'][0]
-    assert channel_messages['messages'][1]['message_id'] == messagedict['message_id_list'][2]
-
-
-# Tests non-existent message id
-def test_invalid_message_id(register_create):
+# Tests editing message with message over 1000 characters
+def test_length_over_1000(register_create):
     messagedict = send_message(register_create, 1)
 
-    message_remove_input = {
+    message_edit_input = {
         'token' : register_create['valid_token'],
-        'message_id' : messagedict['message_id_list'][0] + 1
+        'message_id' : messagedict['message_id_list'][0],
+        'message' : 'a' * 1001
     }
 
-    status = requests.delete(config.url + '/message/remove/v1', json=message_remove_input)
+    status = requests.put(config.url + 'message/edit/v1', json=message_edit_input)
 
     assert status.status_code == InputError.code
 
-# Tests the owners permission to delete another persons message
-def test_owner_delete(register_create):
+
+# Tests invalid message id
+def test_invalid_message_id(register_create):
+    messagedict = send_message(register_create, 1)
+
+    message_edit_input = {
+        'token' : register_create['valid_token'],
+        'message_id' : messagedict['message_id_list'][0] + 1,
+        'message' : 'World!'
+    }
+
+    status = requests.put(config.url + 'message/edit/v1', json=message_edit_input)
+
+    assert status.status_code == InputError.code
+
+# Tests invalid token attempting to access message
+def test_invalid_user(register_create):
+    messagedict = send_message(register_create, 1)
+
+    message_edit_input = {
+        'token' : " ",
+        'message_id' : messagedict['message_id_list'][0],
+        'message' : 'World!'
+    }
+
+    status = requests.put(config.url + 'message/edit/v1', json=message_edit_input)
+
+    assert status.status_code == AccessError.code
+
+def test_not_member(register_create):
+    messagedict = send_message(register_create, 1)
+
+    auth_register_input = {
+        'email' : "person@gmail.com",
+        'password' : "password123",
+        'name_first' : "new",
+        'name_last' : "person",
+    }
+
+    user = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
+
+    message_edit_input = {
+        'token' : user['token'],
+        'message_id' : messagedict['message_id_list'][0],
+        'message' : 'World!'
+    }
+
+    status = requests.put(config.url + 'message/edit/v1', json=message_edit_input)
+
+    assert status.status_code == AccessError.code
+
+# Tests that the owner of the channel is able to edit message
+def test_owner_edit(register_create):
+
     auth_register_input = {
         'email' : "newperson@gmail.com",
         'password' : "password123",
@@ -137,16 +214,17 @@ def test_owner_delete(register_create):
 
     message_info = requests.post(config.url + '/message/send/v1', json=send_message_input).json()
 
-    message_remove_input = {
+    message_edit_input = {
         'token' : register_create['valid_token'],
-        'message_id' : message_info['message_id']
+        'message_id' : message_info['message_id'],
+        'message' : 'World!'
     }
 
-    requests.delete(config.url + '/message/remove/v1', json=message_remove_input)
+    requests.put(config.url + 'message/edit/v1', json=message_edit_input)
 
     channel_messages = get_messages(register_create, 0)
 
-    assert channel_messages['messages'] == []
+    assert channel_messages['messages'][0]['message'] == 'World!'
 
 def test_not_owner_edit(register_create):
  
@@ -174,61 +252,12 @@ def test_not_owner_edit(register_create):
 
     message_info = requests.post(config.url + '/message/send/v1', json=send_message_input).json()
 
-    message_delete_input = {
+    message_edit_input = {
         'token' : member['token'],
         'message_id' : message_info['message_id'],
+        'message' : 'World!'
     }
 
-    status = requests.delete(config.url + 'message/remove/v1', json=message_delete_input)
+    status = requests.put(config.url + 'message/edit/v1', json=message_edit_input)
 
     assert status.status_code == AccessError.code 
-
-def test_not_member(register_create):
-    messagedict = send_message(register_create, 1)
-
-    auth_register_input = {
-        'email' : "person@gmail.com",
-        'password' : "password123",
-        'name_first' : "new",
-        'name_last' : "person",
-    }
-
-    user = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
-
-    message_delete_input = {
-        'token' : user['token'],
-        'message_id' : messagedict['message_id_list'][0],
-    }
-
-    status = requests.delete(config.url + 'message/remove/v1', json=message_delete_input)
-
-    assert status.status_code == AccessError.code
-
-# Tests invalid token trying to delete message
-def test_invalid_token(register_create):
-    messagedict = send_message(register_create, 1)
-
-    message_remove_input = {
-        'token' : " ",
-        'message_id' : messagedict['message_id_list'][0]
-    }
-
-    status = requests.delete(config.url + '/message/remove/v1', json=message_remove_input)
-
-    assert status.status_code == AccessError.code
-
-# Tests invalid token and invalid message id
-def test_invalid_token_invalid_message_id(register_create):
-    messagedict = send_message(register_create, 1)
-
-    message_remove_input = {
-        'token' : " ",
-        'message_id' : messagedict['message_id_list'][0] + 1
-    }
-
-    status = requests.delete(config.url + '/message/remove/v1', json=message_remove_input)
-
-    assert status.status_code == AccessError.code
-
-
-

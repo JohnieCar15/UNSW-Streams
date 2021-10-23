@@ -1,5 +1,6 @@
 from src.data_store import data_store
 from src.error import InputError
+from src import helpers
 
 import re
 
@@ -19,7 +20,7 @@ Exceptions:
 Return Value:
     Returns auth_user_id on registered email and correct password
 '''
-def auth_login_v1(email, password):
+def auth_login_v2(email, password):
     store = data_store.get()
 
     # Checking if email has been registered
@@ -27,8 +28,14 @@ def auth_login_v1(email, password):
         if user['email'] == email:
             # Checking if password given matches the password stored
             if user['password'] == password:
+                session_id = helpers.generate_new_session_id()
+
+                user['session_list'].append(session_id)
+
+                data_store.set(store)
                 return {
-                    'auth_user_id': user['id']
+                    'auth_user_id': user['id'],
+                    'token': helpers.generate_jwt(user['id'], session_id)
                 }
             else:
                 raise InputError("Incorrect password")
@@ -55,7 +62,7 @@ Exceptions:
 Return Value:
     Returns auth_user_id on valid email, password, name_first and name_last
 '''
-def auth_register_v1(email, password, name_first, name_last):
+def auth_register_v2(email, password, name_first, name_last):
     # Checking if email is valid
     if not re.fullmatch(regex, email):
         raise InputError("Invalid email")
@@ -80,9 +87,9 @@ def auth_register_v1(email, password, name_first, name_last):
 
     # Checking if email address is already in use
     user_email_list =  [user['email'] for user in store['users']]
+
     if email in user_email_list:
        raise InputError("Email address already in use")
-
         
     # If there is 1 of the same handle, add a 0 to the end
     # If there is more than 1 of the same handle, remove the last character and add the count
@@ -100,8 +107,12 @@ def auth_register_v1(email, password, name_first, name_last):
     if len(store['users']) == 0:
         permission_id = 1
 
+    auth_user_id = len(helpers.filter_data_store(store_list = 'users', key=None, value=None)) + 1
+    token = helpers.generate_jwt(auth_user_id, session_id=None)
+    session_id = helpers.decode_jwt(token)['session_id']
+
     # Add user to data store
-    auth_user_id = len(store['users']) + 1
+    
     user_dict = {
         'id': auth_user_id,
         'email': email,
@@ -109,12 +120,43 @@ def auth_register_v1(email, password, name_first, name_last):
         'name_first': name_first,
         'name_last': name_last,
         'handle_str': handle_str,
-        'permission_id': permission_id
+        'permission_id': permission_id,
+        'session_list': [session_id],
+        'is_removed': False
     }
 
     store['users'].append(user_dict)
     data_store.set(store)
     
     return {
-        'auth_user_id': auth_user_id
+        'auth_user_id': auth_user_id,
+        'token': token
     }
+
+'''
+auth_logout_v1: Given an active token, invalidates the token to log the user out
+
+Arguments:
+    token (str)     - token of a user
+
+Exceptions:
+    AccessError     - Occurs when an invalid token is passed
+
+Return Value:
+    Returns {} on valid token
+'''
+def auth_logout_v1(token):
+    store = data_store.get()
+
+    validate_return = helpers.validate_token(token)
+
+    user_id = validate_return['user_id']
+    session_id = validate_return['session_id']
+
+    for user in store['users']:
+        if user['id'] == user_id:
+            user['session_list'].remove(session_id)
+
+    data_store.set(store)
+
+    return {}

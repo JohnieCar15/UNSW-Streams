@@ -1,3 +1,4 @@
+import pickle
 '''
 data_store.py
 
@@ -28,7 +29,8 @@ Example usage:
 initial_object = {
     'users': [],
     'channels': [],
-    'messages': []
+    'messages': [],
+    'dms': []
 }
 '''
 user = {
@@ -38,7 +40,9 @@ user = {
     'name_first': str,
     'name_last': str,
     'handle_str': str,
-    'permission_id': int
+    'permission_id': int,
+    'session_list': list[int],
+    'is_removed': bool
 }
 
 channel = {
@@ -52,10 +56,12 @@ channel = {
 
 '''
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
-
 class Datastore:
     def __init__(self):
-        self.__store = initial_object
+        try:
+          self.__store = pickle.load(open("data_store.p", "rb"))
+        except Exception:
+          self.__store = initial_object
 
     def get(self):
         return self.__store
@@ -64,9 +70,10 @@ class Datastore:
         if not isinstance(store, dict):
             raise TypeError('store must be of type dictionary')
         self.__store = store
+        with open('data_store.p', 'wb') as FILE:
+            pickle.dump(store, FILE)
 
 print('Loading Datastore...')
 
 global data_store
 data_store = Datastore()
-
