@@ -3,6 +3,7 @@ from src.error import InputError
 from src import helpers
 
 import re
+import hashlib
 
 regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
@@ -27,7 +28,7 @@ def auth_login_v2(email, password):
     for user in store['users']:
         if user['email'] == email:
             # Checking if password given matches the password stored
-            if user['password'] == password:
+            if user['password'] == hashlib.sha256(password.encode()).hexdigest():
                 session_id = helpers.generate_new_session_id()
 
                 user['session_list'].append(session_id)
@@ -100,7 +101,7 @@ def auth_register_v2(email, password, name_first, name_last):
     user_dict = {
         'id': auth_user_id,
         'email': email,
-        'password': password,
+        'password': hashlib.sha256(password.encode()).hexdigest(),
         'name_first': name_first,
         'name_last': name_last,
         'handle_str': handle_str,
