@@ -34,7 +34,7 @@ def validate_token(encoded_jwt):
         decoded_jwt = decode_jwt(encoded_jwt)
     except Exception:
         decoded_jwt = None
-
+    print('decoded_jwt', decoded_jwt)
     if decoded_jwt is None or decoded_jwt['user_id'] not in user_id_list:
         raise AccessError(description='Invalid Token')
     else:

@@ -114,13 +114,17 @@ def admin_user_remove_v1(token, u_id):
     remove_user_from_all_channels(filtered_dm_list, u_id)
 
 
+    store['users'].remove(removed_user_dict[0])
+
     # Removing users and setting relevant parameters
-    removed_user_dict[0]['is_removed'] = True
     removed_user_dict[0]['name_first'] = 'Removed'
     removed_user_dict[0]['name_last'] = 'user'
     removed_user_dict[0]['email'] = ''
     removed_user_dict[0]['handle_str'] = ''
+
+    store['removed_users'].append(removed_user_dict[0])
  
+    
     data_store.set(store)
     return {}
 

@@ -89,10 +89,10 @@ def auth_register_v2(email, password, name_first, name_last):
 
     # Setting the first registered user to owner (id 1) otherwise member (id 2)
     permission_id = 2
-    if len(store['users']) == 0:
+    if len(store['users']) + len(store['removed_users']) == 0:
         permission_id = 1
 
-    auth_user_id = len(store['users']) + 1
+    auth_user_id = len(store['users']) + len(store['removed_users']) + 1
     session_id = helpers.generate_new_session_id()
     token = helpers.generate_jwt(auth_user_id, session_id)
 
@@ -106,8 +106,7 @@ def auth_register_v2(email, password, name_first, name_last):
         'name_last': name_last,
         'handle_str': handle_str,
         'permission_id': permission_id,
-        'session_list': [session_id],
-        'is_removed': False
+        'session_list': [session_id]
     }
 
     store['users'].append(user_dict)

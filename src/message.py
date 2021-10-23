@@ -105,17 +105,18 @@ def message_send_v1(token, channel_id, message):
         raise InputError(description="Invalid message")
 
     # Sets up new keys for new message
-    new_message = {}
-    new_message['message_id'] = len(store['messages']) + len(store['deleted_messages']) + 1
-    new_message['u_id'] = auth_user_id
-    new_message['message'] = message
-
-    new_message['time_created'] = int(datetime.utcnow().timestamp())
+    new_message = {
+        'message_id': len(store['messages']) + len(store['removed_messages']) + 1,
+        'u_id': auth_user_id,
+        'message': message,
+        'time_created': int(datetime.utcnow().timestamp())
+    }
 
     # Data store creates extra field of channel id for easier identification
-    message_store = {}
-    message_store['message'] = new_message
-    message_store['channel_id'] = channel_id
+    message_store = {
+        'message': new_message,
+        'channel_id': channel_id
+    }
     
     channel_dict['messages'].insert(0, new_message)
     store['messages'].insert(0, message_store)
@@ -168,17 +169,18 @@ def message_senddm_v1(token, dm_id, message):
         raise InputError(description="Invalid message")
 
     # Sets up new keys for new message
-    new_message = {}
-    new_message['message_id'] = len(store['messages']) + len(store['deleted_messages']) + 1
-    new_message['u_id'] = auth_user_id
-    new_message['message'] = message
-
-    new_message['time_created'] = int(datetime.utcnow().timestamp())
+    new_message = {
+        'message_id': len(store['messages']) + len(store['removed_messages']) + 1,
+        'u_id': auth_user_id,
+        'message': message,
+        'time_created': int(datetime.utcnow().timestamp())
+    }
 
     # Data store creates extra field of channel id for easier identification
-    message_store = {}
-    message_store['message'] = new_message
-    message_store['channel_id'] = dm_id
+    message_store = {
+        'message': new_message,
+        'channel_id': dm_id
+    }
     
     dm_dict['messages'].insert(0, new_message)
     store['messages'].insert(0, message_store)
@@ -235,7 +237,7 @@ def message_remove_v1(token, message_id):
         raise AccessError(description="Permission denied")
     
     # Remove selected messages from data store and channel messages
-    store['deleted_messages'].append(messagedict)
+    store['removed_messages'].append(messagedict)
     store['messages'].remove(messagedict)
     channel_dict['messages'].remove(selected_message)
 
