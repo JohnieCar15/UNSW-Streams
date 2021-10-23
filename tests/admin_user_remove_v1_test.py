@@ -43,7 +43,7 @@ def test_remove_user(admin_user_remove_url, clear_and_register):
     # Getting the email and handle of the user before removing them
     removed_user_info = requests.get(config.url + 'user/profile/v1', params={'token': auth_user_token, 'u_id':user_id}).json()
     removed_user_email = removed_user_info['user']['email']
-    removed_user_handle = removed_user_info['user']['handle']
+    removed_user_handle = removed_user_info['user']['handle_str']
 
     # Creating a new dm and channel to test admin_user_remove success
     dm_id = requests.post(config.url + 'dm/create/v1', json={
@@ -105,7 +105,7 @@ def test_remove_user(admin_user_remove_url, clear_and_register):
     }).json()['members']
     dm_members_ids = [user['u_id'] for user in dm_members]
 
-    channel_members = requests.get(config.url + 'channel/details/v1', params={
+    channel_members = requests.get(config.url + 'channel/details/v2', params={
         'token': auth_user_token,
         'channel_id': channel_id
     }).json()['all_members']
@@ -113,10 +113,10 @@ def test_remove_user(admin_user_remove_url, clear_and_register):
 
     # Getting the list of all users in Streams
     all_users_list = requests.get(config.url + 'users/all/v1', params={'token': auth_user_token}).json()['users']
-    all_users_id_list = [user['user_id'] for user in all_users_list]
+    all_users_id_list = [user['u_id'] for user in all_users_list]
 
     # Getting the profile details of the removed user
-    removed_user_info = requests.get(config.url + 'user/profile/v1', params={'token': auth_user_token, 'u_id':user_id}).json()
+    removed_user_info = requests.get(config.url + 'user/profile/v1', params={'token': auth_user_token, 'u_id':user_id}).json()['user']
     
     # Setting the email and handle of the auth to the removed user's ones
     setemail_request = requests.put(config.url + 'user/profile/setemail/v1', json={
@@ -125,7 +125,7 @@ def test_remove_user(admin_user_remove_url, clear_and_register):
     })
     sethandle_request = requests.put(config.url + 'user/profile/sethandle/v1', json={
         'token': auth_user_token,
-        'handle': removed_user_handle
+        'handle_str': removed_user_handle
     })
 
 

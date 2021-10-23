@@ -115,11 +115,11 @@ def admin_user_remove_v1(token, u_id):
 
 
     # Removing users and setting relevant parameters
-    removed_user_dict['is_removed'] = True
-    removed_user_dict['name_first'] = 'Removed'
-    removed_user_dict['name_last'] = 'user'
-    removed_user_dict['email'] = ''
-    removed_user_dict['handle_str'] = ''
+    removed_user_dict[0]['is_removed'] = True
+    removed_user_dict[0]['name_first'] = 'Removed'
+    removed_user_dict[0]['name_last'] = 'user'
+    removed_user_dict[0]['email'] = ''
+    removed_user_dict[0]['handle_str'] = ''
  
     data_store.set(store)
     return {}
