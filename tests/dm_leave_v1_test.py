@@ -49,6 +49,8 @@ def test_invalid_dm_id():
 
     token = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['token']
 
+    requests.post(config.url + 'dm/create/v1', json={'token': token, 'u_ids': []}).json()['dm_id']
+
     leave_return = requests.post(config.url + 'dm/leave/v1', json={'token': token, 'dm_id': ''})
 
     assert leave_return.status_code == InputError.code
@@ -74,7 +76,7 @@ def test_non_member():
 
     token_2 = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['token']
 
-    dm_id = requests.post(config.url + 'dm/create/v1', json={'token': token_1, 'u_ids': ''}).json()['dm_id']
+    dm_id = requests.post(config.url + 'dm/create/v1', json={'token': token_1, 'u_ids': []}).json()['dm_id']
 
     leave_return = requests.post(config.url + 'dm/leave/v1', json={'token': token_2, 'dm_id': dm_id})
 
