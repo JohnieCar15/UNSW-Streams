@@ -137,7 +137,7 @@ def admin_userpermission_change_v1_ep():
     return dumps(admin_userpermission_change_v1(data['token'], data['u_id'], data['permission_id']))
     
 @APP.route("/clear/v1", methods=['DELETE'])
-def clear():
+def clear_v1_ep():
     clear_v1()
     return dumps({})
 
