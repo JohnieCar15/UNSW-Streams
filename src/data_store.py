@@ -26,6 +26,9 @@ Example usage:
 '''
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
+session_tracker = 0
+SECRET = 'JOjQqnzcMKrLVsTVLNc2hzA4iWkqqcQB'
+
 initial_object = {
     'users': [],
     'channels': [],
