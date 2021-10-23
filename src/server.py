@@ -5,17 +5,19 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
-from src.channel import channel_details_v2, channel_invite_v2, channel_join_v2
+from src.channel import channel_details_v2, channel_invite_v2, channel_join_v2, channel_messages_v2, channel_leave_v1
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
+from src.dm import dm_create_v1, dm_list_v1, dm_details_v1, dm_messages_v1
 from src.channels import channels_create_v2, channels_list_v2, channels_listall_v2
 from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 from src.other import clear_v1
 from src.admin import admin_user_remove_v1,  admin_userpermission_change_v1
+from src.message import message_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1
 
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
-
+    
 def defaultHandler(err):
     response = err.get_response()
     print('response', err, err.get_response())
@@ -41,6 +43,20 @@ def channel_details_endpoint():
     channel_id = int(request.args.get('channel_id'))
     return dumps(channel_details_v2(token, channel_id))
 
+@APP.route("/channel/messages/v2", methods=['GET'])
+def channel_messages_v2_ep():
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
+    start = request.args.get('start')
+
+    return dumps(channel_messages_v2(token, int(channel_id), int(start)))
+
+@APP.route("/dm/details/v1", methods=['GET'])
+def dm_details_v1_endpoint():
+    token = request.args.get('token')
+    dm_id = int(request.args.get('dm_id'))
+    return dumps (dm_details_v1(token, dm_id))
+    
 @APP.route('/channels/create/v2', methods=['POST'])
 def channels_create():
     data = request.get_json()
@@ -77,6 +93,17 @@ def admin_user_remove_v1_ep():
     data = request.json
     return dumps(admin_user_remove_v1(data['token'], data['u_id']))
     
+@APP.route("/dm/list/v1", methods=['GET'])
+def dm_list_v1_ep():
+    token = request.args.get('token')
+
+    return dumps(dm_list_v1(token))
+
+@APP.route("/dm/create/v1", methods=['POST'])
+def dm_create_endpoint():
+    data = request.get_json()
+    return dumps(dm_create_v1(data['token'], data['u_ids']))
+
 @APP.route("/users/all/v1", methods=['GET'])
 def users_all():
     token = request.args.get('token')
@@ -129,11 +156,49 @@ def channels_listall():
 def admin_userpermission_change_v1_ep():
     data = request.json
     return dumps(admin_userpermission_change_v1(data['token'], data['u_id'], data['permission_id']))
-    
+
 @APP.route("/clear/v1", methods=['DELETE'])
-def clear():
+def clear_v1_ep():
     clear_v1()
     return dumps({})
+
+@APP.route("/message/send/v1", methods=['POST'])
+def message_send_v1_ep():
+    data = request.get_json()
+
+    return dumps(message_send_v1(data['token'], data['channel_id'], data['message']))
+
+@APP.route("/message/senddm/v1", methods=['POST'])
+def message_senddm_v1_ep():
+    data = request.get_json()
+
+    return dumps(message_senddm_v1(data['token'], data['dm_id'], data['message']))
+
+@APP.route("/message/edit/v1", methods=['PUT'])
+def message_edit_v1_ep():
+    data = request.get_json()
+
+    return dumps(message_edit_v1(data['token'], data['message_id'], data['message']))
+
+@APP.route("/message/remove/v1", methods=['DELETE'])
+def message_remove_v1_ep():
+    data = request.get_json()
+
+    return dumps(message_remove_v1(data['token'], data['message_id']))
+
+@APP.route("/channel/leave/v1", methods=['POST'])
+def channel_leave_endpoint():
+    data = request.get_json()
+    return dumps(channel_leave_v1(data['token'], data['channel_id']))
+
+@APP.route("/dm/messages/v1", methods=['GET'])
+def dm_messages_v1_ep():
+    token = request.args.get('token')
+    dm_id = request.args.get('dm_id')
+    start = request.args.get('start')
+
+    return dumps(dm_messages_v1(token, int(dm_id), int(start)))
+
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

@@ -69,6 +69,7 @@ def channel_invite_v2(token, channel_id, u_id):
     auth_user_id = validate_token(token)['user_id']
 
     channel_list = filter_data_store(store_list='channels', key='id', value=channel_id)
+
     # Checking if the channel_id is valid
     if channel_list == []:
         raise InputError(description="Invalid channel_id")
@@ -126,7 +127,6 @@ def channel_details_v2(token, channel_id):
     all_owners_list = []
     # get variables for channel details - owner from store['users']
     for owner in store['users']:
-        print(owner['id'])
         if owner['id'] in channel_owners:
             owner_dict = {
                 'u_id': owner['id'],
@@ -158,3 +158,108 @@ def channel_details_v2(token, channel_id):
         'owner_members': all_owners_list,
         'all_members': all_members_list
     }
+
+def channel_messages_v2(token, channel_id, start):
+    '''
+    channel_messages_v2: Given a channel_id and start, returns up to 50 messages from start to start + 50,
+    as well as the start and finishing indexes
+
+    Arguments:
+        token (string)    - token of a user
+        channel_id (int)    - id of a channel
+        start (int) - starting index of the messages to be returned
+        ...
+
+    Exceptions:
+        InputError  - Occurs when invalid channel id is entered
+                    - Occurs when start is greater than total number of messages
+        AccessError - Occurs when user is not part of channel members
+
+    Return Value:
+        Returns {messages, 'start', 'end'} on successful token, channel_id and start
+
+    '''
+    store = data_store.get()
+
+  # check if token is valid
+    auth_user_id = validate_token(token)['user_id']
+
+  # Checks if channel id is valid
+    if channel_id not in filter_data_store(store_list='channels', key='id', value=None):
+        raise InputError(description="Invalid channel_id")
+  # Finds the channel with the correct id
+    new_channel = filter_data_store(store_list='channels', key='id', value=channel_id)[0]
+
+  # Check if user is in channel members
+    if auth_user_id not in new_channel['members']:
+        raise AccessError(description="Invalid user_id")
+
+    length = len(new_channel['messages']) - start
+    # A negative length implies that start > length
+    if length < 0:
+        raise InputError(description="Start is greater than total number of messages")
+    # Negative starts are invalid
+    if start < 0:
+      raise InputError(description="Invalid start")
+
+    messages_dict = {}
+    messages_dict['start'] = start
+    # Deals with all cases
+    if length == 0:
+        messages_dict['end'] = -1
+        messages_dict['messages'] = []
+    elif length <= 50:
+        messages_dict['end'] = -1
+        # Create a copy of all messages from start up to final index
+        messages_dict['messages'] = new_channel['messages'][start:start + length]
+    else:
+        messages_dict['end'] = start + 50
+        messages_dict['messages'] = new_channel['messages'][start:start + 50]
+
+    data_store.set(store)
+
+    return messages_dict
+
+def channel_leave_v1(token, channel_id):
+    '''
+    channel_leave_v1: Given a valid authorised token and valid channel_id displays removes token as a member of channel
+
+    Arguments:
+        token (string) - token string used to authorise and authenticate the user 
+        channel_id    - id of the channel from which details are pulled 
+        
+
+    Exceptions:
+        InputError  - Occurs when channel_id does not refer to a valid channel
+        AccessError - Occurs when channel_id is valid but authorised user is not a member of the channel
+        AccessError - Occurs when token isn't valid 
+
+    Return Value:
+        Returns {}
+
+    '''
+    store = data_store.get()
+
+    # check if token is valid
+    auth_user_id = validate_token(token)['user_id']
+
+    # check if channel_id is valid
+    channel_list = [channel['id'] for channel in store['channels']]
+    if len(channel_list) == 0:
+        raise InputError(description="Invalid channel_id")
+    
+    # check if auth_user_id member of channel
+    channel_dict =  [channel for channel in store['channels'] if channel_id == channel['id']][0]
+    if auth_user_id not in channel_dict['members']:
+        raise AccessError(description="Not a member of channel")
+    
+    # remove auth_user_id from owner list if owner
+    if auth_user_id in channel_dict['owner']:
+        channel_dict['owner'].remove(auth_user_id)
+   
+    # remove auth_user_id from members list
+    channel_dict['members'].remove(auth_user_id)
+    
+    data_store.set(store)
+        
+    return {}

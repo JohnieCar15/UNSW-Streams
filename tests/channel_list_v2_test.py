@@ -61,7 +61,6 @@ def clear_then_crete_public0_and_private0():
     # register public_0_owner and create channel public_0
 
     public_0_owner = user_register("0000@unsw.edu.au", "password", "firstname0", "lastname0")
-    print(public_0_owner)
     public_0 = channel_create(public_0_owner, "public_0", True)
 
     # register public_0_member and invite to channel public_0

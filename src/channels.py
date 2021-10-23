@@ -91,7 +91,7 @@ def channels_create_v2(token, name, is_public):
     Return Value:
         Returns {channel_id} on successful run 
 
-'''
+    '''
     store = data_store.get()
 
     # check if token is valid
@@ -102,7 +102,7 @@ def channels_create_v2(token, name, is_public):
         raise InputError(description="Invalid name length")
 
     # channel id will be length of existing list + 1
-    new_id = len(store['channels']) + 1
+    new_id = len(store['dms']) + len(store['channels']) + 1
 
     # store a dictionary containing the following
     channel_dictionary = {
