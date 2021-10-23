@@ -264,6 +264,42 @@ def channel_leave_v1(token, channel_id):
         
     return {}
 
+def channel_removeowner_v1(token, channel_id, u_id):
+    store = data_store.get()
+
+    # check if token is valid
+    auth_user_id = validate_token(token)['user_id']
+
+    # check if channel id is valid
+    if channel_id not in filter_data_store(store_list='channels',key='id'):
+        raise InputError(description="Invalid channel_id")
+
+    # check if u_id is valid
+    if u_id not in filter_data_store(store_list='users', key='id'): 
+        raise InputError(description="Invalid user_id")
+    
+    channel_dict = filter_data_store(store_list='channels',key='id',value=channel_id)[0]
+
+    # check if user has owner permissions
+    user_dict = filter_data_store(store_list='users',key='id',value=auth_user_id)[0]
+    if auth_user_id not in channel_dict['owner'] and user_dict['permission_id'] != 1:
+        raise AccessError(description='User does not have owner permissions in channel')
+
+    # check if user is an owner of the channel
+    if u_id not in channel_dict['owner']:
+        raise InputError(description="Not an owner in channel")
+
+    # check if user isn't only owner 
+    if u_id in channel_dict['owner'] and len(channel_dict['owner']) == 1:
+        raise InputError(description="Only owner of channel")
+    
+    # remove u_id as owner
+    channel_dict['owner'].remove(u_id)
+
+    data_store.set(store)
+
+    return {}
+
 def channel_addowner_v1(token, channel_id, u_id):
     '''
     channel_addowner_v1: Given a valid authorised token with owner_permissions and valid channel_id makes u_id an owner of channel
