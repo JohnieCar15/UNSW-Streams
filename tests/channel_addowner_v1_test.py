@@ -8,7 +8,7 @@ from src.error import InputError, AccessError
 @pytest.fixture
 def clear_and_channel_2_members():
     
-    requests.delete(config.url + 'clear/v2')
+    requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={'email': "yes@yes.com", 'password': "aaaaaa", 'name_first': "firstname", "name_last": "lastname"})
     register_data = register.json()
     token = register_data['token']
@@ -21,7 +21,7 @@ def clear_and_channel_2_members():
     register_2_data = register_2.json()
     u_id_2 = register_2_data['auth_user_id']
 
-    channel_invite = requests.post(config.url + 'channel/invite/v2', json ={'token': token, 'channel_id': channel_id, 'u_id': u_id_2})
+    requests.post(config.url + 'channel/invite/v2', json ={'token': token, 'channel_id': channel_id, 'u_id': u_id_2})
     
 
     return {'token': token, 'token_2': register_2_data['token'], 'u_id': register_data['auth_user_id'], 'u_id_2': u_id_2, 'channel_id': channel_id}
@@ -59,12 +59,26 @@ def test_valid_channel_channel_owner(clear_and_channel_2_members):
 
 # when token is valid but channel id is invalid
 def test_invalid_channel():
-    requests.delete(config.url + 'clear/v2')
+    requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={'email': "yes@yes.com", 'password': "aaaaaa", 'name_first': "firstname", "name_last": "lastname"})
     register_data = register.json()
     token = register_data['token']
     u_id = register_data['auth_user_id']
     channel_addowner = requests.post(config.url + 'channel/addowner/v1', json={'token': token, 'channel_id': 1, 'u_id': u_id})
+    assert channel_addowner.status_code == InputError.code
+
+# when token is valid but u_id is invalid
+def test_invalid_u_id(clear_and_channel_2_members):
+    token = clear_and_channel_2_members['token']
+    u_id = clear_and_channel_2_members['u_id']
+    u_id_2 = clear_and_channel_2_members['u_id_2']
+    channel_id = clear_and_channel_2_members['channel_id']
+
+    invalid_id = 1
+    while (invalid_id == u_id or invalid_id == u_id_2):
+        invalid_id += 1
+
+    channel_addowner = requests.post(config.url + 'channel/addowner/v1', json={'token': token, 'channel_id': channel_id, 'u_id': invalid_id})
     assert channel_addowner.status_code == InputError.code
 
 # when token is valid, channel is valid but user not a member
@@ -108,7 +122,7 @@ def test_no_owner_permissions(clear_and_channel_2_members):
     assert channel_addowner.status_code == AccessError.code
 
 # invalid token, valid channel, valid u_id
-def test_no_owner_permissions(clear_and_channel_2_members):
+def test_invalid_token_valid_channel_valid_u_id(clear_and_channel_2_members):
     token = clear_and_channel_2_members['token']
     token_2 = clear_and_channel_2_members['token_2']
     u_id_2 = clear_and_channel_2_members['u_id_2']
@@ -123,18 +137,12 @@ def test_no_owner_permissions(clear_and_channel_2_members):
 
 # invaid token, invalid channel 
 def test_no_owner_permissions_invalid_channel(clear_and_channel_2_members):
-    token = clear_and_channel_2_members['token']
-    token_2 = clear_and_channel_2_members['token_2']
     u_id_2 = clear_and_channel_2_members['u_id_2']
     channel_id = clear_and_channel_2_members['channel_id']
-
-    invalid_token = 1
-    while (invalid_token == token or invalid_token == token_2):
-        invalid_token += 1
     
     invalid_channel_id = 1
     while (invalid_channel_id == channel_id):
-        invalid_token += 1
+        invalid_channel_id += 1
 
-    channel_addowner = requests.post(config.url + 'channel/addowner/v1', json={'token': invalid_token, 'channel_id': invalid_channel_id, 'u_id': u_id_2})
+    channel_addowner = requests.post(config.url + 'channel/addowner/v1', json={'token': "", 'channel_id': invalid_channel_id, 'u_id': u_id_2})
     assert channel_addowner.status_code == AccessError.code
