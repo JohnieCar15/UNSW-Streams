@@ -26,7 +26,7 @@ def test_valid_channel_authorised_member(clear_and_register):
     dm_id = clear_and_register['dm_id']
     id_num = clear_and_register['u_id']
     id_num_2 = clear_and_register['u_id_2']
-    register = requests.post(config.url + 'auth/register/v2', json={'email': "yes3@yes.com", 'password': "aaaaaa", 'name_first': "firstname", "name_last": "lastname"})
+    requests.post(config.url + 'auth/register/v2', json={'email': "yes3@yes.com", 'password': "aaaaaa", 'name_first': "firstname", "name_last": "lastname"})
     dm_details = requests.get(config.url + 'dm/details/v1', params={'token': token, 'dm_id': dm_id})
     dm_details_data = dm_details.json()
     assert dm_details_data == {
