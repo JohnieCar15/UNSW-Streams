@@ -7,7 +7,7 @@ from src.error import InputError
 from src import config
 from src.channel import channel_details_v2, channel_invite_v2, channel_join_v2, channel_messages_v2
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
-from src.dm import dm_create_v1, dm_list_v1
+from src.dm import dm_create_v1, dm_list_v1, dm_details_v1
 from src.channels import channels_create_v2, channels_list_v2, channels_listall_v2
 from src.user import users_all_v1, user_profile_v1
 from src.user import user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
@@ -53,6 +53,12 @@ def channel_messages_v2_ep():
 
     return dumps(channel_messages_v2(token, int(channel_id), int(start)))
 
+@APP.route("/dm/details/v1", methods=['GET'])
+def dm_details_v1_endpoint():
+    token = request.args.get('token')
+    dm_id = int(request.args.get('dm_id'))
+    return dumps (dm_details_v1(token, dm_id))
+    
 @APP.route('/channels/create/v2', methods=['POST'])
 def channels_create():
     data = request.get_json()
