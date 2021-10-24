@@ -4,13 +4,6 @@ from src import config
 from src.error import AccessError
 
 
-# assumption: channels_listall_v1 will return {list of channels} in the form of 
-# {'channels': [{'channel_id': channel_id, 'name': 'channel_name'}, ... ]}
-# and according to https://edstem.org/au/courses/7025/discussion/613604
-# the order of those channels is not important, so the test will be passed 
-# for any order of the correct list
-
-
 
 # Help functions:
 
@@ -59,7 +52,7 @@ def channels_listall(user):
 # then return all users and channels created by it
 
 @pytest.fixture
-def clear_then_crete_public0_and_private0():
+def clear_then_create_public0_and_private0():
     requests.delete(config.url + 'clear/v1')
     # register public_0_owner and create channel public_0
 
@@ -114,9 +107,9 @@ def test_valid_user_but_no_channels_have_been_created():
     assert channels_listall(user_in_no_channels) == {'channels': []}
 
 
-def test_normal_case(clear_then_crete_public0_and_private0):
+def test_normal_case(clear_then_create_public0_and_private0):
     # the the sorted function will return the list of dictionary sorted by "channel_id"
-    public0_and_private0 = clear_then_crete_public0_and_private0
+    public0_and_private0 = clear_then_create_public0_and_private0
     public_0_owner = public0_and_private0["public_0_owner"]
     public_0 = public0_and_private0["public_0"]
     private_0 = public0_and_private0["private_0"]
@@ -124,9 +117,9 @@ def test_normal_case(clear_then_crete_public0_and_private0):
     assert sort_list(channels_listall(public_0_owner)['channels']) == expect_result
 
 
-def test_complex_case(clear_then_crete_public0_and_private0):
+def test_complex_case(clear_then_create_public0_and_private0):
     # By fixture get the data of public_0 and private_0
-    public0_and_private0 = clear_then_crete_public0_and_private0
+    public0_and_private0 = clear_then_create_public0_and_private0
 
     public_0_owner = public0_and_private0["public_0_owner"]
     public_0_member = public0_and_private0["public_0_member"]
