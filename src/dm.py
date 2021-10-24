@@ -26,12 +26,11 @@ def dm_details_v1(token, dm_id):
     auth_user_id = validate_token(token)['user_id']
 
     # check if dm_id refers to valid dm
-    dm_list = [dm['id'] for dm in store['dms']]
-    if len(dm_list) == 0:
-        raise InputError(description='Invalid dm_id')
+    if dm_id not in filter_data_store(store_list='dms',key='id'):
+        raise InputError(description="Invalid dm_id")
     
     # check if user is part of dm
-    dm_dict = [dm for dm in store['dms'] if dm_id == dm['id']][0]
+    dm_dict = filter_data_store(store_list='dms',key='id',value=dm_id)[0]
     if auth_user_id not in dm_dict['members']:
         raise AccessError(description="Not a member of DM")
 
