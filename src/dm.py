@@ -69,10 +69,10 @@ def dm_remove_v1(token, dm_id):
             if dm['owner'] != auth_user_id:
                 raise AccessError(description='User is not the owner of the DM')
             else:
-                dm['members'] = []
+                store['dms'].remove(dm)
 
     if not found:
-        raise InputError(description='dm_id does not refere to valid DM')
+        raise InputError(description='dm_id does not refer to valid DM')
 
     data_store.set(store)
     

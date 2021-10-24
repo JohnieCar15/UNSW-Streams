@@ -89,7 +89,7 @@ def dm_remove_v1_ep():
     data = request.get_json()
 
     return dumps(dm_remove_v1(data['token'], data['dm_id']))
-    
+
 @APP.route("/dm/list/v1", methods=['GET'])
 def dm_list_v1_ep():
     token = request.args.get('token')
