@@ -35,9 +35,11 @@ initial_object = {
     'messages': [],
     'dms': [],
     'removed_users': [],
-    'removed_messages': []
+    'removed_messages': [],
+    'removed_dms': []
 }
 '''
+Data_store dictionary fields:
 user = {
     'id': int,
     'email': str,

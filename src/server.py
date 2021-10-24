@@ -142,11 +142,12 @@ def dm_create_v1_ep():
     data = request.get_json()
     return dumps(dm_create_v1(data['token'], data['u_ids']))
 
+
 @APP.route("/dm/remove/v1", methods=['DELETE'])
 def dm_remove_v1_ep():
     data = request.get_json()
-
     return dumps(dm_remove_v1(data['token'], data['dm_id']))
+
 
 @APP.route("/dm/details/v1", methods=['GET'])
 def dm_details_v1_endpoint():
@@ -154,15 +155,18 @@ def dm_details_v1_endpoint():
     dm_id = int(request.args.get('dm_id'))
     return dumps (dm_details_v1(token, dm_id))
 
+
 @APP.route("/dm/leave/v1", methods=['POST'])
 def dm_leave_v1_ep():
     data = request.get_json()
     return dumps(dm_leave_v1(data['token'], data['dm_id']))
 
+
 @APP.route("/dm/list/v1", methods=['GET'])
 def dm_list_v1_ep():
     token = request.args.get('token')
     return dumps(dm_list_v1(token))
+
 
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages_v1_ep():
