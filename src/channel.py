@@ -110,12 +110,11 @@ def channel_details_v2(token, channel_id):
     auth_user_id = validate_token(token)['user_id']
     
     # check if channel_id refers to a valid id
-    channel_list = filter_data_store(store_list='channels', key='id')
-    if channel_id not in channel_list:
+    if channel_id not in filter_data_store(store_list='channels',key='id'):
         raise InputError(description="Invalid channel_id")
     
     # check if user is member of channel
-    channel_dict =  filter_data_store(store_list='channels', key='id', value=channel_id)[0]
+    channel_dict = filter_data_store(store_list='channels',key='id',value=channel_id)[0]
     if auth_user_id not in channel_dict['members']:
         raise AccessError(description="Not a member of channel")
 
@@ -244,12 +243,11 @@ def channel_leave_v1(token, channel_id):
     auth_user_id = validate_token(token)['user_id']
 
     # check if channel_id is valid
-    channel_list = filter_data_store(store_list='channels', key='id')
-    if channel_id not in channel_list:
+    if channel_id not in filter_data_store(store_list='channels',key='id'):
         raise InputError(description="Invalid channel_id")
     
     # check if auth_user_id member of channel
-    channel_dict =  filter_data_store(store_list='channels', key='id', value=channel_id)[0]
+    channel_dict = filter_data_store(store_list='channels',key='id',value=channel_id)[0]
     if auth_user_id not in channel_dict['members']:
         raise AccessError(description="Not a member of channel")
     
