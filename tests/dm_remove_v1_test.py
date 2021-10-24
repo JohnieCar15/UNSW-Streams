@@ -25,9 +25,8 @@ def test_dm_remove_v1():
 
     u_id_2 = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['auth_user_id']
 
-    dm_id = requests.post(config.url + 'dm/create/v1', json={'token': token_1, 'u_ids': [u_id_2]}).json()['dm_id']
-
     requests.post(config.url + 'dm/create/v1', json={'token': token_1, 'u_ids': [u_id_2]})
+    dm_id = requests.post(config.url + 'dm/create/v1', json={'token': token_1, 'u_ids': [u_id_2]}).json()['dm_id']
 
     requests.delete(config.url + 'dm/remove/v1', json={'token': token_1, 'dm_id': dm_id})
 

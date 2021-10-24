@@ -30,7 +30,7 @@ def dm_create_v1(token, u_ids):
             raise InputError(description="Invalid user_id")
     
     # generate dm id
-    new_id = len(store['dms']) + len(store['channels']) + 1
+    new_id = len(store['dms']) + len(store['removed_dms']) + len(store['channels']) + 1
     names = []
     u_ids.append(auth_user_id)
     u_ids = list(set(u_ids))
@@ -115,8 +115,8 @@ def dm_leave_v1(token, dm_id):
             found = True
             if auth_user_id not in dm['members']:
                 raise AccessError(description='User is not a member of the DM')
-            else:
-                dm['members'].remove(auth_user_id)
+            
+            dm['members'].remove(auth_user_id)
 
     if not found:
         raise InputError(description='dm_id does not refer to valid DM')
@@ -264,8 +264,11 @@ def dm_remove_v1(token, dm_id):
             found = True
             if auth_user_id not in dm['owner']:
                 raise AccessError(description='User is not the owner of the DM')
-            else:
-                dm['id'] = None
+            
+            dm['owner'] = []
+            dm['members'] = []
+            store['removed_dms'].append(dm)
+            store['dms'].remove(dm)
 
     if not found:
         raise InputError(description='dm_id does not refer to valid DM')
