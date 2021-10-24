@@ -265,6 +265,15 @@ def dm_remove_v1(token, dm_id):
             if auth_user_id not in dm['owner']:
                 raise AccessError(description='User is not the owner of the DM')
             
+            for message in dm['messages']:
+                message_store = {
+                    'message': message,
+                    'channel_id': dm_id
+                }
+                store['messages'].remove(message_store)
+                store['removed_messages'].append(message_store)
+
+
             dm['owner'] = []
             dm['members'] = []
             store['removed_dms'].append(dm)
