@@ -2,7 +2,6 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store
 
-
 def dm_create_v1(token, u_ids):
     '''
     dm_create_v1:
@@ -90,6 +89,21 @@ def dm_list_v1(token):
     }
 
 def dm_leave_v1(token, dm_id):
+    '''
+    dm_leave_v1: removes a given user from a given dm
+    
+    Arguments:
+        token   - string    - token of the user
+        dm_id   - int       - id of the dm
+    
+    Exceptions:
+        InputError  - Occurs when dm_id does not exist 
+        AccessError - Occurs when token is invalid
+                    - Occurs when user is not a member of the dm
+    
+    Return Value:
+        Returns {}
+    '''
     store = data_store.get()
 
     auth_user_id = validate_token(token)['user_id']
@@ -224,6 +238,21 @@ def dm_messages_v1(token, dm_id, start):
     return messages_dict
 
 def dm_remove_v1(token, dm_id):
+    '''
+    dm_remove_v1: removes a given dm
+    
+    Arguments:
+        token   - string    - token of the user
+        dm_id   - int       - id of the dm
+    
+    Exceptions:
+        InputError  - Occurs when dm_id does not exist 
+        AccessError - Occurs when token is invalid
+                    - Occurs when user is not the owner of the dm
+    
+    Return Value:
+        Returns {}
+    '''
     store = data_store.get()
 
     auth_user_id = validate_token(token)['user_id']
