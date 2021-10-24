@@ -146,10 +146,8 @@ def dm_leave_v1(token, dm_id):
 
     found = False
 
-    print('Store', store)
-
     for dm in store['dms']:
-        if dm['dm_id'] == dm_id:
+        if dm['id'] == dm_id:
             found = True
             if auth_user_id not in dm['members']:
                 raise AccessError(description='User is not a member of the DM')
@@ -157,7 +155,7 @@ def dm_leave_v1(token, dm_id):
                 dm['members'].remove(auth_user_id)
 
     if not found:
-        raise InputError(description='dm_id does not refere to valid DM')
+        raise InputError(description='dm_id does not refer to valid DM')
 
     data_store.set(store)
     
@@ -187,13 +185,11 @@ def dm_details_v1(token, dm_id):
     auth_user_id = validate_token(token)['user_id']
 
     # check if dm_id refers to valid dm
-    dm_list = [dm['dm_id'] for dm in store['dms']]
-    if len(dm_list) == 0:
-        raise InputError(description='Invalid dm_id')
+    if dm_id not in filter_data_store(store_list='dms',key='id'):
+        raise InputError(description="Invalid dm_id")
     
     # check if user is part of dm
-    dm_dict = [dm for dm in store['dms'] if dm_id == dm['dm_id']][0]
-    print (dm_dict)
+    dm_dict = filter_data_store(store_list='dms',key='id',value=dm_id)[0]
     if auth_user_id not in dm_dict['members']:
         raise AccessError(description="Not a member of DM")
 
@@ -215,6 +211,7 @@ def dm_details_v1(token, dm_id):
         'name': dm_dict['name'],
         'members': all_members_list
     }
+
 def dm_messages_v1(token, dm_id, start):
     '''
     dm_messages_v1: Given a dm_id and start, returns up to 50 messages from start to start + 50,
