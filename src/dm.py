@@ -2,56 +2,6 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store
 
-def dm_details_v1(token, dm_id):
-    '''
-    dm_details_v1: Given a valid authroised token and valid dm_id displays details for that dm 
-
-    Arguments:
-        token (string) - token string used to authorise and authenticate the user 
-        dm_id    - id of the dm from which details are pulled 
-        
-
-    Exceptions:
-        InputError  - Occurs when dm_id does not refer to a valid dm
-        AccessError - Occurs when dm_id is valid but authorised user is not a member of the dm
-        AccessError - Occurs when auth_user_id isn't valid 
-
-    Return Value:
-        Returns {name, members}
-    '''
-
-    store = data_store.get()
-
-    # check if token is valid
-    auth_user_id = validate_token(token)['user_id']
-
-    # check if dm_id refers to valid dm
-    if dm_id not in filter_data_store(store_list='dms',key='id'):
-        raise InputError(description="Invalid dm_id")
-    
-    # check if user is part of dm
-    dm_dict = filter_data_store(store_list='dms',key='id',value=dm_id)[0]
-    if auth_user_id not in dm_dict['members']:
-        raise AccessError(description="Not a member of DM")
-
-    all_members_list = []
-    # create dictionary for each member
-    for member in store['users']:
-        if member['id'] in dm_dict['members']:
-            member_dict = {
-                'u_id': member['id'],
-                'email': member['email'],
-                'name_first': member['name_first'],
-                'name_last': member['name_last'],
-                'handle_str': member['handle_str']
-            }
-            all_members_list.append(member_dict)
-
-
-    return {
-        'name': dm_dict['name'],
-        'members': all_members_list
-    }
 
 def dm_create_v1(token, u_ids):
     '''
