@@ -3,18 +3,24 @@ from src.error import AccessError, InputError
 from src.helpers import validate_token, filter_data_store, is_global_owner
 
 
-# Helper Function
 def check_valid_permission_id(permission_id):
+    '''
+    Checks that the permission id entered is valid (either 1 or 2)
+    '''
     if permission_id not in (1, 2):
         raise InputError(description='permission_id is invalid')
 
-# Helper Function
 def is_last_global_owner(u_id):
+    '''
+    Checks to see if the user id refers to the last global owner
+    '''
     global_owner_list = filter_data_store(store_list='users', key='permission_id', value=1)
     return len(global_owner_list) == 1 and global_owner_list[0]['id'] == u_id
 
-# Helper Function
 def remove_user_from_all_channels(channel_list, u_id):
+    '''
+    Removes the all traces of the user from all channels they are a member of
+    '''
     for channel_dict in channel_list:
         # Replacing contents of messages with 'Removed user'
         for message_dict in channel_dict['messages']:

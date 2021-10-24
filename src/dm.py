@@ -26,12 +26,11 @@ def dm_details_v1(token, dm_id):
     auth_user_id = validate_token(token)['user_id']
 
     # check if dm_id refers to valid dm
-    dm_list = [dm['id'] for dm in store['dms']]
-    if len(dm_list) == 0:
-        raise InputError(description='Invalid dm_id')
+    if dm_id not in filter_data_store(store_list='dms',key='id'):
+        raise InputError(description="Invalid dm_id")
     
     # check if user is part of dm
-    dm_dict = [dm for dm in store['dms'] if dm_id == dm['id']][0]
+    dm_dict = filter_data_store(store_list='dms',key='id',value=dm_id)[0]
     if auth_user_id not in dm_dict['members']:
         raise AccessError(description="Not a member of DM")
 
@@ -55,6 +54,22 @@ def dm_details_v1(token, dm_id):
     }
 
 def dm_create_v1(token, u_ids):
+    '''
+    dm_create_v1:
+    Creates a new dm with the specified u_ids.
+
+    Arguments:
+        token (string) - token string used to authorise and authenticate the user 
+        u_ids (list) - list of u_ids to be added to the dm
+
+    Exceptions:
+        InputError - Occurs when any u_id in u_ids does not refer to a valid user
+        AccessError - Occurs when token is invalid
+
+    Return Value:
+        Returns {channel_id} on successful run 
+
+    '''
     store = data_store.get()
 
     # check if token is valid
@@ -91,6 +106,21 @@ def dm_create_v1(token, u_ids):
     }
 
 def dm_list_v1(token):
+    '''
+    dm_list_v1: provides a list of all channels (and their associated details) that the authorised user is part of.
+    
+    Arguments:
+        token  - string    - token of the user
+    
+    Exceptions:
+        No InputError will be raised in this function  
+        AccessError - Occurs when token is invalid
+    
+    Return Value:
+        Returns a dictionary contains list of channels that the user belongs to when auth_user is valid
+        For example: { 'channels': [{'channel_id': 1, 'name': channel_1}, 
+                                    {'channel_id': 2, 'name': channel_2}]}
+    '''
     store = data_store.get()
 
     auth_user_id = validate_token(token)['user_id']

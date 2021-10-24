@@ -55,11 +55,11 @@ def channels_list_v2(token):
     channels_list_v2: provides a list of all channels (and their associated details) that the authorised user is part of.
     
     Arguments:
-        auth_user_id  - integer    - auth_id of the user
+        token  - string    - token of the user
     
     Exceptions:
         No InputError will be raised in this function  
-        AccessError - Occurs when auth_user is invalid
+        AccessError - Occurs when token is invalid
     
     Return Value:
         Returns a dictionary contains list of channels that the user belongs to when auth_user is valid
@@ -85,11 +85,11 @@ def channels_listall_v2(token):
     (and their associated details)
 
     Arguments:
-        auth_user_id - integer    - auth_id of the user
+        token - string    - token of the user
 
     Exceptions:
         No InputError will be raised in this function  
-        AccessError - Occurs when auth_user is invalid
+        AccessError - Occurs when token is invalid
 
     Return Value:
         Returns a dictionary contains all the channels in the stream when auth_user is valid
