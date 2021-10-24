@@ -191,7 +191,6 @@ def message_senddm_v1(token, dm_id, message):
         'message_id': new_message['message_id']
     }
 
-
 def message_remove_v1(token, message_id):
     '''
     message_remove_v1: Deletes a message from an authorised user to a channel specified
