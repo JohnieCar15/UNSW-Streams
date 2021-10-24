@@ -1,3 +1,4 @@
+import pickle
 '''
 data_store.py
 
@@ -25,9 +26,16 @@ Example usage:
 '''
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
+session_tracker = 0
+SECRET = 'JOjQqnzcMKrLVsTVLNc2hzA4iWkqqcQB'
+
 initial_object = {
     'users': [],
     'channels': [],
+    'messages': [],
+    'dms': [],
+    'removed_users': [],
+    'removed_messages': []
 }
 '''
 user = {
@@ -37,24 +45,47 @@ user = {
     'name_first': str,
     'name_last': str,
     'handle_str': str,
-    'permission_id': int
+    'permission_id': int,
+    'session_list': [int session_id]
 }
 
 channel = {
     'id': int,
     'name': str,
-    'owner': int,
+    'owner': [int u_id],
     'is_public': bool,
-    'members': [int id],
+    'members': [int u_id],
     'messages: []
+}
+
+dm = {
+    'id': int,
+    'name': str,
+    'owner': [int u_id],
+    'members': [int u_id],
+    'messages: [message]
+}
+
+message = {
+    'message_id': int,
+    'u_id': int,
+    'message': str,
+    'time_created': int unix timestamp
+}
+
+message_store = {
+    'message': message,
+    'channel_id': int
 }
 
 '''
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
-
 class Datastore:
     def __init__(self):
-        self.__store = initial_object
+        try:
+          self.__store = pickle.load(open("data_store.p", "rb"))
+        except Exception:
+          self.__store = initial_object
 
     def get(self):
         return self.__store
@@ -63,9 +94,10 @@ class Datastore:
         if not isinstance(store, dict):
             raise TypeError('store must be of type dictionary')
         self.__store = store
+        with open('data_store.p', 'wb') as FILE:
+            pickle.dump(store, FILE)
 
 print('Loading Datastore...')
 
 global data_store
 data_store = Datastore()
-
