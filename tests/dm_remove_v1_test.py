@@ -23,9 +23,7 @@ def test_dm_remove_v1():
         'name_last':'Last'
     }
 
-    user_2 = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
-    token_2 = user_2['token']
-    u_id_2 = user_2['auth_user_id']
+    u_id_2 = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['auth_user_id']
 
     dm_id = requests.post(config.url + 'dm/create/v1', json={'token': token_1, 'u_ids': [u_id_2]}).json()['dm_id']
 
@@ -101,9 +99,7 @@ def test_invalid_token_valid_dm_id():
         'name_last':'Last'
     }
 
-    user_2 = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
-    token_2 = user_2['token']
-    u_id_2 = user_2['auth_user_id']
+    u_id_2 = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()['auth_user_id']
 
     dm_id = requests.post(config.url + 'dm/create/v1', json={'token': token_1, 'u_ids': [u_id_2]}).json()['dm_id']
 
