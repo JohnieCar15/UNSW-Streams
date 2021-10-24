@@ -92,7 +92,7 @@ def test_user_not_a_member(clear_and_register):
             }
         ],
     }
-'''
+
 def test_valid_channel_2_members(clear_and_register):
     
     # get token for 1st user
@@ -102,7 +102,7 @@ def test_valid_channel_2_members(clear_and_register):
     # get token for 2nd user
     register = requests.post(config.url + 'auth/register/v2', json={'email': "yes2@yes.com", 'password': "aaaaaa", 'name_first': "name", "name_last": "name"})
     register_data = register.json()
-    id_num_2 = register_data["u_id"]
+    id_num_2 = register_data["auth_user_id"]
 
     register = requests.post(config.url + 'channel/invite/v2', json={'token': token, 'channel_id': channel_id, 'u_id': id_num_2})
 
@@ -140,7 +140,7 @@ def test_valid_channel_2_members(clear_and_register):
             }
         ],
     }
-'''
+
 # def test_valid_channel_two_owners
 
 def test_valid_channel_unauthorised(clear_and_register):
