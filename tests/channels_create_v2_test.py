@@ -26,11 +26,9 @@ def test_valid_id_valid_name_public(clear_and_register):
     channels_create_data = channels_create.json()
     channels_create_id = channels_create_data['channel_id']
     
-    channels_list = requests.get(config.url + 'channels/list/v2', params={'token': token})
-    channels_list_data = channels_list.json()['channels']
-    channels_list_id = channels_list_data[0]['channel_id']
+    channels_list = requests.get(config.url + 'channels/list/v2', params={'token': token}).json()
+    channels_list_id = channels_list['channels'][0]['channel_id']
     
-    assert channels_create.status_code == 200
     assert channels_create_id == channels_list_id
 
 def test_valid_id_invalid_short_channel_name_public(clear_and_register):
