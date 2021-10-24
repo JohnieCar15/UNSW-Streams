@@ -7,9 +7,9 @@ from src.error import InputError
 from src import config
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
+from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_messages_v1, dm_leave_v1
 from src.channel import channel_details_v2, channel_invite_v2, channel_join_v2, channel_messages_v2, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1
 from src.channels import channels_create_v2, channels_list_v2, channels_listall_v2
-from src.dm import dm_create_v1, dm_list_v1, dm_details_v1, dm_messages_v1, dm_leave_v1
 from src.message import message_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1
 from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 from src.other import clear_v1
@@ -142,6 +142,11 @@ def dm_create_v1_ep():
     data = request.get_json()
     return dumps(dm_create_v1(data['token'], data['u_ids']))
 
+@APP.route("/dm/remove/v1", methods=['DELETE'])
+def dm_remove_v1_ep():
+    data = request.get_json()
+
+    return dumps(dm_remove_v1(data['token'], data['dm_id']))
 
 @APP.route("/dm/details/v1", methods=['GET'])
 def dm_details_v1_endpoint():
@@ -152,33 +157,12 @@ def dm_details_v1_endpoint():
 @APP.route("/dm/leave/v1", methods=['POST'])
 def dm_leave_v1_ep():
     data = request.get_json()
-
     return dumps(dm_leave_v1(data['token'], data['dm_id']))
 
 @APP.route("/dm/list/v1", methods=['GET'])
 def dm_list_v1_ep():
     token = request.args.get('token')
     return dumps(dm_list_v1(token))
-
-
-#@APP.route("/dm/remove/v1", methods=['DELETE'])
-#def dm_remove_v1_ep():
-#    data = request.get_json()
-#    return dumps(dm_remove_v1(data['token'], data['dm_id']))
-
-
-@APP.route("/dm/details/v1", methods=['GET'])
-def dm_details_v1_ep():
-    token = request.args.get('token')
-    dm_id = int(request.args.get('dm_id'))
-    return dumps (dm_details_v1(token, dm_id))
-
-
-#@APP.route("/dm/leave/v1", methods=['POST'])
-#def dm_leave_v1_ep():
-#    data = request.get_json()
-#    return dumps(dm_leave_v1(data['token'], data['dm_id']))
-
 
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages_v1_ep():
@@ -224,12 +208,10 @@ def user_profile_sethandle_v1_ep():
     data = request.get_json()
     return dumps(user_profile_sethandle_v1(data['token'], data['handle_str']))
 
-
 @APP.route("/admin/user/remove/v1", methods=['DELETE'])
 def admin_user_remove_v1_ep():
     data = request.get_json()
     return dumps(admin_user_remove_v1(data['token'], data['u_id']))
-
 
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def admin_userpermission_change_v1_ep():

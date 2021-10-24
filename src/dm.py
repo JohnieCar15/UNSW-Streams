@@ -272,3 +272,25 @@ def dm_messages_v1(token, dm_id, start):
     data_store.set(store)
         
     return messages_dict
+
+def dm_remove_v1(token, dm_id):
+    store = data_store.get()
+
+    auth_user_id = validate_token(token)['user_id']
+
+    found = False
+
+    for dm in store['dms']:
+        if dm['id'] == dm_id:
+            found = True
+            if auth_user_id not in dm['owner']:
+                raise AccessError(description='User is not the owner of the DM')
+            else:
+                dm['id'] = None
+
+    if not found:
+        raise InputError(description='dm_id does not refer to valid DM')
+
+    data_store.set(store)
+
+    return {}
