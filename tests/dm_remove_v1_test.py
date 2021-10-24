@@ -29,6 +29,8 @@ def test_dm_remove_v1():
 
     dm_id = requests.post(config.url + 'dm/create/v1', json={'token': token_1, 'u_ids': [u_id_2]}).json()['dm_id']
 
+    requests.post(config.url + 'dm/create/v1', json={'token': token_1, 'u_ids': [u_id_2]})
+
     requests.delete(config.url + 'dm/remove/v1', json={'token': token_1, 'dm_id': dm_id})
 
     details_return = requests.get(config.url + 'dm/details/v1', params={'token': token_1, 'dm_id': dm_id})

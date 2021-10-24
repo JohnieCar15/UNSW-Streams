@@ -2,6 +2,59 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store
 
+def dm_details_v1(token, dm_id):
+    '''
+    dm_details_v1: Given a valid authroised token and valid dm_id displays details for that dm 
+
+    Arguments:
+        token (string) - token string used to authorise and authenticate the user 
+        dm_id    - id of the dm from which details are pulled 
+        
+
+    Exceptions:
+        InputError  - Occurs when dm_id does not refer to a valid dm
+        AccessError - Occurs when dm_id is valid but authorised user is not a member of the dm
+        AccessError - Occurs when auth_user_id isn't valid 
+
+    Return Value:
+        Returns {name, members}
+    '''
+
+    store = data_store.get()
+
+    # check if token is valid
+    auth_user_id = validate_token(token)['user_id']
+
+    # check if dm_id refers to valid dm
+    dm_list = [dm['id'] for dm in store['dms']]
+    print('DM_LIST', dm_list)
+    if dm_id not in dm_list:
+        raise InputError(description='Invalid dm_id')
+    
+    # check if user is part of dm
+    dm_dict = [dm for dm in store['dms'] if dm_id == dm['id']][0]
+    if auth_user_id not in dm_dict['members']:
+        raise AccessError(description="Not a member of DM")
+
+    all_members_list = []
+    # create dictionary for each member
+    for member in store['users']:
+        if member['id'] in dm_dict['members']:
+            member_dict = {
+                'u_id': member['id'],
+                'email': member['email'],
+                'name_first': member['name_first'],
+                'name_last': member['name_last'],
+                'handle_str': member['handle_str']
+            }
+            all_members_list.append(member_dict)
+
+
+    return {
+        'name': dm_dict['name'],
+        'members': all_members_list
+    }
+
 def dm_create_v1(token, u_ids):
     store = data_store.get()
 
@@ -14,9 +67,10 @@ def dm_create_v1(token, u_ids):
             raise InputError(description="Invalid user_id")
     
     # generate dm id
-    new_id = len(store['dms']) + 1
+    new_id = len(store['dms']) + len(store['channels']) + 1
     names = []
     u_ids.append(auth_user_id)
+    u_ids = list(set(u_ids))
     for uid in u_ids:
         names.append(filter_data_store(store_list='users', key='id', value=uid)[0]['handle_str'])
 
@@ -25,7 +79,7 @@ def dm_create_v1(token, u_ids):
     name_str = ", ".join(names)
 
     dm_dictionary = {
-        'dm_id': new_id,
+        'id': new_id,
         'name': name_str,
         'owner': [auth_user_id],
         'members': u_ids,
@@ -47,7 +101,7 @@ def dm_list_v1(token):
     for dm in store['dms']:
         if auth_user_id in dm['members']:
             dm_dictionary = {
-                'dm_id': dm['dm_id'],
+                'dm_id': dm['id'],
                 'name': dm['name']
             }
             dms.append(dm_dictionary)
@@ -64,16 +118,77 @@ def dm_remove_v1(token, dm_id):
     found = False
 
     for dm in store['dms']:
-        if dm['dm_id'] == dm_id:
+        if dm['id'] == dm_id:
             found = True
-            if dm['owner'] != auth_user_id:
+            if auth_user_id not in dm['owner']:
                 raise AccessError(description='User is not the owner of the DM')
             else:
-                store['dms'].remove(dm)
+                dm['id'] = None
 
     if not found:
         raise InputError(description='dm_id does not refer to valid DM')
 
     data_store.set(store)
-    
+
     return {}
+
+def dm_messages_v1(token, dm_id, start):
+    '''
+    dm_messages_v1: Given a dm_id and start, returns up to 50 messages from start to start + 50,
+    as well as the start and finishing indexes
+
+    Arguments:
+        token (string)    - token of a user
+        dm_id (int)    - id of a dm
+        start (int) - starting index of the messages to be returned
+        ...
+
+    Exceptions:
+        InputError  - Occurs when invalid dm id is entered
+                    - Occurs when start is greater than total number of messages
+        AccessError - Occurs when user is not part of dm members
+
+    Return Value:
+        Returns {messages, 'start', 'end'} on successful token, dm_id and start
+
+    '''
+    store = data_store.get()
+
+  # check if token is valid
+    auth_user_id = validate_token(token)['user_id']
+
+  # Checks if dm id is valid
+    if dm_id not in filter_data_store(store_list='dms', key='id'):
+        raise InputError(description="Invalid dm_id")
+  # Finds the dm with the correct id
+    new_dm = filter_data_store(store_list='dms', key='id', value=dm_id)[0]
+
+  # Check if user is in dm members
+    if auth_user_id not in new_dm['members']:
+        raise AccessError(description="Invalid user_id")
+
+    length = len(new_dm['messages']) - start
+    # A negative length implies that start > length
+    if length < 0:
+        raise InputError(description="Start is greater than total number of messages")
+    # Negative starts are invalid
+    if start < 0:
+      raise InputError(description="Invalid start")
+
+    messages_dict = {}
+    messages_dict['start'] = start
+    # Deals with all cases
+    if length == 0:
+        messages_dict['end'] = -1
+        messages_dict['messages'] = []
+    elif length <= 50:
+        messages_dict['end'] = -1
+        # Create a copy of all messages from start up to final index
+        messages_dict['messages'] = new_dm['messages'][start:start + length]
+    else:
+        messages_dict['end'] = start + 50
+        messages_dict['messages'] = new_dm['messages'][start:start + 50]
+
+    data_store.set(store)
+        
+    return messages_dict

@@ -12,6 +12,7 @@ def message_edit_v1(token, message_id, message):
         token (string)    - token of a user
         message_id (int)    - id of a message
         message (string) - message to be sent
+                         - Invalid token entered
         ...
 
     Exceptions:
@@ -38,7 +39,7 @@ def message_edit_v1(token, message_id, message):
         messagedict = look_message[0]
 
     # Checks which channel the message is sent in and finds that message
-    channel_dict = [channel for channel in store['channels'] if messagedict['channel_id'] == channel['id']][0]
+    channel_dict = [channel for channel in (store['channels'] + store['dms']) if messagedict['channel_id'] == channel['id']][0]
     selected_message = [message for message in channel_dict['messages'] if message['message_id'] == message_id][0]
 
     # Checks if user is part of that channel
@@ -70,13 +71,14 @@ def message_send_v1(token, channel_id, message):
     Arguments:
         token (string)    - token of a user
         channel_id (int)    - id of a channel
-        smessage (string) - message to be sent
+        message (string) - message to be sent
         ...
 
     Exceptions:
         InputError  - Occurs when invalid channel id is entered
                     - Length of message is less than 1 character or more than 1000 characters
         AccessError - Occurs when user is not part of channel members
+                    - Invalid token entered
 
     Return Value:
         Returns {message_id} on successful token, id and message
@@ -104,7 +106,7 @@ def message_send_v1(token, channel_id, message):
 
     # Sets up new keys for new message
     new_message = {}
-    new_message['message_id'] = len(store['messages']) + 1
+    new_message['message_id'] = len(store['messages']) + len(store['deleted_messages']) + 1
     new_message['u_id'] = auth_user_id
     new_message['message'] = message
 
@@ -124,12 +126,90 @@ def message_send_v1(token, channel_id, message):
         'message_id': new_message['message_id']
     }
 
-def message_remove_v1(token, message_id):
+def message_senddm_v1(token, dm_id, message):
+    '''
+    message_senddm_v1: Sends a message from an authorised user to a channel specified
+    by a channel_id
+
+    Arguments:
+        token (string)    - token of a user
+        dm_id (int)       - id of a channel
+        smessage (string) - message to be sent
+        ...
+
+    Exceptions:
+        InputError  - Occurs when invalid dm id is entered
+                    - Length of message is less than 1 character or more than 1000 characters
+        AccessError - Occurs when user is not part of channel members
+                    - Invalid token entered
+
+    Return Value:
+        Returns {message_id} on successful token, id and message
+
+    '''
     store = data_store.get()
 
-    print("*******************************")
-    print(store['messages'])
-    print("*******************************")
+    # check if token is valid
+    auth_user_id = validate_token(token)['user_id']
+
+    # Checks if channel id is valid
+    if dm_id not in filter_data_store(store_list='dms', key='id', value=None):
+        raise InputError(description="Invalid channel_id")
+
+    # Filters data store for correct channel
+    dm_dict = filter_data_store(store_list='dms', key='id', value=dm_id)[0]
+
+    # Checks if user is part of channel members
+    if auth_user_id not in dm_dict['members']:
+        raise AccessError(description="Not a member of channel")
+
+    # Checks if message is valid
+    if len(message) < 1 or len(message) > 1000:
+        raise InputError(description="Invalid message")
+
+    # Sets up new keys for new message
+    new_message = {}
+    new_message['message_id'] = len(store['messages']) + len(store['deleted_messages']) + 1
+    new_message['u_id'] = auth_user_id
+    new_message['message'] = message
+
+    new_message['time_created'] = int(datetime.utcnow().timestamp())
+
+    # Data store creates extra field of channel id for easier identification
+    message_store = {}
+    message_store['message'] = new_message
+    message_store['channel_id'] = dm_id
+    
+    dm_dict['messages'].insert(0, new_message)
+    store['messages'].insert(0, message_store)
+
+    data_store.set(store)
+
+    return { 
+        'message_id': new_message['message_id']
+    }
+
+
+def message_remove_v1(token, message_id):
+    '''
+    message_remove_v1: Deletes a message from an authorised user to a channel specified
+    by a channel_id
+
+    Arguments:
+        token (string)    - token of a user
+        dm_id (int)       - id of a channel
+        ...
+
+    Exceptions:
+        InputError  - Occurs when invalid message id is entered
+        AccessError - Invalid token entered
+                    - Occurs when user did not make request and is not owner
+
+    Return Value:
+        Returns {} on successful token, id and message
+
+    '''
+    store = data_store.get()
 
     # check if token is valid
     auth_user_id = validate_token(token)['user_id']
@@ -144,7 +224,7 @@ def message_remove_v1(token, message_id):
         messagedict = look_message[0]
 
     # Checks which channel the message is sent in and finds that message
-    channel_dict = [channel for channel in store['channels'] if messagedict['channel_id'] == channel['id']][0]
+    channel_dict = [channel for channel in (store['channels'] + store['dms']) if messagedict['channel_id'] == channel['id']][0]
     selected_message = [message for message in channel_dict['messages'] if message['message_id'] == message_id][0]
 
     # Checks if user is part of that channel
@@ -155,6 +235,7 @@ def message_remove_v1(token, message_id):
         raise AccessError(description="Permission denied")
     
     # Remove selected messages from data store and channel messages
+    store['deleted_messages'].append(messagedict)
     store['messages'].remove(messagedict)
     channel_dict['messages'].remove(selected_message)
 
