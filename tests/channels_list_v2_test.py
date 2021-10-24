@@ -3,13 +3,6 @@ import requests
 from src import config
 from src.error import AccessError
 
-# assumption: channels_listall_v1 will return {list of channels} in the form of 
-# {'channels': [{'channel_id': channel_id, 'name': 'channel_name'}, ... ]}
-# and according to https://edstem.org/au/courses/7025/discussion/613604
-# the order of those channels is not important, so the test will be passed 
-# for any order of the correct list
-
-
 # Help functions:
 
 # Sorts list of channels by channel_id
@@ -17,7 +10,7 @@ def sort_list(channel_list):
     return sorted(channel_list, key=lambda k: k['channel_id'])
 
 
-# regiseter a user and return {"token": token, "auth_user_id": u_id}
+# register a user and return {"token": token, "auth_user_id": u_id}
 def user_register(email, password, name_first, name_last):
     input = {
         "email" : email,
@@ -50,13 +43,13 @@ def channels_list(user):
     return requests.get(config.url + 'channels/list/v2', params={"token": user["token"]}).json()
 
 
-# this fuction will create two channels: public_0 and private_0
+# this function will create two channels: public_0 and private_0
 # and register four users: 
 # public_0 owner, public_0, member,
 # private_0 owner, private_0 member,
 # then return all users and channels created by it
 @pytest.fixture
-def clear_then_crete_public0_and_private0():
+def clear_then_create_public0_and_private0():
     requests.delete(config.url + 'clear/v1')
     # register public_0_owner and create channel public_0
 
@@ -110,8 +103,8 @@ def test_valid_user_not_in_any_channel():
     user_in_no_channels = user_register("0000@unsw.edu.au", "password", "firstname0", "lastname0")
     assert channels_list(user_in_no_channels) == {'channels': []}
 
-def test_owner_of_one_public_channel(clear_then_crete_public0_and_private0):
-    public0_and_private0 = clear_then_crete_public0_and_private0
+def test_owner_of_one_public_channel(clear_then_create_public0_and_private0):
+    public0_and_private0 = clear_then_create_public0_and_private0
     public_0_owner = public0_and_private0["public_0_owner"]
     public_0 = public0_and_private0["public_0"]
     assert channels_list(public_0_owner) == {
@@ -122,8 +115,8 @@ def test_owner_of_one_public_channel(clear_then_crete_public0_and_private0):
     }
 
 
-def test_member_of_one_public_channel(clear_then_crete_public0_and_private0):
-    public0_and_private0 = clear_then_crete_public0_and_private0
+def test_member_of_one_public_channel(clear_then_create_public0_and_private0):
+    public0_and_private0 = clear_then_create_public0_and_private0
     public_0_member = public0_and_private0["public_0_member"]
     public_0 = public0_and_private0["public_0"]
     assert channels_list(public_0_member) == {
@@ -134,8 +127,8 @@ def test_member_of_one_public_channel(clear_then_crete_public0_and_private0):
     }
 
 
-def test_owner_of_one_private_channel(clear_then_crete_public0_and_private0):
-    public0_and_private0 = clear_then_crete_public0_and_private0
+def test_owner_of_one_private_channel(clear_then_create_public0_and_private0):
+    public0_and_private0 = clear_then_create_public0_and_private0
     private_0_owner = public0_and_private0["private_0_owner"]
     private_0 = public0_and_private0["private_0"]
     assert channels_list(private_0_owner) == {
@@ -146,8 +139,8 @@ def test_owner_of_one_private_channel(clear_then_crete_public0_and_private0):
     }
 
 
-def test_member_of_one_private_channel(clear_then_crete_public0_and_private0):
-    public0_and_private0 = clear_then_crete_public0_and_private0
+def test_member_of_one_private_channel(clear_then_create_public0_and_private0):
+    public0_and_private0 = clear_then_create_public0_and_private0
     private_0_member = public0_and_private0["private_0_member"]
     private_0 = public0_and_private0["private_0"]
     assert channels_list(private_0_member) == {
@@ -158,8 +151,8 @@ def test_member_of_one_private_channel(clear_then_crete_public0_and_private0):
     }
 
 
-def test_complex_case(clear_then_crete_public0_and_private0):
-    public0_and_private0 = clear_then_crete_public0_and_private0
+def test_complex_case(clear_then_create_public0_and_private0):
+    public0_and_private0 = clear_then_create_public0_and_private0
 
     public_0_owner = public0_and_private0["public_0_owner"]
     public_0_member = public0_and_private0["public_0_member"]

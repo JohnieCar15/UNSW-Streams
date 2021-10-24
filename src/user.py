@@ -32,10 +32,10 @@ def users_all_v1(token):
     # raise AccessError("Invalid token")
     validate_token(token)
     # get a list of user
-    user_list = filter_data_store(store_list='users', key='is_removed', value=False)
+    store = data_store.get()
 
     list_of_user = []
-    for user in user_list:
+    for user in store['users']:
             list_of_user.append(
                 {
                     'u_id': user['id'],
@@ -46,7 +46,7 @@ def users_all_v1(token):
                 }
             )
 
-    return { 'users': list_of_user}
+    return {'users': list_of_user}
 
 
 def user_profile_v1(token, u_id):
@@ -72,12 +72,12 @@ def user_profile_v1(token, u_id):
             'handle_str': handle_str},
         }                     
     """
-
+    store = data_store.get()
     # Checking if token is valid
     # if token can not be decoded
     # raise AccessError("Invalid token")
     validate_token(token)
-    user = filter_data_store(store_list='users', key='id', value=u_id)
+    user = [user for user in (store['users'] + store['removed_users']) if user['id'] == u_id]
     if user == []:
         raise InputError("Invalid u_id")
 
