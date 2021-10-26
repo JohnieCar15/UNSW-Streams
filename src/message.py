@@ -1,6 +1,6 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
-from src.helpers import validate_token, filter_data_store
+from src.helpers import is_global_owner, validate_token, filter_data_store
 from datetime import datetime
 
 def message_edit_v1(token, message_id, message):
@@ -46,7 +46,7 @@ def message_edit_v1(token, message_id, message):
     if auth_user_id not in channel_dict['members']:
         raise AccessError(description="Not a member of channel")
     
-    if auth_user_id != messagedict['message']['u_id'] and auth_user_id not in channel_dict['owner']:
+    if auth_user_id != messagedict['message']['u_id'] and auth_user_id not in channel_dict['owner'] and not is_global_owner(auth_user_id):
         raise AccessError(description="Permission denied")
 
     if len(message) > 1000:
@@ -232,7 +232,7 @@ def message_remove_v1(token, message_id):
     if auth_user_id not in channel_dict['members']:
         raise AccessError(description="Not a member of channel")
     
-    if auth_user_id != messagedict['message']['u_id'] and auth_user_id not in channel_dict['owner']:
+    if auth_user_id != messagedict['message']['u_id'] and auth_user_id not in channel_dict['owner'] and not is_global_owner(auth_user_id):
         raise AccessError(description="Permission denied")
     
     # Remove selected messages from data store and channel messages
