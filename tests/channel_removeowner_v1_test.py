@@ -118,7 +118,7 @@ def test_nonmeber_global_owner_removeowner():
         'u_id': u_id_3
     })
     
-    channel_addowner = requests.post(config.url + 'channel/addowner/v1', json={
+    requests.post(config.url + 'channel/addowner/v1', json={
         'token': token_2, 
         'channel_id': channel_id, 
         'u_id': u_id_3
