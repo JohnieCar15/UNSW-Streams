@@ -277,4 +277,65 @@ def test_dmmessage_edit():
 
     assert dm_messages['messages'] == []
 
+def test_globalowner_remove():
+    requests.delete(config.url + '/clear/v1')
+
+    auth_register_input1 = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    global_token = requests.post(config.url + '/auth/register/v2', json=auth_register_input1).json()['token'] 
+
+    auth_register_input2 = {
+        'email' : "newperson@gmail.com",
+        'password' : "password123",
+        'name_first' : "New",
+        'name_last' : "Person",
+    }
+
+    normal_token = requests.post(config.url + '/auth/register/v2', json=auth_register_input2).json()['token'] 
+
+    channel_create_input = {
+        'token' : normal_token,
+        'name' : "channel",
+        'is_public' : True
+    }
+
+    channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input).json()['channel_id']
+
+    join_channel_input = {
+        'token' : global_token,
+        'channel_id' : channel_id
+    }
+
+    requests.post(config.url + 'channel/join/v2', json=join_channel_input).json()
+
+    send_message_input = {
+        'token' : normal_token,
+        'channel_id': channel_id,
+        'message': "Hello!"
+    }
+
+    message_id = requests.post(config.url + '/message/send/v1', json=send_message_input).json()['message_id']
+
+    message_remove_input = {
+        'token' : global_token,
+        'message_id' : message_id,
+    }
+
+    requests.delete(config.url + 'message/remove/v1', json=message_remove_input)
+
+    channel_messages_input = {
+        'token' : normal_token,
+        'channel_id' : channel_id,
+        'start' : 0
+    }
+
+    channel_messages = requests.get(config.url + '/channel/messages/v2', params=channel_messages_input).json()
+
+    assert channel_messages['messages'] == []
+
 
