@@ -129,7 +129,7 @@ def test_share_channel(register_create_channel):
     assert channel_messages['messages'][0]['message'] == "Hello!" + "World!"
     assert abs((channel_messages['messages'][0]['time_created'] - messagedict['timelist'][0])) < 2
     assert channel_messages['messages'][0]['reacts'] == { 
-                                                        'react_id': 0,
+                                                        'react_id': 1,
                                                         'u_ids': [],
                                                         'is_this_user_reacted': False,
                                                 }
@@ -177,7 +177,7 @@ def test_share_dm(register_create_dm):
     assert dm_messages['messages'][0]['message'] == "Hello!" + "World!"
     assert abs((dm_messages['messages'][0]['time_created'] - timesent)) < 2
     assert dm_messages['messages'][0]['reacts'] == { 
-                                                        'react_id': 0,
+                                                        'react_id': 1,
                                                         'u_ids': [],
                                                         'is_this_user_reacted': False,
                                                 }
