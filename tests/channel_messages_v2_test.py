@@ -68,17 +68,6 @@ def get_messages(register_create, start):
 
     return channel_messages
 
-# HELPER FUNCTION
-# Checks if time provided in channel_messages is within two seconds of sending message request
-# Returns original time of channel_messages if true (to allow assertion), else returns False
-def time_in_range(new_time, channel_messages, length):
-    difference = new_time - channel_messages['messages']['time_created'][length]
-
-    if difference.TotalSeconds < 2:
-        return channel_messages['messages']['time_created'][length]
-    else:
-        return None
-
 # Tests case where there are no messages
 def test_empty(register_create):
 
