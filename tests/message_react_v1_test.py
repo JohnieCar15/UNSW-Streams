@@ -88,6 +88,37 @@ def test_normal_react(register_create_channel):
         'is_this_user_reacted' : True
     }
 
+def test_member_react(register_create_channel):
+   
+    messagedict = send_message(register_create_channel, 1)
+
+    auth_register_input = {
+        'email' : "newperson@gmail.com",
+        'password' : "password123",
+        'name_first' : "New",
+        'name_last' : "Person",
+    }
+
+    member = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
+
+
+    message_react_input = {
+        'token' : member['token'],
+        'message_id' : messagedict['message_id_list'][0],
+        'react_id' : 1
+    }
+
+    requests.post(config.url + '/message/react/v1', json=message_react_input).json()
+
+
+    channel_messages = get_messages(register_create_channel, 0)
+
+    assert channel_messages['messages'][0]['reacts'] == {
+        'react_id' : 1,
+        'u_ids' : [member['auth_user_id']],
+        'is_this_user_reacted' : False
+    } 
+
 def test_invalid_message_id(register_create_channel):
     messagedict = send_message(register_create_channel, 1)
 
@@ -98,7 +129,7 @@ def test_invalid_message_id(register_create_channel):
         'react_id' : 1
     }
 
-    status = requests.post(config.url + '/message/react/v1', json=message_react_input).json()
+    status = requests.post(config.url + '/message/react/v1', json=message_react_input)
 
     assert status.status_code == InputError.code
 
@@ -112,7 +143,7 @@ def test_invalid_react_id(register_create_channel):
         'react_id' : 5
     }
 
-    status = requests.post(config.url + '/message/react/v1', json=message_react_input).json()
+    status = requests.post(config.url + '/message/react/v1', json=message_react_input)
 
     assert status.status_code == InputError.code
 
@@ -133,7 +164,7 @@ def test_already_reacted(register_create_channel):
         'react_id' : 1
     }
 
-    status = requests.post(config.url + '/message/react/v1', json=message_react_input).json()
+    status = requests.post(config.url + '/message/react/v1', json=message_react_input)
 
     assert status.status_code == InputError.code
 
@@ -146,6 +177,6 @@ def test_invalid_token(register_create_channel):
         'react_id' : 1
     }
 
-    status = requests.post(config.url + '/message/react/v1', json=message_react_input).json()
+    status = requests.post(config.url + '/message/react/v1', json=message_react_input)
 
     assert status.status_code == AccessError.code
