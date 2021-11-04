@@ -109,7 +109,13 @@ def message_send_v1(token, channel_id, message):
         'message_id': len(store['messages']) + len(store['removed_messages']) + 1,
         'u_id': auth_user_id,
         'message': message,
-        'time_created': int(datetime.utcnow().timestamp())
+        'time_created': int(datetime.utcnow().timestamp()),
+        'reacts' : {
+            'react_id' : 1,
+            'u_ids' : [],
+            'is_this_user_reacted' : False
+        },
+        'is_pinned' : False
     }
 
     # Data store creates extra field of channel id for easier identification
@@ -173,7 +179,13 @@ def message_senddm_v1(token, dm_id, message):
         'message_id': len(store['messages']) + len(store['removed_messages']) + 1,
         'u_id': auth_user_id,
         'message': message,
-        'time_created': int(datetime.utcnow().timestamp())
+        'time_created': int(datetime.utcnow().timestamp()),
+        'reacts' : {
+            'react_id' : 1,
+            'u_ids' : [],
+            'is_this_user_reacted' : False
+        },
+        'is_pinned' : False
     }
 
     # Data store creates extra field of channel id for easier identification
