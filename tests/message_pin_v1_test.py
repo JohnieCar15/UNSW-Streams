@@ -4,8 +4,6 @@ from src import config
 from src.error import InputError, AccessError
 from datetime import datetime
 
-from tests.channel_messages_v2_test import register_create
-
 # Clears datastore, registers user and creates a channel (making the user a member)
 @pytest.fixture
 def register_create_channel():
@@ -91,7 +89,7 @@ def test_invalid_message_id(register_create_channel):
         'message_id' : messagedict['message_id_list'][0] + 1
     }
 
-    status = requests.post(config.url + 'message/pin/v1', json=message_pin_input).json()
+    status = requests.post(config.url + 'message/pin/v1', json=message_pin_input)
 
     assert status.status_code == InputError.code
 
@@ -104,14 +102,16 @@ def test_already_pinned(register_create_channel):
         'message_id' : messagedict['message_id_list'][0]
     }
 
-    status = requests.post(config.url + 'message/pin/v1', json=message_pin_input1).json()
+    status = requests.post(config.url + 'message/pin/v1', json=message_pin_input1)
+
+    assert status.status_code == 200
 
     message_pin_input2 = {
         'token' : register_create_channel['valid_token'],
         'message_id' : messagedict['message_id_list'][0]
     }
 
-    status = requests.post(config.url + 'message/pin/v1', json=message_pin_input2).json()
+    status = requests.post(config.url + 'message/pin/v1', json=message_pin_input2)
 
     assert status.status_code == InputError.code
 
@@ -124,7 +124,7 @@ def test_invalid_token(register_create_channel):
         'message_id' : messagedict['message_id_list'][0]
     }
 
-    status = requests.post(config.url + 'message/pin/v1', json=message_pin_input).json()
+    status = requests.post(config.url + 'message/pin/v1', json=message_pin_input)
 
     assert status.status_code == AccessError.code
 
@@ -152,6 +152,6 @@ def test_not_owner(register_create_channel):
         'message_id' : messagedict['message_id_list'][0]
     }
 
-    status = requests.post(config.url + 'message/pin/v1', json=message_pin_input).json()
+    status = requests.post(config.url + 'message/pin/v1', json=message_pin_input)
 
     assert status.status_code == AccessError.code
