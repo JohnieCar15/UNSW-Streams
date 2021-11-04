@@ -186,6 +186,6 @@ def test_invalid_token(register_create_channel):
         'react_id' : 1
     }
 
-    status = requests.post(config.url + '/message/react/v1', json=message_react_input)
+    status = requests.post(config.url + '/message/unreact/v1', json=message_react_input)
 
     assert status.status_code == AccessError.code
