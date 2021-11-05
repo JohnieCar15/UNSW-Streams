@@ -14,7 +14,6 @@ def notifications_get_v1(token):
 
 def add_notification(u_id, trigger_u_id, channel_id, notification_type, message=None):
     store = data_store.get()
-    print('!!!!!!!!!!!!', notification_type)
     notifications_list = filter_data_store(store_list='users', key='id', value=u_id)[0]['notifications']
     trigger_user_handle = filter_data_store(store_list='users', key='id', value=trigger_u_id)[0]['handle_str']
 
@@ -31,7 +30,6 @@ def add_notification(u_id, trigger_u_id, channel_id, notification_type, message=
     elif notification_type == 'react':
         notification['notification_message'] = f"{trigger_user_handle} reacted to your message in {channel_name}"
     elif notification_type == 'invite':
-        print('!!!!!!!!!!!!')
         notification['notification_message'] = f"{trigger_user_handle} added you to {channel_name}"
 
     notifications_list.insert(0, notification)
