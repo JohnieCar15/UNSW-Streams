@@ -11,6 +11,7 @@ from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_mes
 from src.channel import channel_details_v2, channel_invite_v2, channel_join_v2, channel_messages_v2, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1
 from src.channels import channels_create_v2, channels_list_v2, channels_listall_v2
 from src.message import message_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1
+from src.notifications import notifications_get_v1
 from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 from src.other import clear_v1
 
@@ -226,10 +227,14 @@ def admin_userpermission_change_v1_ep():
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear_v1_ep():
     return dumps(clear_v1())
-    
 
+
+@APP.route("/notifications/get/v1", methods=['GET'])
+def notifications_get_v1_ep():
+    token = request.args.get('token')
+    return dumps(notifications_get_v1(token))
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port) # Do not edit this port
+    APP.run(port=config.port, debug=True) # Do not edit this port

@@ -48,7 +48,8 @@ user = {
     'name_last': str,
     'handle_str': str,
     'permission_id': int,
-    'session_list': [int session_id]
+    'session_list': [int session_id],
+    'notifications': []
 }
 
 channel = {
@@ -80,6 +81,12 @@ message_store = {
     'channel_id': int
 }
 
+
+notification = {
+    'notification_message': str,
+    'channel_id': int,
+    'dm_id':int
+}
 '''
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 class Datastore:

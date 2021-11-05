@@ -2,6 +2,7 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import is_global_owner, validate_token, filter_data_store
 from datetime import datetime
+from src.notifications import add_notification, find_tagged_users
 
 def message_edit_v1(token, message_id, message):
     '''
@@ -58,6 +59,12 @@ def message_edit_v1(token, message_id, message):
     else:
         messagedict['message']['message'] = message
         selected_message['message'] = message
+
+        # Checking if any users were tagged in the message and sending them a notification
+        tagged_users_list = find_tagged_users(message)
+        for u_id in tagged_users_list:
+            if u_id in channel_dict['members']:
+                add_notification(u_id, auth_user_id, channel_dict['id'], 'tagged', message)
         
     data_store.set(store)
 
@@ -90,7 +97,7 @@ def message_send_v1(token, channel_id, message):
     auth_user_id = validate_token(token)['user_id']
 
     # Checks if channel id is valid
-    if channel_id not in filter_data_store(store_list='channels', key='id', value=None):
+    if channel_id not in filter_data_store(store_list='channels', key='id'):
         raise InputError(description="Invalid channel_id")
 
     # Filters data store for correct channel
@@ -111,6 +118,12 @@ def message_send_v1(token, channel_id, message):
         'message': message,
         'time_created': int(datetime.utcnow().timestamp())
     }
+
+    # Checking if any users were tagged in the message and sending them a notification
+    tagged_users_list = find_tagged_users(message)
+    for u_id in tagged_users_list:
+        if u_id in channel_dict['members']:
+            add_notification(u_id, auth_user_id, channel_id, 'tagged', message)
 
     # Data store creates extra field of channel id for easier identification
     message_store = {
@@ -154,7 +167,7 @@ def message_senddm_v1(token, dm_id, message):
     auth_user_id = validate_token(token)['user_id']
 
     # Checks if channel id is valid
-    if dm_id not in filter_data_store(store_list='dms', key='id', value=None):
+    if dm_id not in filter_data_store(store_list='dms', key='id'):
         raise InputError(description="Invalid channel_id")
 
     # Filters data store for correct channel
@@ -175,6 +188,12 @@ def message_senddm_v1(token, dm_id, message):
         'message': message,
         'time_created': int(datetime.utcnow().timestamp())
     }
+
+    # Checking if any users were tagged in the message and sending them a notification
+    tagged_users_list = find_tagged_users(message)
+    for u_id in tagged_users_list:
+        if u_id in dm_dict['members']:
+            add_notification(u_id, auth_user_id, dm_id, 'tagged', message)
 
     # Data store creates extra field of channel id for easier identification
     message_store = {
