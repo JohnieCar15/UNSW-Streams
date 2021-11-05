@@ -1,13 +1,32 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store, is_global_owner
-from datetime import datetime, timedelta
+from datetime import datetime
 import threading
 import time
 
 def standup_start_v1(token, channel_id, length):
-    store = data_store.get()
+    '''
+    standup_start_v1:
+    For a given channel start the standup period for the next "length" seconds. Returns time_finish
 
+    Arguments:
+        token (string) - token string used to authorise and authenticate the user 
+        channel_id(int) - id of the channel for the standup to start
+        length(int) - The time in seconds thats the meeting will go on for 
+
+    Exceptions:      
+        InputError - channel_id does not refer to a valid channel
+        InputError  - length is a negative integer
+        InputError - an active standup is currently running in the channel
+      
+      AccessError - channel_id is valid and the authorised user is not a member of the channel
+
+    Return Value:
+        Returns {time_finish} on successful run 
+
+    '''
+    store = data_store.get()
     # check valid token 
     auth_user_id = validate_token(token)['user_id']
     # check valid channel id
@@ -24,14 +43,15 @@ def standup_start_v1(token, channel_id, length):
     if channel_dict['standup_active'] == True:
         raise InputError(description="Already an active standup")
     # set standup to be True 
-    channel_dict['standup_active'] == True
+    channel_dict['standup_active'] = True
     # calculate time_finish
-    time_finish = int(datetime.utcnow()+ timedelta(seconds=length).timestamp())
+    time_finish = int(datetime.utcnow().timestamp() + (length))
     # threading after length set standup to be False 
-    t = threading.Timer(legnth, standup_end(channel_dict, auth_user_id, time_finish))
+    t = threading.Timer(length, standup_end, [channel_dict, auth_user_id, time_finish])
     t.start()
+    data_store.set(store)
     # return time_finish
-    return time_finish
+    return {'time_finish': time_finish}
 
 def standup_end(channel_dict, auth_user_id, time_finish):
     store = data_store.get()
@@ -50,4 +70,5 @@ def standup_end(channel_dict, auth_user_id, time_finish):
     channel_dict['messages'].insert(0, standup_message)
     store['messages'].insert(0, message_store)
     # set standup_active to False
-    channel_dict['standup_active'] == False
+    channel_dict['standup_active'] = False
+    data_store.set(store)
