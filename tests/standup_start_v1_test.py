@@ -2,7 +2,7 @@ import pytest
 import requests
 from src import config 
 from src.error import AccessError, InputError
-from datetime import datetime, timedelta
+from datetime import datetime
 
 @pytest.fixture 
 def clear_and_register_channel():
@@ -39,8 +39,7 @@ def test_successful_case(clear_and_register_channel):
         'channel_id': channel_id,
         'length': 60,
     }).json()
-    cur_time = datetime.utcnow()
-    time_finish = int((cur_time + timedelta(seconds = 60)).timestamp())
+    time_finish = int(datetime.utcnow().timestamp() + 60)
     assert standup_start['time_finish'] == time_finish
 
 def test_invalid_channel_id(clear_and_register_channel):
@@ -51,7 +50,7 @@ def test_invalid_channel_id(clear_and_register_channel):
         'token': token,
         'channel_id': channel_id + 1,
         'length': 60 
-    }).json()
+    })
     assert standup_start.status_code == InputError.code
 
 def test_invalid_length(clear_and_register_channel):
@@ -62,7 +61,7 @@ def test_invalid_length(clear_and_register_channel):
         'token': token,
         'channel_id': channel_id,
         'length': -60,
-    }).json()
+    })
     assert standup_start.status_code == InputError.code
 
 def test_active_standup_already(clear_and_register_channel):
@@ -75,11 +74,17 @@ def test_active_standup_already(clear_and_register_channel):
         'length': 60,
     })
 
+    requests.post(config.url + 'standup/start/v1', json={
+        'token': token,
+        'channel_id': channel_id,
+        'length': 60 
+    })
+
     standup_start = requests.post(config.url + 'standup/start/v1', json={
         'token': token,
         'channel_id': channel_id,
         'length': 60 
-    }).json()
+    })
     assert standup_start.status_code == InputError.code
 
 def test_not_a_member(clear_and_register_channel):
@@ -99,7 +104,7 @@ def test_not_a_member(clear_and_register_channel):
         'token': token_2,
         'channel_id': channel_id,
         'length': 60 
-    }).json()
+    })
 
     assert standup_start.status_code == AccessError.code
 
@@ -120,7 +125,7 @@ def test_not_a_member_negative_length(clear_and_register_channel):
         'token': token_2,
         'channel_id': channel_id,
         'length': -60 
-    }).json()
+    })
 
     assert standup_start.status_code == AccessError.code
 
@@ -147,7 +152,7 @@ def test_not_a_member_active_standup(clear_and_register_channel):
         'token': token_2,
         'channel_id': channel_id,
         'length': 60 
-    }).json()
+    })
     
     assert standup_start.status_code == AccessError.code
     
@@ -174,7 +179,7 @@ def test_invalid_token_valid_channel_id():
         'token': 1,
         'channel_id': channel_id,
         'length': 60 
-    }).json()
+    })
 
     assert standup_start.status_code == AccessError.code
 
@@ -184,6 +189,6 @@ def test_invalid_token_invalid_channel_id():
         'token': 1,
         'channel_id': 1,
         'length': 60 
-    }).json()
+    })
 
     assert standup_start.status_code == AccessError.code
