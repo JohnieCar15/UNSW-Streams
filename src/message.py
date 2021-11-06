@@ -113,7 +113,6 @@ def message_send_v1(token, channel_id, message):
         'reacts' : [{
             'react_id' : 1,
             'u_ids' : [],
-            'is_this_user_reacted' : False
         }],
         'is_pinned' : False
     }
@@ -183,7 +182,6 @@ def message_senddm_v1(token, dm_id, message):
         'reacts' : [{
             'react_id' : 1,
             'u_ids' : [],
-            'is_this_user_reacted' : False
         }],
         'is_pinned' : False
     }
