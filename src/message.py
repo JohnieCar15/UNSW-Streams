@@ -107,7 +107,7 @@ def message_send_v1(token, channel_id, message):
 
     # Sets up new keys for new message
     new_message = {
-        'message_id': len(store['messages']) + len(store['removed_messages']) + store['pending_messages'] + 1,
+        'message_id': len(store['messages']) + len(store['removed_messages']) + len(store['pending_messages']) + 1,
         'u_id': auth_user_id,
         'message': message,
         'time_created': int(datetime.utcnow().timestamp())
@@ -171,7 +171,7 @@ def message_senddm_v1(token, dm_id, message):
 
     # Sets up new keys for new message
     new_message = {
-        'message_id': len(store['messages']) + len(store['removed_messages']) + store['pending_messages'] + 1,
+        'message_id': len(store['messages']) + len(store['removed_messages']) + len(store['pending_messages']) + 1,
         'u_id': auth_user_id,
         'message': message,
         'time_created': int(datetime.utcnow().timestamp())
@@ -271,31 +271,39 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     if seconds_difference < 0:
         raise InputError(description="Invalid time")
 
-    store['pending_messages'] += 1
-    new_message_id = len(store['messages']) + len(store['removed_messages']) + store['pending_messages'] 
+    new_message = {
+        'message_id': len(store['messages']) + len(store['removed_messages']) + len(store['pending_messages']) + 1,
+        'u_id': auth_user_id,
+        'message': message,
+        'time_created': int(datetime.utcnow().timestamp())
+    }
 
-    t = Timer(seconds_difference, message_sendlater_v1_dummy, [token, channel_id, message, new_message_id])
+    # Stores request sent by user and time they made that request
+    store['pending_messages'].insert(0, new_message)
+
+    t = Timer(seconds_difference, message_sendlater_v1_dummy, [channel_id, new_message, channel_dict])
     t.start()
 
     data_store.set(store)
 
     return {
-        'message_id' : new_message_id
+        'message_id' : new_message['message_id']
     }
 
-def message_sendlater_v1_dummy(token, channel_id, message, new_message_id):
+def message_sendlater_v1_dummy(channel_id, new_message, channel_dict):
     store = data_store.get()
 
-    message_id = message_send_v1(token, channel_id, message)['message_id']
+    # Modifies new time to be when message is being sent
+    new_message['time_created'] = int(datetime.utcnow().timestamp())
 
-    # Filters data store for correct message
-    channel_dict = [channel for channel in (store['channels'] + store['dms']) if channel_id == channel['id']][0]
-    selected_message = [message for message in channel_dict['messages'] if message['message_id'] == message_id][0]
-    selected_message['message_id'] = new_message_id
-
-    store['pending_messages'] -= 1
+    # Data store creates extra field of channel id for easier identification
+    message_store = {
+        'message': new_message,
+        'channel_id': channel_id
+    }
+    
+    channel_dict['messages'].insert(0, new_message)
+    store['messages'].insert(0, message_store)
+    store['pending_messages'].remove(new_message)
 
     data_store.set(store)
-
-
-

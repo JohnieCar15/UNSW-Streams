@@ -36,7 +36,7 @@ initial_object = {
     'dms': [],
     'removed_users': [],
     'removed_messages': [],
-    'pending_messages' : 0,
+    'pending_messages' : [],
     'removed_dms': []
 }
 '''
