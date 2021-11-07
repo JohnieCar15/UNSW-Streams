@@ -2,6 +2,7 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import is_global_owner, validate_token, filter_data_store
 from datetime import datetime
+from threading import Timer
 
 def message_edit_v1(token, message_id, message):
     '''
@@ -106,7 +107,7 @@ def message_send_v1(token, channel_id, message):
 
     # Sets up new keys for new message
     new_message = {
-        'message_id': len(store['messages']) + len(store['removed_messages']) + 1,
+        'message_id': len(store['messages']) + len(store['removed_messages']) + store['pending_messages'] + 1,
         'u_id': auth_user_id,
         'message': message,
         'time_created': int(datetime.utcnow().timestamp())
@@ -170,7 +171,7 @@ def message_senddm_v1(token, dm_id, message):
 
     # Sets up new keys for new message
     new_message = {
-        'message_id': len(store['messages']) + len(store['removed_messages']) + 1,
+        'message_id': len(store['messages']) + len(store['removed_messages']) + store['pending_messages'] + 1,
         'u_id': auth_user_id,
         'message': message,
         'time_created': int(datetime.utcnow().timestamp())
@@ -243,4 +244,58 @@ def message_remove_v1(token, message_id):
     data_store.set(store)
 
     return {}
-    
+
+def message_sendlater_v1(token, channel_id, message, time_sent):
+    store = data_store.get()
+
+    # check if token is valid
+    auth_user_id = validate_token(token)['user_id']
+
+    # Checks if channel id is valid
+    if channel_id not in filter_data_store(store_list='channels', key='id', value=None):
+        raise InputError(description="Invalid channel_id")
+
+    # Filters data store for correct channel
+    channel_dict = filter_data_store(store_list='channels', key='id', value=channel_id)[0]
+
+    # Checks if user is part of channel members
+    if auth_user_id not in channel_dict['members']:
+        raise AccessError(description="Not a member of channel")
+
+    # Checks if message is valid
+    if len(message) < 1 or len(message) > 1000:
+        raise InputError(description="Invalid message")
+
+    seconds_difference = int(time_sent) - int(datetime.utcnow().timestamp())
+
+    if seconds_difference < 0:
+        raise InputError(description="Invalid time")
+
+    store['pending_messages'] += 1
+    new_message_id = len(store['messages']) + len(store['removed_messages']) + store['pending_messages'] 
+
+    t = Timer(seconds_difference, message_sendlater_v1_dummy, [token, channel_id, message, new_message_id])
+    t.start()
+
+    data_store.set(store)
+
+    return {
+        'message_id' : new_message_id
+    }
+
+def message_sendlater_v1_dummy(token, channel_id, message, new_message_id):
+    store = data_store.get()
+
+    message_id = message_send_v1(token, channel_id, message)['message_id']
+
+    # Filters data store for correct message
+    channel_dict = [channel for channel in (store['channels'] + store['dms']) if channel_id == channel['id']][0]
+    selected_message = [message for message in channel_dict['messages'] if message['message_id'] == message_id][0]
+    selected_message['message_id'] = new_message_id
+
+    store['pending_messages'] -= 1
+
+    data_store.set(store)
+
+
+
