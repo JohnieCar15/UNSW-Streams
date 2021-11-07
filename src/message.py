@@ -289,3 +289,38 @@ def message_react_v1(token, message_id, react_id):
     data_store.set(store)
 
     return {}
+
+def message_unreact_v1(token, message_id, react_id):
+    store = data_store.get()
+
+    # check if token is valid
+    auth_user_id = validate_token(token)['user_id']
+
+    # Checks if message exists
+    # Contains extra field "channel_id"
+    look_message = [message for message in store['messages'] if message['message']['message_id'] == message_id]
+
+    if not look_message:
+        raise InputError(description="Invalid message")
+    else:
+        messagedict = look_message[0]
+
+    # Checks which channel the message is sent in and finds that message
+    channel_dict = [channel for channel in (store['channels'] + store['dms']) if messagedict['channel_id'] == channel['id']][0]
+    selected_message = [message for message in channel_dict['messages'] if message['message_id'] == message_id][0]
+
+    # Checks if user is part of that channel
+    if auth_user_id not in channel_dict['members']:
+        raise AccessError(description="Not a member of channel")
+
+    if (react_id != 1):
+        raise InputError(description="Invalid react id")
+
+    if auth_user_id not in selected_message['reacts'][0]['u_ids']:
+        raise InputError(description="No reaction to message")
+
+    selected_message['reacts'][0]['u_ids'].remove(auth_user_id)
+
+    data_store.set(store)
+    
+    return {}

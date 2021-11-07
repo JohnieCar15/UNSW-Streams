@@ -30,7 +30,7 @@ def register_create_channel():
         'valid_user_id': user_id['auth_user_id'], 
         'valid_channel_id': channel_id
     }
-# Clears datastore, registers user and creates a channel (making the user a member)
+# Clears datastore, registers user and creates a dm (making the user a member)
 @pytest.fixture
 def register_create_dm():
     requests.delete(config.url + '/clear/v1')
