@@ -14,7 +14,7 @@ def register_create():
         'email' : "valid@gmail.com",
         'password' : "password",
         'name_first' : "First",
-        'name_last' : "Last"
+        'name_last' : "Last",
     }
 
     user_id = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
@@ -43,7 +43,7 @@ def get_messages(register_create, start):
         'start' : start
     }
 
-    dm_messages = requests.get(config.url + '/dm/messages/v2', params=dm_messages_input).json()
+    dm_messages = requests.get(config.url + '/dm/messages/v1', params=dm_messages_input).json()
 
     return dm_messages
 
@@ -52,32 +52,57 @@ def test_normal(register_create):
         'token' : register_create['valid_token'],
         'dm_id' : register_create['valid_dm_id'],
         'message' : "Hello!",
-        'time_sent' : int(datetime.utcnow().timestamp()) + 5
+        'time_sent' : int(datetime.utcnow().timestamp()) + 3
     }
 
     message_id = requests.post(config.url + '/message/sendlaterdm/v1', json=message_sendlaterdm_input).json()['message_id']
 
-    time.sleep(5)
+    dm_messages1 = get_messages(register_create, 0)
+
+    assert dm_messages1['messages'] == []
+
+    time.sleep(3)
 
     dm_messages = get_messages(register_create, 0)
 
     assert dm_messages['messages'][0]['message_id'] == message_id
-    assert dm_messages['messages'][0]['u_id'] == register_create['valid_token']
+    assert dm_messages['messages'][0]['u_id'] == register_create['valid_user_id']
     assert dm_messages['messages'][0]['message'] == "Hello!"
     assert abs(int(datetime.utcnow().timestamp()) - dm_messages['messages'][0]['time_created']) < 2
-    assert dm_messages['messages'][0]['reacts'] == {
-        'react_id' : 1,
-        'u_ids' : [],
-        'is_this_user_reacted' : False
+
+def test_send_message_inbetween(register_create):
+    message_sendlaterdm_input = {
+        'token' : register_create['valid_token'],
+        'dm_id' : register_create['valid_dm_id'],
+        'message' : "World!",
+        'time_sent' : int(datetime.utcnow().timestamp()) + 3
     }
-    assert dm_messages['messages'][0]['is_pinned'] == False
+
+    message_id = requests.post(config.url + '/message/sendlaterdm/v1', json=message_sendlaterdm_input).json()['message_id']
+
+    message_senddm_input = {
+        'token' : register_create['valid_token'],
+        'dm_id' : register_create['valid_dm_id'],
+        'message' : "Hello!",
+    }
+
+    requests.post(config.url + '/message/senddm/v1', json=message_senddm_input).json()['message_id']
+
+    time.sleep(3)
+
+    dm_messages = get_messages(register_create, 0)
+
+    assert dm_messages['messages'][0]['message_id'] == message_id
+    assert dm_messages['messages'][0]['u_id'] == register_create['valid_user_id']
+    assert dm_messages['messages'][0]['message'] == "World!"
+    assert abs(int(datetime.utcnow().timestamp()) - dm_messages['messages'][0]['time_created']) < 2
 
 def test_invalid_token(register_create):
     message_sendlaterdm_input = {
         'token' : " ",
         'dm_id' : register_create['valid_dm_id'],
         'message' : "Hello!",
-        'time_sent' : int(datetime.utcnow().timestamp()) + 5
+        'time_sent' : int(datetime.utcnow().timestamp()) + 3
     }
 
     status = requests.post(config.url + '/message/sendlaterdm/v1', json=message_sendlaterdm_input)
@@ -109,7 +134,7 @@ def test_invalid_message_over_1000(register_create):
     assert status.status_code == InputError.code
 
 # Test is by assumption of message send
-def test_invalid_message_under_0(register_create):
+def test_invalid_message_empty(register_create):
     message_sendlaterdm_input = {
         'token' : register_create['valid_token'],
         'dm_id' : register_create['valid_dm_id'],

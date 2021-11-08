@@ -156,14 +156,14 @@ def message_senddm_v1(token, dm_id, message):
 
     # Checks if channel id is valid
     if dm_id not in filter_data_store(store_list='dms', key='id', value=None):
-        raise InputError(description="Invalid channel_id")
+        raise InputError(description="Invalid dm_id")
 
     # Filters data store for correct channel
     dm_dict = filter_data_store(store_list='dms', key='id', value=dm_id)[0]
 
     # Checks if user is part of channel members
     if auth_user_id not in dm_dict['members']:
-        raise AccessError(description="Not a member of channel")
+        raise AccessError(description="Not a member of dm")
 
     # Checks if message is valid
     if len(message) < 1 or len(message) > 1000:
@@ -303,6 +303,69 @@ def message_sendlater_v1_dummy(channel_id, new_message, channel_dict):
     }
     
     channel_dict['messages'].insert(0, new_message)
+    store['messages'].insert(0, message_store)
+    store['pending_messages'].remove(new_message)
+
+    data_store.set(store)
+
+def message_sendlaterdm_v1(token, dm_id, message, time_sent):
+    store = data_store.get()
+
+    # check if token is valid
+    auth_user_id = validate_token(token)['user_id']
+
+    # Checks if dm id is valid
+    if dm_id not in filter_data_store(store_list='dms', key='id', value=None):
+        raise InputError(description="Invalid dm_id")
+
+    # Filters data store for correct dm
+    dm_dict = filter_data_store(store_list='dms', key='id', value=dm_id)[0]
+
+    # Checks if user is part of channel members
+    if auth_user_id not in dm_dict['members']:
+        raise AccessError(description="Not a member of dm")
+
+    # Checks if message is valid
+    if len(message) < 1 or len(message) > 1000:
+        raise InputError(description="Invalid message")
+
+    seconds_difference = int(time_sent) - int(datetime.utcnow().timestamp())
+
+    if seconds_difference < 0:
+        raise InputError(description="Invalid time")
+
+    new_message = {
+        'message_id': len(store['messages']) + len(store['removed_messages']) + len(store['pending_messages']) + 1,
+        'u_id': auth_user_id,
+        'message': message,
+        'time_created': int(datetime.utcnow().timestamp())
+    }
+
+    # Stores request sent by user and time they made that request
+    store['pending_messages'].insert(0, new_message)
+
+    t = Timer(seconds_difference, message_sendlaterdm_v1_dummy, [dm_id, new_message, dm_dict])
+    t.start()
+
+    data_store.set(store)
+
+    return {
+        'message_id' : new_message['message_id']
+    }
+
+def message_sendlaterdm_v1_dummy(dm_id, new_message, dm_dict):
+    store = data_store.get()
+
+    # Modifies new time to be when message is being sent
+    new_message['time_created'] = int(datetime.utcnow().timestamp())
+
+    # Data store creates extra field of channel id for easier identification
+    message_store = {
+        'message': new_message,
+        'channel_id': dm_id
+    }
+    
+    dm_dict['messages'].insert(0, new_message)
     store['messages'].insert(0, message_store)
     store['pending_messages'].remove(new_message)
 
