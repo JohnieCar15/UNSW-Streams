@@ -673,3 +673,107 @@ def message_sendlaterdm_v1_dummy(dm_id, new_message, dm_dict):
     store['pending_messages'].remove(new_message)
 
     data_store.set(store)
+
+def message_pin_v1(token, message_id):
+    '''
+    message_pin_v1: Given a message in a channel/DM, mark as "pinned"
+
+    Arguments:
+        token (string)    - token of a user
+        message_id (int)  - id of a message
+        ...
+
+    Exceptions:
+        InputError  - Occurs when message id is not valid message in channel/DM user has joined
+                    - Message is already pinned
+        AccessError - Message id is valid but user does not have owner permissions
+
+    Return Value:
+        Returns {} on successful token and message id
+
+    '''
+    store = data_store.get()
+
+    # check if token is valid
+    auth_user_id = validate_token(token)['user_id']
+
+    # Checks if message exists
+    # Contains extra field "channel_id"
+    look_message = [message for message in store['messages'] if message['message']['message_id'] == message_id]
+
+    if not look_message:
+        raise InputError(description="Invalid message")
+    else:
+        messagedict = look_message[0]
+
+    # Checks which channel the message is sent in and finds that message
+    channel_dict = [channel for channel in (store['channels'] + store['dms']) if messagedict['channel_id'] == channel['id']][0]
+    selected_message = [message for message in channel_dict['messages'] if message['message_id'] == message_id][0]
+
+    # Checks if user is part of that channel
+    if auth_user_id not in channel_dict['members']:
+        raise InputError(description="Invalid message")
+
+    if auth_user_id not in channel_dict['owner'] and not is_global_owner(auth_user_id):
+        raise AccessError(description="Permission denied")
+
+    if selected_message['is_pinned'] == True:
+        raise InputError(description="Message is already pinned")
+
+    selected_message['is_pinned'] = True
+
+    data_store.set(store)
+
+    return {}
+
+def message_unpin_v1(token, message_id):
+    '''
+    message_unpin_v1: Given a message in a channel/DM, remove mark as "pinned"
+
+    Arguments:
+        token (string)    - token of a user
+        message_id (int)  - id of a message
+        ...
+
+    Exceptions:
+        InputError  - Occurs when message id is not valid message in channel/DM user has joined
+                    - Message is not already pinned
+        AccessError - Message id is valid but user does not have owner permissions
+
+    Return Value:
+        Returns {} on successful token and message id
+
+    '''
+    store = data_store.get()
+
+    # check if token is valid
+    auth_user_id = validate_token(token)['user_id']
+
+    # Checks if message exists
+    # Contains extra field "channel_id"
+    look_message = [message for message in store['messages'] if message['message']['message_id'] == message_id]
+
+    if not look_message:
+        raise InputError(description="Invalid message")
+    else:
+        messagedict = look_message[0]
+
+    # Checks which channel the message is sent in and finds that message
+    channel_dict = [channel for channel in (store['channels'] + store['dms']) if messagedict['channel_id'] == channel['id']][0]
+    selected_message = [message for message in channel_dict['messages'] if message['message_id'] == message_id][0]
+
+    # Checks if user is part of that channel
+    if auth_user_id not in channel_dict['members']:
+        raise InputError(description="Invalid message")
+
+    if auth_user_id not in channel_dict['owner'] and not is_global_owner(auth_user_id):
+        raise AccessError(description="Permission denied")
+
+    if selected_message['is_pinned'] == False:
+        raise InputError(description="Message is not pinned")
+
+    selected_message['is_pinned'] = False
+
+    data_store.set(store)
+
+    return {}
