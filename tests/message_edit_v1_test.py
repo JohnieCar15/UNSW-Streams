@@ -188,7 +188,7 @@ def test_not_member(register_create):
 
     status = requests.put(config.url + 'message/edit/v1', json=message_edit_input)
 
-    assert status.status_code == AccessError.code
+    assert status.status_code == InputError.code
 
 # Tests that the owner of the channel is able to edit message
 def test_owner_edit(register_create):

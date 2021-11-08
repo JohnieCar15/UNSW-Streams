@@ -328,4 +328,4 @@ def test_not_part_of_channel(register_create_channel):
 
     status = requests.post(config.url + '/message/unreact/v1', json=message_unreact_input)
 
-    assert status.status_code == AccessError.code
+    assert status.status_code == InputError.code

@@ -46,7 +46,7 @@ def message_edit_v1(token, message_id, message):
 
     # Checks if user is part of that channel
     if auth_user_id not in channel_dict['members']:
-        raise AccessError(description="Not a member of channel")
+        raise InputError(description="Invalid message id")
     
     if auth_user_id != messagedict['message']['u_id'] and auth_user_id not in channel_dict['owner'] and not is_global_owner(auth_user_id):
         raise AccessError(description="Permission denied")
@@ -242,7 +242,7 @@ def message_remove_v1(token, message_id):
 
     # Checks if user is part of that channel
     if auth_user_id not in channel_dict['members']:
-        raise AccessError(description="Not a member of channel")
+        raise InputError(description="Invalid message id")
     
     if auth_user_id != messagedict['message']['u_id'] and auth_user_id not in channel_dict['owner'] and not is_global_owner(auth_user_id):
         raise AccessError(description="Permission denied")
@@ -394,9 +394,9 @@ def message_react_v1(token, message_id, react_id):
     channel_dict = [channel for channel in (store['channels'] + store['dms']) if messagedict['channel_id'] == channel['id']][0]
     selected_message = [message for message in channel_dict['messages'] if message['message_id'] == message_id][0]
 
-    # Checks if user is part of that channel
+    # Checks if user is part of that channel to access messages
     if auth_user_id not in channel_dict['members']:
-        raise AccessError(description="Not a member of channel")
+        raise InputError(description="Invalid message ID")
     
     # Looks for particular message
     look_react = [react for react in selected_message['reacts'] if react['react_id'] == react_id]
@@ -456,9 +456,9 @@ def message_unreact_v1(token, message_id, react_id):
     channel_dict = [channel for channel in (store['channels'] + store['dms']) if messagedict['channel_id'] == channel['id']][0]
     selected_message = [message for message in channel_dict['messages'] if message['message_id'] == message_id][0]
 
-    # Checks if user is part of that channel
+    # Checks if user is part of that channel to access message
     if auth_user_id not in channel_dict['members']:
-        raise AccessError(description="Not a member of channel")
+        raise InputError(description="Invalid message ID")
 
     # Looks for particular message
     look_react = [react for react in selected_message['reacts'] if react['react_id'] == react_id]

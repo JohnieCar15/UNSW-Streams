@@ -204,7 +204,7 @@ def test_not_member(register_create):
 
     status = requests.delete(config.url + 'message/remove/v1', json=message_delete_input)
 
-    assert status.status_code == AccessError.code
+    assert status.status_code == InputError.code
 
 # Tests invalid token trying to delete message
 def test_invalid_token(register_create):
