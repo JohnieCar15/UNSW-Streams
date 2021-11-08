@@ -234,7 +234,8 @@ def dm_messages_v1(token, dm_id, start):
         messages_dict['messages'] = new_dm['messages'][start:start + 50]
 
     for message in messages_dict['messages']:
-        message['reacts'][0]['is_this_user_reacted'] = True if auth_user_id in message['reacts'][0]['u_ids'] else False
+        for react in message['reacts']:
+            react['is_this_user_reacted'] = True if auth_user_id in react['u_ids'] else False
 
     data_store.set(store)
         
