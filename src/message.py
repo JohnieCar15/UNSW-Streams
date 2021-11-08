@@ -332,7 +332,12 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         'message_id': len(store['messages']) + len(store['removed_messages']) + 1,
         'u_id': auth_user_id,
         'message': f"{message}" + "\n\n" + f'"""\n{og_selected_message["message"]}\n"""',
-        'time_created': int(datetime.utcnow().timestamp())
+        'time_created': int(datetime.utcnow().timestamp()),
+        'reacts' : [{
+            'react_id' : 1,
+            'u_ids' : [],
+        }],
+        'is_pinned' : False
     }
 
     # Data store creates extra field of channel id for easier identification
@@ -349,7 +354,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     return {
         'shared_message_id' : new_message['message_id']
     }
-    
+
 def message_react_v1(token, message_id, react_id):
     '''
     message_react_v1: Given a message, add a 'react' to that particular message

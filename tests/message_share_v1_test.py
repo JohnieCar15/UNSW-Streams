@@ -130,6 +130,8 @@ def test_share_channel_to_channel(register_create_channel):
 
     messagedict = send_message(register_create_channel['valid_token'], register_create_channel['valid_channel_id'], 1)
 
+    print(messagedict)
+
     message_share_input = {
         'token': register_create_channel['valid_token'],
         'og_message_id': messagedict['message_id_list'][0],
@@ -138,9 +140,13 @@ def test_share_channel_to_channel(register_create_channel):
         'dm_id': -1
     }
 
-    shared_message_id = requests.post(config.url + 'message/share/v1', json=message_share_input).json()['shared_message_id']
+    shared_message_id = requests.post(config.url + '/message/share/v1', json=message_share_input).json()['shared_message_id']
+
+    print(shared_message_id)
 
     channel_messages = get_messages(register_create_channel['valid_token'], new_channel_id, 0)
+
+    print(channel_messages)
 
     assert channel_messages['messages'][0]['message_id'] == shared_message_id
     assert channel_messages['messages'][0]['u_id'] == register_create_channel['valid_user_id']

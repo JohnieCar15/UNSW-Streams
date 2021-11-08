@@ -214,9 +214,9 @@ def channel_messages_v2(token, channel_id, start):
     else:
         messages_dict['end'] = start + 50
         messages_dict['messages'] = new_channel['messages'][start:start + 50]
-    
+
     for message in messages_dict['messages']:
-        message['reacts'][0]['is_this_user_reacted'] = True if auth_user_id in message['reacts'][0]['u_ids'] else False
+       message['reacts'][0]['is_this_user_reacted'] = True if auth_user_id in message['reacts'][0]['u_ids'] else False
         
     data_store.set(store)
 
