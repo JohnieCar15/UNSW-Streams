@@ -32,13 +32,40 @@ def register_create_channel():
         'valid_channel_id': channel_id
     }
 
+# Clears datastore, registers user and creates a dm (making the user a member)
+@pytest.fixture
+def register_create_dm():
+    requests.delete(config.url + '/clear/v1')
+
+    auth_register_input = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    user_id = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
+
+    dm_create_input = {
+        'token' : user_id['token'],
+        'u_ids' : []
+    }
+
+    dm_id = requests.post(config.url + '/dm/create/v1', json=dm_create_input).json()['dm_id']
+
+    return {
+        'valid_token': user_id['token'], 
+        'valid_user_id': user_id['auth_user_id'], 
+        'valid_dm_id': dm_id
+    }
+
 
 # HELPER FUNCTION
 # Sends a number of messages to specific endpoint
-def send_message(register_create, length):
+def send_message(token, channel_id, length):
     send_message_input = {
-        'token' : register_create['valid_token'],
-        'channel_id': register_create['valid_channel_id'],
+        'token' : token,
+        'channel_id': channel_id,
         'message': "Hello!"
     }
 
@@ -73,11 +100,13 @@ def pin_message(token, message_id):
         'message_id' : message_id 
     }
 
-    requests.post(config.url + 'message/pin/v1', json=message_pin_input).json()
+    requests.post(config.url + '/message/pin/v1', json=message_pin_input)
 
-def test_unpinned_normal(register_create_channel):
-
-    messagedict = send_message(register_create_channel, 1)
+def test_unpinned_channel(register_create_channel):
+    '''
+    Tests normal functionality of unpinning of message in channel
+    '''
+    messagedict = send_message(register_create_channel['valid_token'], register_create_channel['valid_channel_id'], 1)
 
     pin_message(register_create_channel['valid_token'], messagedict['message_id_list'][0])
 
@@ -90,16 +119,48 @@ def test_unpinned_normal(register_create_channel):
         'message_id' : messagedict['message_id_list'][0]      
     }
 
-    requests.post(config.url + 'message/unpin/v1', json=message_unpin_input).json()
+    requests.post(config.url + 'message/unpin/v1', json=message_unpin_input)
 
     channel_messages2 = get_messages(register_create_channel, 0)
 
     assert channel_messages2['messages'][0]['is_pinned'] == False
 
+def test_unpinned_dm(register_create_dm):
+    '''
+    Tests normal functionality of unpinning message in dm
+    '''
+    send_messagedm_input = {
+        'token' : register_create_dm['valid_token'],
+        'dm_id': register_create_dm['valid_dm_id'],
+        'message': "Hello!"
+    }
+
+    message_id = requests.post(config.url + '/message/senddm/v1', json=send_messagedm_input).json()['message_id']
+
+    pin_message(register_create_dm['valid_token'], message_id)
+
+    message_unpin_input = {
+        'token' : register_create_dm['valid_token'],
+        'message_id' : message_id     
+    }
+
+    requests.post(config.url + 'message/unpin/v1', json=message_unpin_input)
+
+    dm_messages_input = {
+        'token' : register_create_dm['valid_token'],
+        'dm_id' : register_create_dm['valid_dm_id'],
+        'start' : 0
+    }
+
+    dm_messages = requests.get(config.url + '/dm/messages/v1', params=dm_messages_input).json()
+
+    assert dm_messages['messages'][0]['is_pinned'] == False
 
 def test_invalid_message_id(register_create_channel):
-
-    messagedict = send_message(register_create_channel, 1)
+    '''
+    Tests invalid message id that doesn't exist in data store
+    '''
+    messagedict = send_message(register_create_channel['valid_token'], register_create_channel['valid_channel_id'], 1)
 
     pin_message(register_create_channel['valid_token'], messagedict['message_id_list'][0])
 
@@ -113,8 +174,10 @@ def test_invalid_message_id(register_create_channel):
     assert status.status_code == InputError.code
 
 def test_already_unpinned(register_create_channel):
-
-    messagedict = send_message(register_create_channel, 1)
+    '''
+    Tests already unpinned message
+    '''
+    messagedict = send_message(register_create_channel['valid_token'], register_create_channel['valid_channel_id'], 1)
 
     message_unpin_input = {
         'token' : register_create_channel['valid_token'],
@@ -126,8 +189,11 @@ def test_already_unpinned(register_create_channel):
     assert status.status_code == InputError.code
 
 def test_invalid_token(register_create_channel):
+    '''
+    Tests invalid token
+    '''
 
-    messagedict = send_message(register_create_channel, 1)
+    messagedict = send_message(register_create_channel['valid_token'], register_create_channel['valid_channel_id'], 1)
 
     message_unpin_input = {
         'token' : " ",
@@ -138,7 +204,62 @@ def test_invalid_token(register_create_channel):
 
     assert status.status_code == AccessError.code
 
+def test_global_owner():
+    '''
+    Tests global owner user permissions
+    '''
+    requests.delete(config.url + '/clear/v1')
+
+    auth_register_input1 = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    global_token = requests.post(config.url + '/auth/register/v2', json=auth_register_input1).json()['token']
+
+    auth_register_input2 = {
+        'email' : "newperson@gmail.com",
+        'password' : "password123",
+        'name_first' : "First1",
+        'name_last' : "Last1",
+    }
+
+    member_token = requests.post(config.url + '/auth/register/v2', json=auth_register_input2).json()['token']
+
+    channel_create_input = {
+        'token' : member_token,
+        'name' : "channel",
+        'is_public' : True
+    }
+
+    channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input).json()['channel_id']
+
+    channel_join_input = {
+        'token': global_token,
+        'channel_id': channel_id
+    }
+
+    requests.post(config.url + 'channel/join/v2', json=channel_join_input)
+
+    messagedict = send_message(member_token, channel_id, 1)
+
+    pin_message(member_token, messagedict['message_id_list'][0])
+
+    message_unpin_input = {
+        'token' : global_token,
+        'message_id' : messagedict['message_id_list'][0]
+    }
+
+    status = requests.post(config.url + 'message/unpin/v1', json=message_unpin_input)
+
+    assert status.status_code == 200
+
 def test_not_owner(register_create_channel):
+    '''
+    Tests member trying to unpin message
+    '''
     auth_register_input = {
         'email' : "newperson@gmail.com",
         'password' : "password",
@@ -155,7 +276,7 @@ def test_not_owner(register_create_channel):
 
     requests.post(config.url + 'channel/join/v2', json=channel_join_input).json()
 
-    messagedict = send_message(register_create_channel, 1)
+    messagedict = send_message(register_create_channel['valid_token'], register_create_channel['valid_channel_id'], 1)
 
     pin_message(register_create_channel['valid_token'], messagedict['message_id_list'][0])
 
@@ -167,3 +288,27 @@ def test_not_owner(register_create_channel):
     status = requests.post(config.url + 'message/unpin/v1', json=message_unpin_input)
 
     assert status.status_code == AccessError.code
+
+def test_not_member(register_create_channel):
+    '''
+    Tests user attempting to unpin message from channel they are not part of
+    '''
+    auth_register_input = {
+        'email' : "newperson@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    member = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
+
+    messagedict = send_message(register_create_channel['valid_token'], register_create_channel['valid_channel_id'], 1)
+
+    message_unpin_input = {
+        'token' : member['token'],
+        'message_id' : messagedict['message_id_list'][0]
+    }
+
+    status = requests.post(config.url + 'message/unpin/v1', json=message_unpin_input)
+
+    assert status.status_code == InputError.code
