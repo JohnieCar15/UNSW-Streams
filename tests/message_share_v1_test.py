@@ -138,7 +138,7 @@ def test_share_channel_to_channel(register_create_channel):
         'dm_id': -1
     }
 
-    shared_message_id = requests.post(config.url + 'message/share/v1', json=message_share_input).json()['shared_message_id']
+    shared_message_id = requests.post(config.url + '/message/share/v1', json=message_share_input).json()['shared_message_id']
 
     channel_messages = get_messages(register_create_channel['valid_token'], new_channel_id, 0)
 
