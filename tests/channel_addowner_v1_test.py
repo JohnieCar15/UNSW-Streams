@@ -86,7 +86,57 @@ def test_valid_channel_channel_owner(clear_and_channel_2_members):
         ]
 
 
-# when token is valid, channel is valid and called by global owner 
+# when token is valid, channel is valid and called by global owner who isn't a member
+def test_nonmember_global_owner():
+    requests.delete(config.url + 'clear/v1')
+    register = requests.post(config.url + 'auth/register/v2', json={
+        'email': "yes@yes.com", 
+        'password': "aaaaaa", 
+        'name_first': "firstname", 
+        "name_last": "lastname"
+    })
+    register_data = register.json()
+    token = register_data['token']
+
+    register_2 = requests.post(config.url + 'auth/register/v2', json={
+        'email': "yes2@yes.com", 
+        'password': "aaaaaa", 
+        'name_first': "name", 
+        "name_last": "name"
+    })
+    register_2_data = register_2.json()
+    token_2 = register_2_data['token']
+
+    channel_create = requests.post(config.url + 'channels/create/v2', json={
+        'token': token_2, 
+        'name': 'name', 
+        'is_public': True
+    })
+    channel_create_data = channel_create.json()
+    channel_id = channel_create_data['channel_id']
+
+    register_3 = requests.post(config.url + 'auth/register/v2', json={
+        'email': "yes3@yes.com", 
+        'password': "aaaaaa", 
+        'name_first': "name", 
+        "name_last": "name"
+    })
+    register_3_data = register_3.json()
+    u_id_3 = register_3_data['auth_user_id']
+
+    requests.post(config.url + 'channel/invite/v2', json ={
+        'token': token_2, 
+        'channel_id': channel_id, 
+        'u_id': u_id_3
+    })
+    
+    channel_addowner = requests.post(config.url + 'channel/addowner/v1', json={
+        'token': token, 
+        'channel_id': channel_id, 
+        'u_id': u_id_3
+    })
+    assert channel_addowner.status_code == AccessError.code
+
 
 # when token is valid but channel id is invalid
 def test_invalid_channel():
