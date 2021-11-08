@@ -246,6 +246,30 @@ def message_remove_v1(token, message_id):
     return {}
     
 def message_share_v1(token, og_message_id, message, channel_id, dm_id):
+    '''
+    message_share_v1: Shares a message to a DM or channel id, with an optional
+    additional message.
+
+    Arguments:
+        token (string)       - token of a user
+        og_message_id (int)  - id of original message
+        message (string)     - additional message attached to shared message
+        channel_id (int)     - id of channel being shared to. -1 if being shared to dm
+        dm_id (int)          - id of dm being shared to. -1 if being shared to channel
+        ...
+
+    Exceptions:
+        InputError  - Occurs when channel id or dm id are invalid
+                    - Neither channel id or dm id are -1
+                    - Both channel id and dm id are -1
+                    - Message id does not refer to valid message
+        AccessError - Invalid token entered
+                    - Occurs when user is not part of channel/dm they are sending message to
+
+    Return Value:
+        Returns {shared_message_id} on successful token, og_message_id, message, channel_id and dm_id
+
+    '''
     store = data_store.get()
 
     # check if token is valid
