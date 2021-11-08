@@ -15,6 +15,10 @@
   9.  Automarking
   10. Plagiarism
 
+
+## 0. Change log:
+* Clarified `message/share` and edited a rogue `auth_user_id` to say token instead
+
 ## 1. Aims:
 
 * To provide students with hands on experience testing, developing, and maintaining a backend server in Python.
@@ -931,7 +935,7 @@ These interface specifications come from Andrea and Andrew, who are building the
     </td>
   </tr>
   <tr>
-    <td><code>message/share/v1</code><br /><br /><code>og_message_id</code> is the ID of the original message. <code>channel_id</code> is the channel that the message is being shared to, and is <code>-1</code> if it is being sent to a DM. <code>dm_id</code> is the DM that the message is being shared to, and is <code>-1</code> if it is being sent to a channel. <code>message</code> is the optional message in addition to the shared message, and will be an empty string <code>''</code> if no message is given.</td>
+    <td><code>message/share/v1</code><br /><br /><code>og_message_id</code> is the ID of the original message. <code>channel_id</code> is the channel that the message is being shared to, and is <code>-1</code> if it is being sent to a DM. <code>dm_id</code> is the DM that the message is being shared to, and is <code>-1</code> if it is being sent to a channel. <code>message</code> is the optional message in addition to the shared message, and will be an empty string <code>''</code> if no message is given. A new message should be sent to the channel/DM identified by the channel_id/dm_id that contains the contents of both the original message and the optional message. The format does not matter as long as both the original and optional message exist as a substring within the new message.</td>
     <td style="font-weight: bold; color: blue;">POST</td>
     <td><b>Parameters:</b><br /><code>{ token, og_message_id, message, channel_id, dm_id }</code><br /><br /><b>Return Type:</b><br /><code>{ shared_message_id }</code></td>
     <td>
@@ -1141,7 +1145,7 @@ These interface specifications come from Andrea and Andrew, who are building the
 
 Either an `InputError` or `AccessError` is thrown when something goes wrong. All of these cases are listed in the **Interface** table. If input implies that both errors should be thrown, throw an `AccessError`.
 
-One exception is that, even though it's not listed in the table, for all functions except `auth/register`, `auth/login`, `auth/passwordreset/request` (iteration 3) and `auth/passwordreset/reset` (iteration 3), an `AccessError` is thrown when the auth_user_id passed in is invalid.
+One exception is that, even though it's not listed in the table, for all functions except `auth/register`, `auth/login`, `auth/passwordreset/request` (iteration 3) and `auth/passwordreset/reset` (iteration 3), an `AccessError` is thrown when the token passed in is invalid.
 
 ### 6.4. Valid email format
 
