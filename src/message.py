@@ -256,6 +256,25 @@ def message_remove_v1(token, message_id):
     return {}
 
 def message_react_v1(token, message_id, react_id):
+    '''
+    message_react_v1: Given a message, add a 'react' to that particular message
+
+    Arguments:
+        token (string)    - token of a user
+        message_id (int)  - id of message
+        react_id (int)    - id of react
+        ...
+
+    Exceptions:
+        InputError  - Occurs when invalid message id is entered
+                    - Not valid react ID
+                    - Message already contains react from user
+        AccessError - Invalid token entered
+
+    Return Value:
+        Returns {} on successful token, message id and react id
+
+    '''
     store = data_store.get()
 
     # check if token is valid
@@ -277,20 +296,47 @@ def message_react_v1(token, message_id, react_id):
     # Checks if user is part of that channel
     if auth_user_id not in channel_dict['members']:
         raise AccessError(description="Not a member of channel")
+    
+    # Looks for particular message
+    look_react = [react for react in selected_message['reacts'] if react['react_id'] == react_id]
 
-    if (react_id != 1):
+    # If react ID does not exist, raise error
+    if not look_react:
         raise InputError(description="Invalid react id")
+    else:
+        react_dict = look_react[0]
 
-    if auth_user_id in selected_message['reacts'][0]['u_ids']:
+    # Raise error if user has already reacted to message
+    if auth_user_id in react_dict['u_ids']:
         raise InputError(description="Already reacted to message")
 
-    selected_message['reacts'][0]['u_ids'].append(auth_user_id)
+    # Append user id to members that have reacted
+    react_dict['u_ids'].append(auth_user_id)
     
     data_store.set(store)
 
     return {}
 
 def message_unreact_v1(token, message_id, react_id):
+    '''
+    message_unreact_v1: Given a message, removes a 'react' to that particular message
+
+    Arguments:
+        token (string)    - token of a user
+        message_id (int)  - id of message
+        react_id (int)    - id of react
+        ...
+
+    Exceptions:
+        InputError  - Occurs when invalid message id is entered
+                    - Not valid react ID
+                    - Message already contains react from user
+        AccessError - Invalid token entered
+
+    Return Value:
+        Returns {} on successful token, message id and react id
+
+    '''
     store = data_store.get()
 
     # check if token is valid
@@ -313,14 +359,22 @@ def message_unreact_v1(token, message_id, react_id):
     if auth_user_id not in channel_dict['members']:
         raise AccessError(description="Not a member of channel")
 
-    if (react_id != 1):
-        raise InputError(description="Invalid react id")
+    # Looks for particular message
+    look_react = [react for react in selected_message['reacts'] if react['react_id'] == react_id]
 
-    if auth_user_id not in selected_message['reacts'][0]['u_ids']:
+    # If react ID does not exist, raise error
+    if not look_react:
+        raise InputError(description="Invalid react id")
+    else:
+        react_dict = look_react[0]
+
+    # Raise error if user has not reacted to message
+    if auth_user_id not in react_dict['u_ids']:
         raise InputError(description="No reaction to message")
 
-    selected_message['reacts'][0]['u_ids'].remove(auth_user_id)
-
-    data_store.set(store)
+    # Remove user from from users that have reacted
+    react_dict['u_ids'].remove(auth_user_id)
     
+    data_store.set(store)
+
     return {}
