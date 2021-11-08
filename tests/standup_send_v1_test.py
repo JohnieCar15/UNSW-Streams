@@ -27,16 +27,14 @@ def clear_and_register_channel():
     requests.post(config.url + 'standup/start/v1',json={
         'token': token,
         'channel_id': channel_id,
-        'length': 5,
+        'length': 3,
     })
     # not sure if correct
-    cur_time = datetime.utcnow()
-    time_finish = int((cur_time + timedelta(seconds = 60)).timestamp())
-
+    time_finish = int(datetime.utcnow().timestamp() + 3)
     return {
         'token': token, 
         'u_id': register_data['auth_user_id'], 
-        'channel_id': channel_id
+        'channel_id': channel_id,
         'time_finish': time_finish
         }
 
@@ -63,15 +61,15 @@ def test_successful_case_one_user(clear_and_register_channel):
         'channel_id': channel_id,
         'message': "hi3"
     })
-    time.sleep(5)
+    time.sleep(3)
     channel_messages = requests.get(config.url + 'channel/messages/v2', params={
         'token': token,
         'channel_id': channel_id,
         'start': 0
     }).json()
     assert channel_messages['messages'][0]['message'] == """firstnamelastname: hi
-    firstnamelastname: hi2
-    firstnamelastname: hi3"""
+firstnamelastname: hi2
+firstnamelastname: hi3"""
     assert channel_messages['messages'][0]['u_id'] == u_id
     assert channel_messages['messages'][0]['time_created'] == time_finish
 
@@ -88,7 +86,7 @@ def test_successful_case_multiple_message_multiple_user(clear_and_register_chann
         "name_last": "name"
     })
     register_2_data = register_2.json()
-    token = register_2_data['token']
+    token_2 = register_2_data['token']
     u_id_2 = register_2_data['auth_user_id']
 
     requests.post(config.url + 'channel/invite/v2', json={'token': token, 'channel_id': channel_id, 'u_id': u_id_2})
@@ -111,15 +109,15 @@ def test_successful_case_multiple_message_multiple_user(clear_and_register_chann
         'message': "hi3"
     })
 
-    time.sleep(5)
+    time.sleep(3)
     channel_messages = requests.get(config.url + 'channel/messages/v2', params={
         'token': token,
         'channel_id': channel_id,
         'start': 0
     }).json()
     assert channel_messages['messages'][0]['message'] == """firstnamelastname: hi
-    namename: hi2
-    firstnamelastname: hi3"""
+namename: hi2
+firstnamelastname: hi3"""
     assert channel_messages['messages'][0]['u_id'] == u_id
     assert channel_messages['messages'][0]['time_created'] == time_finish
 
@@ -131,7 +129,7 @@ def test_invalid_channel_id(clear_and_register_channel):
         'token': token,
         'channel_id': channel_id + 1,
         'message': "hi"
-    }).json()
+    })
 
     assert standup_send.status_code == InputError.code
 
@@ -143,7 +141,7 @@ def test_invalid_message_long(clear_and_register_channel):
         'token': token,
         'channel_id': channel_id,
         'message': 1001*'a'
-    }).json()
+    })
 
     standup_send.status_code == InputError.code
 
@@ -169,12 +167,11 @@ def test_no_active_standup():
         'token': token,
         'channel_id': channel_id,
         'message': "hi"
-    }).json()
+    })
 
     assert standup_send.status_code == InputError.code
 
 def test_not_member(clear_and_register_channel):
-    token = clear_and_register_channel['token']
     channel_id = clear_and_register_channel['channel_id']
 
     register_2 = requests.post(config.url + 'auth/register/v2', json={
@@ -190,12 +187,11 @@ def test_not_member(clear_and_register_channel):
         'token': token_2,
         'channel_id': channel_id,
         'message': "hi"
-    }).json()
+    })
 
     assert standup_send.status_code == AccessError.code    
 
 def test_not_member_invalid_message_long(clear_and_register_channel):
-    token = clear_and_register_channel['token']
     channel_id = clear_and_register_channel['channel_id']
 
     register_2 = requests.post(config.url + 'auth/register/v2', json={
@@ -211,7 +207,7 @@ def test_not_member_invalid_message_long(clear_and_register_channel):
         'token': token_2,
         'channel_id': channel_id,
         'message': 1001*'a'
-    }).json()
+    })
 
     assert standup_send.status_code == AccessError.code 
 
@@ -222,6 +218,6 @@ def test_invalid_token():
         'token': 1,
         'channel_id': 1,
         'message': 1001*'a'
-    }).json()
+    })
 
     assert standup_send.status_code == AccessError.code 
