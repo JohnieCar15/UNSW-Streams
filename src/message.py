@@ -330,7 +330,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
     # Sets up new keys for new message
     new_message = {
-        'message_id': len(store['messages']) + len(store['removed_messages']) + 1,
+        'message_id': len(store['messages']) + len(store['removed_messages']) + len(store['pending_messages'])+ 1,
         'u_id': auth_user_id,
         'message': f"{message}" + "\n\n" + f'"""\n{og_selected_message["message"]}\n"""',
         'time_created': int(datetime.utcnow().timestamp()),
