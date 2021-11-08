@@ -49,6 +49,9 @@ def get_messages(register_create, start):
     return channel_messages
 
 def test_normal(register_create):
+    '''
+    Tests normal functionality of sending messages later
+    '''
     message_sendlater_input = {
         'token' : register_create['valid_token'],
         'channel_id' : register_create['valid_channel_id'],
@@ -72,6 +75,9 @@ def test_normal(register_create):
     assert abs(int(datetime.utcnow().timestamp()) - channel_messages['messages'][0]['time_created']) < 2
 
 def test_send_message_inbetween(register_create):
+    '''
+    Tests sending a message after message send later is called, ensures that original message id is maintained
+    '''
     message_sendlater_input = {
         'token' : register_create['valid_token'],
         'channel_id' : register_create['valid_channel_id'],
@@ -99,6 +105,9 @@ def test_send_message_inbetween(register_create):
     assert abs(int(datetime.utcnow().timestamp()) - channel_messages['messages'][0]['time_created']) < 2
 
 def test_invalid_token(register_create):
+    '''
+    Test invalid token
+    '''
     message_sendlater_input = {
         'token' : " ",
         'channel_id' : register_create['valid_channel_id'],
@@ -111,6 +120,9 @@ def test_invalid_token(register_create):
     assert status.status_code == AccessError.code
 
 def test_invalid_channel_id(register_create):
+    '''
+    Tests invalid channel id
+    '''
     message_sendlater_input = {
         'token' : register_create['valid_token'],
         'channel_id' : register_create['valid_channel_id'] + 1,
@@ -123,6 +135,9 @@ def test_invalid_channel_id(register_create):
     assert status.status_code == InputError.code
 
 def test_invalid_message_over_1000(register_create):
+    '''
+    Tests message over 1000 characters
+    '''
     message_sendlater_input = {
         'token' : register_create['valid_token'],
         'channel_id' : register_create['valid_channel_id'],
@@ -136,6 +151,9 @@ def test_invalid_message_over_1000(register_create):
 
 # Test is by assumption of message send
 def test_invalid_message_empty(register_create):
+    '''
+    Tests empty message
+    '''
     message_sendlater_input = {
         'token' : register_create['valid_token'],
         'channel_id' : register_create['valid_channel_id'],
@@ -148,6 +166,9 @@ def test_invalid_message_empty(register_create):
     assert status.status_code == InputError.code
 
 def test_invalid_time(register_create):
+    '''
+    Tests invalid time (time sent in past)
+    '''
     message_sendlater_input = {
         'token' : register_create['valid_token'],
         'channel_id' : register_create['valid_channel_id'],
@@ -160,7 +181,9 @@ def test_invalid_time(register_create):
     assert status.status_code == InputError.code
 
 def test_not_part_of_channel(register_create):
-
+    '''
+    Tests user not part of channel
+    '''
     auth_register_input = {
         'email' : "newpersond@gmail.com",
         'password' : "password123",
