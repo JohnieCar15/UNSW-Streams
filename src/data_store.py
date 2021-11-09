@@ -80,6 +80,7 @@ message = {
 message_store = {
     'message': message,
     'channel_id': int
+    'is_dm' : bool
 }
 
 

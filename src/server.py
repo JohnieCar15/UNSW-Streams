@@ -14,6 +14,7 @@ from src.message import message_send_v1, message_senddm_v1, message_edit_v1, mes
 from src.notifications import notifications_get_v1
 from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 from src.other import clear_v1
+from src.standup import standup_start_v1, standup_active_v1
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -257,6 +258,16 @@ def admin_userpermission_change_v1_ep():
     data = request.get_json()
     return dumps(admin_userpermission_change_v1(data['token'], data['u_id'], data['permission_id']))
 
+@APP.route("/standup/start/v1", methods=['POST'])
+def standup_start_v1_ep():
+    data = request.get_json()
+    return dumps(standup_start_v1(data['token'], data['channel_id'], data['length']))
+
+@APP.route("/standup/active/v1", methods=['GET'])
+def standup_active_v1_ep():
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+    return dumps(standup_active_v1(token, channel_id))
 
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear_v1_ep():
