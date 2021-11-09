@@ -330,13 +330,13 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     check = True
     if dm_id == -1:
         # Checks if channel id is valid
-        if channel_id not in filter_data_store(store_list='channels', key='id', value=None):
+        if channel_id not in filter_data_store(store_list='channels', key='id'):
             raise InputError(description="Invalid channel_id")
         check = False
         final_id = channel_id
     else:
         # Checks if dm id is valid
-        if dm_id not in filter_data_store(store_list='dms', key='id', value=None):
+        if dm_id not in filter_data_store(store_list='dms', key='id'):
             raise InputError(description="Invalid dm_id")
         check = True
         final_id = dm_id
@@ -390,6 +390,12 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
     shared_channel_dict['messages'].insert(0, new_message)
     store['messages'].insert(0, message_store)
+
+    # Checking if any users were tagged in the message and sending them a notification
+    tagged_users_list = find_tagged_users(message)
+    for u_id in tagged_users_list:
+        if u_id in shared_channel_dict['members']:
+            add_notification(u_id, auth_user_id, final_id, 'tagged', message)
 
     data_store.set(store)
 
@@ -456,7 +462,7 @@ def message_react_v1(token, message_id, react_id):
     react_dict['u_ids'].append(auth_user_id)
     
     # Sending a notification to user invited to the channel/dm
-    add_notification(selected_message['u_id'], auth_user_id, channel_dict['id'], 'invite')
+    add_notification(selected_message['u_id'], auth_user_id, channel_dict['id'], 'react')
 
     data_store.set(store)
 
@@ -553,7 +559,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     auth_user_id = validate_token(token)['user_id']
 
     # Checks if channel id is valid
-    if channel_id not in filter_data_store(store_list='channels', key='id', value=None):
+    if channel_id not in filter_data_store(store_list='channels', key='id'):
         raise InputError(description="Invalid channel_id")
 
     # Filters data store for correct channel
@@ -657,7 +663,7 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     auth_user_id = validate_token(token)['user_id']
 
     # Checks if dm id is valid
-    if dm_id not in filter_data_store(store_list='dms', key='id', value=None):
+    if dm_id not in filter_data_store(store_list='dms', key='id'):
         raise InputError(description="Invalid dm_id")
 
     # Filters data store for correct dm

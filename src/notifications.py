@@ -41,9 +41,9 @@ def add_notification(u_id, trigger_u_id, channel_id, notification_type, message=
     }
     if notification_type == 'tagged':
         notification['notification_message'] = f"{trigger_user_handle} tagged you in {channel_name}: {message[:20]}"
-    elif notification_type == 'react':
+    if notification_type == 'react':
         notification['notification_message'] = f"{trigger_user_handle} reacted to your message in {channel_name}"
-    elif notification_type == 'invite':
+    if notification_type == 'invite':
         notification['notification_message'] = f"{trigger_user_handle} added you to {channel_name}"
 
     notifications_list.insert(0, notification)

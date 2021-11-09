@@ -1,5 +1,6 @@
 import pytest
 import requests
+import time
 from datetime import datetime
 from src import config
 from src.error import AccessError, InputError
@@ -120,6 +121,8 @@ def test_tagging_in_message_sendlater(notifications_get_url, clear_and_register)
         'time_sent': int(datetime.utcnow().timestamp()) + 1
     }).json()['message_id']
 
+    time.sleep(1)
+
     r = requests.get(notifications_get_url, params={'token': user_token})
     notification = r.json()['notifications'][0]
     assert r.status_code == 200
@@ -139,6 +142,8 @@ def test_tagging_in_message_sendlaterdm(notifications_get_url, clear_and_registe
         'message': message_string,
         'time_sent': int(datetime.utcnow().timestamp()) + 1
     }).json()['message_id']
+
+    time.sleep(1)
 
     r = requests.get(notifications_get_url, params={'token': user_token})
     notification = r.json()['notifications'][0]
