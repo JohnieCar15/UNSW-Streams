@@ -46,6 +46,7 @@ def standup_start_v1(token, channel_id, length):
     channel_dict['standup_active'] = True
     # calculate time_finish
     time_finish = int(datetime.utcnow().timestamp() + (length))
+    channel_dict['standup_finish'] = time_finish
     # threading after length set standup to be False 
     t = threading.Timer(length, standup_end, [channel_dict, auth_user_id, time_finish])
     t.start()
@@ -77,6 +78,35 @@ def standup_end(channel_dict, auth_user_id, time_finish):
     # set standup_active to False
     channel_dict['standup_active'] = False
     data_store.set(store)
+
+def standup_active_v1(token, channel_id):
+    '''
+    standup_active_v1:
+    For a given channel check if a startup is active. 
+
+    Arguments:
+        token (string) - token string used to authorise and authenticate the user 
+        channel_id(int) - id of the channel for the standup to start
+    Exceptions:      
+        InputError - channel_id does not refer to a valid channel
+        AccessError - channel_id is valid and the authorised user is not a member of the channel
+
+    Return Value:
+        Returns {is_active, time_finish} on successful run 
+
+    '''
+    # check valid token 
+    auth_user_id = validate_token(token)['user_id']
+    # check valid channel id
+    if channel_id not in filter_data_store(store_list='channels',key='id'):
+        raise InputError(description="Invalid channel_id")
+    # check is a member of channel 
+    channel_dict = filter_data_store(store_list='channels',key='id',value=channel_id)[0]
+    if auth_user_id not in channel_dict['members']:
+        raise AccessError(description="Not a member of channel")
+    # check if standup is active
+    else: 
+        return { 'is_active': channel_dict['standup_active'], 'time_finish': channel_dict['standup_finish']}
 
 def standup_send_v1(token, channel_id, message):
     store = data_store.get()

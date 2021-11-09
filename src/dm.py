@@ -272,7 +272,8 @@ def dm_remove_v1(token, dm_id):
             for message in dm['messages']:
                 message_store = {
                     'message': message,
-                    'channel_id': dm_id
+                    'channel_id': dm_id,
+                    'is_dm' : True
                 }
                 store['messages'].remove(message_store)
                 store['removed_messages'].append(message_store)
