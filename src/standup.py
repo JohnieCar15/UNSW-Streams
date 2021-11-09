@@ -59,7 +59,7 @@ def standup_end(channel_dict, auth_user_id, time_finish):
     # send combined message
     standup_str = "\n".join(channel_dict['standup_messages'])
     standup_message = {
-        'message_id': len(store['messages']) + len(store['removed_messages']) + 1,
+        'message_id': len(store['messages']) + len(store['removed_messages']) + len(store['pending_messages']) + 1,
         'u_id': auth_user_id,
         'message': standup_str,
         'time_created': time_finish,
