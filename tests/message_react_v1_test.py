@@ -261,7 +261,7 @@ def test_invalid_token(register_create_channel):
 
 def test_not_part_of_channel(register_create_channel):
     '''
-    Tests invalid token
+    Tests person reacting to message in another channel
     '''
     messagedict = send_message(register_create_channel, 1)
 
@@ -282,4 +282,4 @@ def test_not_part_of_channel(register_create_channel):
 
     status = requests.post(config.url + '/message/react/v1', json=message_react_input)
 
-    assert status.status_code == AccessError.code
+    assert status.status_code == InputError.code
