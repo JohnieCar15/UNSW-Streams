@@ -104,6 +104,5 @@ def standup_active_v1(token, channel_id):
     # check if standup is active
     if channel_dict['standup_active'] == True:
         return { 'is_active': True, 'time_finish': channel_dict['standup_finish']}
-    
-    if channel_dict['standup_active'] == False:
+    else: 
         return { 'is_active': False, 'time_finish': channel_dict['standup_finish']}
