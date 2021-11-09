@@ -92,7 +92,6 @@ def test_tagging_in_message_senddm(notifications_get_url, clear_and_register):
     user_token = clear_and_register['user1_token']
     user_handle = clear_and_register['user1_handle']
     dm_id = clear_and_register['dm_id']
-    
 
     message_string = f'Hello @{user_handle}, welcome to Streams!'
     requests.post(config.url + 'message/senddm/v1', json={
@@ -108,7 +107,6 @@ def test_tagging_in_message_senddm(notifications_get_url, clear_and_register):
     assert notification['dm_id'] == dm_id
     assert notification['notification_message'] == "firstlast tagged you in firstlast: Hello @firstlast, we"
 
-@pytest.mark.skip
 def test_tagging_in_message_sendlater(notifications_get_url, clear_and_register):
     user_token = clear_and_register['user1_token']
     user_handle = clear_and_register['user1_handle']
@@ -129,12 +127,10 @@ def test_tagging_in_message_sendlater(notifications_get_url, clear_and_register)
     assert notification['dm_id'] == -1
     assert notification['notification_message'] == "firstlast tagged you in Channel: Hello @firstlast, we"
 
-@pytest.mark.skip
 def test_tagging_in_message_sendlaterdm(notifications_get_url, clear_and_register):
     user_token = clear_and_register['user1_token']
     user_handle = clear_and_register['user1_handle']
     dm_id = clear_and_register['dm_id']
-    
 
     message_string = f'Hello @{user_handle}, welcome to Streams!'
     requests.post(config.url + 'message/sendlaterdm/v1', json={
@@ -176,7 +172,6 @@ def test_tagging_in_message_edit(notifications_get_url, clear_and_register):
     assert notification['dm_id'] == -1
     assert notification['notification_message'] == "firstlast tagged you in Channel: Hello @firstlast, we"
 
-@pytest.mark.skip
 def test_tagging_in_message_share(notifications_get_url, clear_and_register):
     user_token = clear_and_register['user1_token']
     user_handle = clear_and_register['user1_handle']
@@ -204,7 +199,6 @@ def test_tagging_in_message_share(notifications_get_url, clear_and_register):
     assert notification['dm_id'] == -1
     assert notification['notification_message'] == "firstlast tagged you in Channel: Hello @firstlast, we"
 
-@pytest.mark.skip
 def test_reacting_to_channel_message(notifications_get_url, clear_and_register):
     user_token = clear_and_register['user1_token']
     channel_id = clear_and_register['channel_id']
@@ -228,7 +222,6 @@ def test_reacting_to_channel_message(notifications_get_url, clear_and_register):
     assert notification['dm_id'] == -1
     assert notification['notification_message'] == "firstlast reacted to your message in Channel"
 
-@pytest.mark.skip
 def test_reacting_to_dm_message(notifications_get_url, clear_and_register):
     user_token = clear_and_register['user1_token']
     dm_id = clear_and_register['dm_id']

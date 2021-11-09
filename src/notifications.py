@@ -1,9 +1,20 @@
 import re
 from src.data_store import data_store
-from src.error import AccessError, InputError
 from src.helpers import validate_token, filter_data_store
 
 def notifications_get_v1(token):
+    '''
+    notifications_get_v1: Return the user's most recent 20 notifications, ordered from most recent to least recent.
+
+    Arguments:
+        token (str) - Token string used to authorise and authenticate the user
+
+    Exceptions:
+        AccessError - Occurs when the token passed in is not a valid token
+                    
+    Return Value:
+        Returns { notifications } on successful token
+    '''
     # Checking that the token is valid and returning the decoded token
     user_id = validate_token(token)['user_id']
     
@@ -13,6 +24,9 @@ def notifications_get_v1(token):
 
 
 def add_notification(u_id, trigger_u_id, channel_id, notification_type, message=None):
+    '''
+    Adds notification to the specified user's data store.
+    '''
     store = data_store.get()
     notifications_list = filter_data_store(store_list='users', key='id', value=u_id)[0]['notifications']
     trigger_user_handle = filter_data_store(store_list='users', key='id', value=trigger_u_id)[0]['handle_str']
@@ -42,6 +56,5 @@ def find_tagged_users(message):
     '''
     store = data_store.get()
     tagged_list = re.findall('@([0-9a-zA-Z]+)', message)
-    #NEED TO CHECK IF USER IS TAGGED MULTIPLE TIMES IN A SINGLE MESSAGE IF THEY ARE NOTIFIED EACH TIME
     return [user['id'] for handle in tagged_list for user in store['users'] if handle in user['handle_str']]
         

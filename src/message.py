@@ -433,6 +433,9 @@ def message_react_v1(token, message_id, react_id):
     # Append user id to members that have reacted
     react_dict['u_ids'].append(auth_user_id)
     
+    # Sending a notification to user invited to the channel/dm
+    add_notification(selected_message['u_id'], auth_user_id, channel_dict['id'], 'invite')
+
     data_store.set(store)
 
     return {}
@@ -594,6 +597,12 @@ def message_sendlater_v1_dummy(channel_id, new_message, channel_dict):
     # Removes message from pending messages store
     store['pending_messages'].remove(new_message)
 
+    # Checking if any users were tagged in the message and sending them a notification
+    tagged_users_list = find_tagged_users(new_message['message'])
+    for u_id in tagged_users_list:
+        if u_id in channel_dict['members']:
+            add_notification(u_id, new_message['u_id'], channel_id, 'tagged', new_message['message'])
+
     data_store.set(store)
 
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
@@ -690,6 +699,12 @@ def message_sendlaterdm_v1_dummy(dm_id, new_message, dm_dict):
 
     # Removes the message from the pending messages store
     store['pending_messages'].remove(new_message)
+
+    # Checking if any users were tagged in the message and sending them a notification
+    tagged_users_list = find_tagged_users(new_message['message'])
+    for u_id in tagged_users_list:
+        if u_id in dm_dict['members']:
+            add_notification(u_id, new_message['u_id'], dm_id, 'tagged', new_message['message'])
 
     data_store.set(store)
 
