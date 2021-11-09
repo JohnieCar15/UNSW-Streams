@@ -215,6 +215,10 @@ def channel_messages_v2(token, channel_id, start):
         messages_dict['end'] = start + 50
         messages_dict['messages'] = new_channel['messages'][start:start + 50]
 
+    for message in messages_dict['messages']:
+        for react in message['reacts']:
+            react['is_this_user_reacted'] = True if auth_user_id in react['u_ids'] else False
+        
     data_store.set(store)
 
     return messages_dict
@@ -294,16 +298,20 @@ def channel_removeowner_v1(token, channel_id, u_id):
     if channel_id not in filter_data_store(store_list='channels',key='id'):
         raise InputError(description="Invalid channel_id")
 
-    # check if u_id is valid
-    if u_id not in filter_data_store(store_list='users', key='id'): 
-        raise InputError(description="Invalid user_id")
-    
     channel_dict = filter_data_store(store_list='channels',key='id',value=channel_id)[0]
 
     # check if user has owner permissions
     user_dict = filter_data_store(store_list='users',key='id',value=auth_user_id)[0]
     if auth_user_id not in channel_dict['owner'] and user_dict['permission_id'] != 1:
         raise AccessError(description='User does not have owner permissions in channel')
+    
+    # check if global owner they are a member of channel
+    if auth_user_id not in channel_dict['members']:
+        raise AccessError(description='User does not have owner permissions in channel')
+
+    # check if u_id is valid
+    if u_id not in filter_data_store(store_list='users', key='id'): 
+        raise InputError(description="Invalid user_id")
 
     # check if user is an owner of the channel
     if u_id not in channel_dict['owner']:
@@ -351,19 +359,23 @@ def channel_addowner_v1(token, channel_id, u_id):
     if channel_id not in filter_data_store(store_list='channels',key='id'):
         raise InputError(description="Invalid channel_id")
 
+    # check if token has owner permissions, is in owner or has global permissions
+    user_dict = filter_data_store(store_list='users',key='id',value=auth_user_id)[0]
+    channel_dict = filter_data_store(store_list='channels',key='id',value=channel_id)[0]
+    if auth_user_id not in channel_dict['owner'] and user_dict['permission_id'] != 1:
+        raise AccessError(description='User does not have owner permissions in channel')
+    
+    # if is global owner check that they are a member of the channel 
+    if auth_user_id not in channel_dict['members']:
+        raise AccessError(description='User does not have owner permissions in channel')
+
     # check if u_id is valid
     if u_id not in filter_data_store(store_list='users', key='id'): 
         raise InputError(description="Invalid user_id")
 
     # check if u_id is member of channel
-    channel_dict = filter_data_store(store_list='channels',key='id',value=channel_id)[0]
     if u_id not in channel_dict['members']:
         raise InputError(description="Not a member of channel")
-    
-    # check if token has owner permissions, is in owner or has global permissions
-    user_dict = filter_data_store(store_list='users',key='id',value=auth_user_id)[0]
-    if auth_user_id not in channel_dict['owner'] and user_dict['permission_id'] != 1:
-        raise AccessError(description='User does not have owner permissions in channel')
     
     # check if u_id already owner of channel
     if u_id in channel_dict['owner']:

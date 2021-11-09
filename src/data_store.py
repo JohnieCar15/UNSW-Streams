@@ -36,6 +36,7 @@ initial_object = {
     'dms': [],
     'removed_users': [],
     'removed_messages': [],
+    'pending_messages' : [],
     'removed_dms': []
 }
 '''
@@ -78,6 +79,7 @@ message = {
 message_store = {
     'message': message,
     'channel_id': int
+    'is_dm' : bool
 }
 
 '''
