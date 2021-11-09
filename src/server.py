@@ -14,7 +14,7 @@ from src.message import message_send_v1, message_senddm_v1, message_edit_v1, mes
 from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 from src.other import clear_v1
 from src.standup import standup_start_v1, standup_active_v1
-
+from src.search import search_v1
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -267,6 +267,12 @@ def standup_active_v1_ep():
     token = request.args.get('token')
     channel_id = int(request.args.get('channel_id'))
     return dumps(standup_active_v1(token, channel_id))
+
+@APP.route("/search/v1", methods=['GET'])
+def search_v1_ep():
+    token = request.args.get('token')
+    query_str = request.args.get('query_str')
+    return dumps(search_v1(token, query_str))
 
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear_v1_ep():
