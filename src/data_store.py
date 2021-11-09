@@ -26,13 +26,21 @@ Example usage:
 '''
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
+session_tracker = 0
+SECRET = 'JOjQqnzcMKrLVsTVLNc2hzA4iWkqqcQB'
+
 initial_object = {
     'users': [],
     'channels': [],
     'messages': [],
-    'dms': []
+    'dms': [],
+    'removed_users': [],
+    'removed_messages': [],
+    'pending_messages' : [],
+    'removed_dms': []
 }
 '''
+Data_store dictionary fields:
 user = {
     'id': int,
     'email': str,
@@ -41,17 +49,36 @@ user = {
     'name_last': str,
     'handle_str': str,
     'permission_id': int,
-    'session_list': list[int],
-    'is_removed': bool
+    'session_list': [int session_id]
 }
 
 channel = {
     'id': int,
     'name': str,
-    'owner': int,
+    'owner': [int u_id],
     'is_public': bool,
-    'members': [int id],
+    'members': [int u_id],
     'messages: []
+}
+
+dm = {
+    'id': int,
+    'name': str,
+    'owner': [int u_id],
+    'members': [int u_id],
+    'messages: [message]
+}
+
+message = {
+    'message_id': int,
+    'u_id': int,
+    'message': str,
+    'time_created': int unix timestamp
+}
+
+message_store = {
+    'message': message,
+    'channel_id': int
 }
 
 '''

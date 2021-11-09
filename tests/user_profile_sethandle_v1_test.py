@@ -11,22 +11,22 @@ from src.error import AccessError, InputError
 def clear_and_register_user0():
     requests.delete(config.url + 'clear/v1')
     user0_register = {
-        "email" : "0000@unsw.edu.au",
-        "password" : "password",
-        "name_first" : "firstname0",
-        "name_last" : "lastname0",
+        'email' : '0000@unsw.edu.au',
+        'password' : 'password',
+        'name_first' : 'firstname0',
+        'name_last' : 'lastname0',
     }
     user0 = requests.post(config.url + 'auth/register/v2', json=user0_register).json()
     user2_register = {
-        "email" : "0002@unsw.edu.au",
-        "password" : "password",
-        "name_first" : "firstname2",
-        "name_last" : "lastname2",
+        'email' : '0002@unsw.edu.au',
+        'password' : 'password',
+        'name_first' : 'firstname2',
+        'name_last' : 'lastname2',
     }
     requests.post(config.url + 'auth/register/v2', json=user2_register).json()
     return {
-        "token": user0['token'],
-        "u_id": user0['auth_user_id']
+        'token': user0['token'],
+        'u_id': user0['auth_user_id']
     }
 
 
@@ -34,8 +34,8 @@ def clear_and_register_user0():
 def test_invalid_token_and_valid_handle(clear_and_register_user0):
     user0 = clear_and_register_user0
     input = {
-        "token": user0['token'] + "1",
-        "handle_str": "abcd"
+        'token': user0['token'] + '1',
+        'handle_str': 'abcd'
     }
     assert requests.put(config.url + 'user/profile/sethandle/v1', json=input).status_code == AccessError.code
 
@@ -44,8 +44,8 @@ def test_invalid_token_and_valid_handle(clear_and_register_user0):
 def test_invalid_token_and_invalid_handle(clear_and_register_user0):
     user0 = clear_and_register_user0
     input = {
-        "token": user0['token'] + "1",
-        "handle_str": "a"
+        'token': user0['token'] + '1',
+        'handle_str': 'a'
     }
     assert requests.put(config.url + 'user/profile/sethandle/v1', json=input).status_code == AccessError.code
 
@@ -54,32 +54,32 @@ def test_invalid_token_and_invalid_handle(clear_and_register_user0):
 def test_valid_token_and_invalid_handle(clear_and_register_user0):
     user0 = clear_and_register_user0
     input = {
-        "token": user0['token'],
-        "handle_str": "a"
+        'token': user0['token'],
+        'handle_str': 'a'
     }
     assert requests.put(config.url + 'user/profile/sethandle/v1', json=input).status_code == InputError.code
-    input['handle_str'] = "a" * 50
+    input['handle_str'] = 'a' * 50
     assert requests.put(config.url + 'user/profile/sethandle/v1', json=input).status_code == InputError.code
-    input['handle_str'] = "!@#$%^" 
+    input['handle_str'] = '!@#$%^' 
     assert requests.put(config.url + 'user/profile/sethandle/v1', json=input).status_code == InputError.code
 
 # test valid token and handle, but the handle is used by others, this should raise InputError
 def test_handle_used_by_others(clear_and_register_user0):
     user0 = clear_and_register_user0
     user1_register = {
-        "email" : "0001@unsw.edu.au",
-        "password" : "password",
-        "name_first" : "firstname1",
-        "name_last" : "lastname1",
+        'email' : '0001@unsw.edu.au',
+        'password' : 'password',
+        'name_first' : 'firstname1',
+        'name_last' : 'lastname1',
     }
     user1 = requests.post(config.url + 'auth/register/v2', json=user1_register).json()
     input = {
-        "token": user0['token'],
-        "handle_str": "firstname1lastname1"
+        'token': user0['token'],
+        'handle_str': 'firstname1lastname1'
     }
     assert requests.put(config.url + 'user/profile/sethandle/v1', json=input).status_code == InputError.code
     input['token'] = user1['token']
-    input['handle_str'] = "firstname0lastname0"
+    input['handle_str'] = 'firstname0lastname0'
     assert requests.put(config.url + 'user/profile/sethandle/v1', json=input).status_code == InputError.code
     
 
@@ -87,8 +87,8 @@ def test_handle_used_by_others(clear_and_register_user0):
 def test_same_handle_as_previous(clear_and_register_user0):
     user0 = clear_and_register_user0
     input = {
-        "token": user0['token'],
-        "handle_str": "firstname0lastname0"
+        'token': user0['token'],
+        'handle_str': 'firstname0lastname0'
     }
     assert requests.put(config.url + 'user/profile/sethandle/v1', json=input).status_code == InputError.code
 
@@ -96,13 +96,13 @@ def test_same_handle_as_previous(clear_and_register_user0):
 def test_valid_token_and_valid_handle(clear_and_register_user0):
     user0 = clear_and_register_user0
     input = {
-        "token": user0['token'],
-        "handle_str": "firstname0lastname1"
+        'token': user0['token'],
+        'handle_str': 'firstname0lastname1'
     }
     requests.put(config.url + 'user/profile/sethandle/v1', json=input)
 
     input = {
-        "token": user0['token'],
-        "u_id": user0['u_id']
+        'token': user0['token'],
+        'u_id': user0['u_id']
     }
-    assert requests.get(config.url + 'user/profile/v1', params=input).json()["user"]["handle_str"] == "firstname0lastname1"
+    assert requests.get(config.url + 'user/profile/v1', params=input).json()['user']['handle_str'] == 'firstname0lastname1'
