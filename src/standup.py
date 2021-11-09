@@ -102,7 +102,5 @@ def standup_active_v1(token, channel_id):
     if auth_user_id not in channel_dict['members']:
         raise AccessError(description="Not a member of channel")
     # check if standup is active
-    if channel_dict['standup_active'] == True:
-        return { 'is_active': True, 'time_finish': channel_dict['standup_finish']}
     else: 
-        return { 'is_active': False, 'time_finish': channel_dict['standup_finish']}
+        return { 'is_active': channel_dict['standup_active'], 'time_finish': channel_dict['standup_finish']}
