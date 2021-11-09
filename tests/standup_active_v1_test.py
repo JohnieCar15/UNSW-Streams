@@ -3,6 +3,7 @@ import requests
 from src import config 
 from src.error import AccessError, InputError
 from datetime import datetime, timedelta
+import time
 
 @pytest.fixture 
 def clear_and_register_channel():
@@ -65,6 +66,26 @@ def test_no_standup_active_success(clear_and_register_channel):
     token = clear_and_register_channel['token']
     channel_id = clear_and_register_channel['channel_id']
 
+    standup_active = requests.get(config.url + 'standup/active/v1', params={
+        'token': token,
+        'channel_id': channel_id
+    }).json()
+    assert standup_active['is_active'] == False
+    assert standup_active['time_finish'] == None
+
+def test_no_standup_active_success_2(clear_and_register_channel):
+    '''
+    Testing when there is no standup active after standup has ended success case
+    '''
+    token = clear_and_register_channel['token']
+    channel_id = clear_and_register_channel['channel_id']
+
+    requests.post(config.url + 'standup/start/v1',json={
+        'token': token,
+        'channel_id': channel_id,
+        'length': 1,
+    })
+    time.sleep(1)
     standup_active = requests.get(config.url + 'standup/active/v1', params={
         'token': token,
         'channel_id': channel_id
