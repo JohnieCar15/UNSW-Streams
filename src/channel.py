@@ -3,6 +3,21 @@ from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store, is_global_owner
 from src.notifications import add_notification
 
+'''
+channel.py: This file contains all functions relating to channel endpoints.
+
+Channel Functions:
+    - channel_join_v2(token, channel_id)
+    - channel_invite_v2(token, channel_id, u_id)
+    - channel_details_v2(token, channel_id)
+    - channel_messages_v2(token, channel_id, start)
+    - channel_leave_v1(token, channel_id)
+    - channel_removeowner_v1(token, channel_id, u_id)
+    - channel_addowner_v1(token, channel_id, u_id)
+
+Channel Helper functions:
+    - generate_handle(name_first, name_last)
+'''
 
 def channel_join_v2(token, channel_id):
     '''

@@ -2,6 +2,17 @@ import re
 from src.data_store import data_store
 from src.helpers import validate_token, filter_data_store
 
+'''
+notifications.py: This file contains all functions relating to notifications endpoints.
+
+Notifications Functions:
+    - notifications_get_v1(token)
+
+Notifications Helper Functions:
+    - add_notification(u_id, trigger_u_id, channel_id, notification_type, message=None)
+    - find_tagged_users(message)
+'''
+
 def notifications_get_v1(token):
     '''
     notifications_get_v1: Return the user's most recent 20 notifications, ordered from most recent to least recent.

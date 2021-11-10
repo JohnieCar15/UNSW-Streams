@@ -6,6 +6,27 @@ from src.error import InputError, AccessError
 from src.helpers import is_global_owner, validate_token, filter_data_store
 from src.notifications import add_notification, find_tagged_users
 
+'''
+message.py: This file contains all functions relating to message endpoints.
+
+Message Functions:
+    - message_edit_v1(token, message_id, message)
+    - message_send_v1(token, channel_id, message)
+    - message_senddm_v1(token, dm_id, message)
+    - message_remove_v1(token, message_id)
+    - message_share_v1(token, og_message_id, message, channel_id, dm_id)
+    - message_react_v1(token, message_id, react_id)
+    - message_unreact_v1(token, message_id, react_id)
+    - message_sendlaterdm_v1(token, dm_id, message, time_sent)
+    - message_sendlater_v1(token, channel_id, message, time_sent)
+    - message_pin_v1(token, message_id)
+    - message_unpin_v1(token, message_id)
+
+Message Helper Functions:
+    - message_sendlater_v1_dummy(channel_id, new_message, channel_dict)
+    - message_sendlaterdm_v1_dummy(dm_id, new_message, dm_dict)
+'''
+
 def message_edit_v1(token, message_id, message):
     '''
     message_edit_v1: Sends a message from an authorised user to a channel specified

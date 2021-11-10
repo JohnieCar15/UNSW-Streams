@@ -16,6 +16,10 @@ from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, use
 from src.other import clear_v1
 from src.standup import standup_start_v1, standup_active_v1
 
+'''
+server.py: This file contains all functions relating to the http endpoints.
+'''
+
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -189,7 +193,7 @@ def dm_remove_v1_ep():
 def dm_details_v1_endpoint():
     token = request.args.get('token')
     dm_id = int(request.args.get('dm_id'))
-    return dumps (dm_details_v1(token, dm_id))
+    return dumps(dm_details_v1(token, dm_id))
 
 
 @APP.route("/dm/leave/v1", methods=['POST'])
@@ -272,7 +276,6 @@ def standup_active_v1_ep():
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear_v1_ep():
     return dumps(clear_v1())
-
 
 @APP.route("/notifications/get/v1", methods=['GET'])
 def notifications_get_v1_ep():

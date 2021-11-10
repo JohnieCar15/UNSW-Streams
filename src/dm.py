@@ -3,6 +3,18 @@ from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store
 from src.notifications import add_notification
 
+'''
+dm.py: This file contains all functions relating to dm endpoints.
+
+Dm Functions:
+    - dm_create_v1(token, u_ids)
+    - dm_list_v1(token)
+    - dm_leave_v1(token, dm_id)
+    - dm_details_v1(token, dm_id)
+    - dm_messages_v1(token, dm_id, start)
+    - dm_remove_v1(token, dm_id)
+'''
+
 def dm_create_v1(token, u_ids):
     '''
     dm_create_v1:

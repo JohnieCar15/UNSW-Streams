@@ -5,6 +5,15 @@ from datetime import datetime
 import threading
 import time
 
+'''
+standup.py: This file contains all functions relating to standup endpoints.
+
+Standup Functions:
+    - standup_start_v1(token, channel_id, length)
+    - standup_end(channel_dict, auth_user_id, time_finish)
+    - standup_active_v1(token, channel_id)
+'''
+
 def standup_start_v1(token, channel_id, length):
     '''
     standup_start_v1:
