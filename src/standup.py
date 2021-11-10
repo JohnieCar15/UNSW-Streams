@@ -12,6 +12,7 @@ Standup Functions:
     - standup_start_v1(token, channel_id, length)
     - standup_end(channel_dict, auth_user_id, time_finish)
     - standup_active_v1(token, channel_id)
+    - standup_send_v1(token, channel_id, message)
 '''
 
 def standup_start_v1(token, channel_id, length):

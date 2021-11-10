@@ -15,8 +15,6 @@ Channel Functions:
     - channel_removeowner_v1(token, channel_id, u_id)
     - channel_addowner_v1(token, channel_id, u_id)
 
-Channel Helper functions:
-    - generate_handle(name_first, name_last)
 '''
 
 def channel_join_v2(token, channel_id):
