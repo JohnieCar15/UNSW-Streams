@@ -61,17 +61,22 @@ def standup_start_v1(token, channel_id, length):
     t.start()
     data_store.set(store)
     # return time_finish
-    return {'time_finish': time_finish}        
+    return {'time_finish': time_finish}
 
 def standup_end(channel_dict, auth_user_id, time_finish):
     store = data_store.get()
     # send combined message
     standup_str = "\n".join(channel_dict['standup_messages'])
     standup_message = {
-        'message_id': len(store['messages']) + len(store['removed_messages']) + 1,
+        'message_id': len(store['messages']) + len(store['removed_messages']) + len(store['pending_messages']) + 1,
         'u_id': auth_user_id,
         'message': standup_str,
-        'time_created': time_finish
+        'time_created': time_finish,
+        'reacts': [{
+            'react_id': 1,
+            'u_ids': [],
+        }],
+        'is_pinned': False
     }
     message_store = {
         'message': standup_message,
@@ -113,3 +118,25 @@ def standup_active_v1(token, channel_id):
     # check if standup is active
     else: 
         return { 'is_active': channel_dict['standup_active'], 'time_finish': channel_dict['standup_finish']}
+
+def standup_send_v1(token, channel_id, message):
+    store = data_store.get()
+    # check valid token 
+    auth_user_id = validate_token(token)['user_id']
+    # check valid channel id
+    if channel_id not in filter_data_store(store_list='channels',key='id'):
+        raise InputError(description="Invalid channel_id")
+    # check is a member of channel 
+    channel_dict = filter_data_store(store_list='channels',key='id',value=channel_id)[0]
+    if auth_user_id not in channel_dict['members']:
+        raise AccessError(description="Not a member of channel")
+    # check if length of message is over 1000 characters
+    if len(message) > 1000:
+        raise InputError(description="Message over 1000 characters")
+    if channel_dict['standup_active'] == False:
+        raise InputError(description="No active standup")
+    user_dict = filter_data_store(store_list='users', key='id', value=auth_user_id)[0]
+    # add message to standup_messages
+    standup_message = f"{user_dict['handle_str']}: {message}"
+    channel_dict['standup_messages'].append(standup_message)
+    data_store.set(store)
