@@ -8,7 +8,7 @@ channel_invite_v2_test.py: All functions related to testing the channel_invite_v
 '''
 
 @pytest.fixture
-def channel_invites_url():
+def channel_invite_url():
     '''
     This function returns the url to the channel/invite/v2 endpoint
     '''
