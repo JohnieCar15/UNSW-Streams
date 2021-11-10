@@ -41,7 +41,9 @@ initial_object = {
     'channels_exist': [],
     'dms_exist': [],
     'messages_exist': [],
-    'users_in_channel_or_dm': []
+    'users_in_channel_or_dm': [],
+    'pending_messages' : [],
+    'removed_dms': []
 }
 '''
 Data_store dictionary fields:
@@ -86,6 +88,7 @@ message = {
 message_store = {
     'message': message,
     'channel_id': int
+    'is_dm' : bool
 }
 
 user_in_channel_or_dm = u_id

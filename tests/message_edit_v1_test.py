@@ -188,7 +188,7 @@ def test_not_member(register_create):
 
     status = requests.put(config.url + 'message/edit/v1', json=message_edit_input)
 
-    assert status.status_code == AccessError.code
+    assert status.status_code == InputError.code
 
 # Tests that the owner of the channel is able to edit message
 def test_owner_edit(register_create):
@@ -312,3 +312,116 @@ def test_dmmessage_edit():
     dm_messages = requests.get(config.url + 'dm/messages/v1', params=dm_messages_input).json()
 
     assert dm_messages['messages'][0]['message'] == "Universe!"
+
+def test_globalowner_edit_channel():
+    requests.delete(config.url + '/clear/v1')
+
+    auth_register_input1 = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    global_token = requests.post(config.url + '/auth/register/v2', json=auth_register_input1).json()['token'] 
+
+    auth_register_input2 = {
+        'email' : "newperson@gmail.com",
+        'password' : "password123",
+        'name_first' : "New",
+        'name_last' : "Person",
+    }
+
+    normal_token = requests.post(config.url + '/auth/register/v2', json=auth_register_input2).json()['token'] 
+
+    channel_create_input = {
+        'token' : normal_token,
+        'name' : "channel",
+        'is_public' : True
+    }
+
+    channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input).json()['channel_id']
+
+    join_channel_input = {
+        'token' : global_token,
+        'channel_id' : channel_id
+    }
+
+    requests.post(config.url + 'channel/join/v2', json=join_channel_input).json()
+
+    send_message_input = {
+        'token' : normal_token,
+        'channel_id': channel_id,
+        'message': "Hello!"
+    }
+
+    message_id = requests.post(config.url + '/message/send/v1', json=send_message_input).json()['message_id']
+
+    message_edit_input = {
+        'token' : global_token,
+        'message_id' : message_id,
+        'message' : 'World!'
+    }
+
+    status = requests.put(config.url + 'message/edit/v1', json=message_edit_input)
+    
+    assert status.status_code == 200
+
+    channel_messages_input = {
+        'token' : normal_token,
+        'channel_id' : channel_id,
+        'start' : 0
+    }
+
+    channel_messages = requests.get(config.url + '/channel/messages/v2', params=channel_messages_input).json()
+
+    assert channel_messages['messages'][0]['message'] == 'World!'
+
+def test_globalowner_edit_dm():
+    requests.delete(config.url + '/clear/v1')
+
+    auth_register_input1 = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    global_member = requests.post(config.url + '/auth/register/v2', json=auth_register_input1).json()
+
+    auth_register_input2 = {
+        'email' : "newperson@gmail.com",
+        'password' : "password123",
+        'name_first' : "First1",
+        'name_last' : "Last1",
+    }
+
+    member_token = requests.post(config.url + '/auth/register/v2', json=auth_register_input2).json()['token']
+
+    dms_create_input = {
+        'token': member_token,
+        'u_ids': [global_member['auth_user_id']]
+    }
+
+    dm_id = requests.post(config.url + 'dm/create/v1', json=dms_create_input).json()['dm_id']
+
+    message_senddm_input = {
+        'token': member_token,
+        'dm_id': dm_id,
+        'message': "message"
+    }
+
+    message_id = requests.post(config.url + 'message/senddm/v1', json=message_senddm_input).json()['message_id']
+
+    message_edit_input = {
+        'token' : global_member['token'],
+        'message_id' : message_id,
+        'message' : "Universe!"
+    }
+
+    status = requests.put(config.url + '/message/edit/v1', json=message_edit_input)
+
+    assert status.status_code == AccessError.code
+
+
+

@@ -41,7 +41,10 @@ def channels_create_v2(token, name, is_public):
         'owner': [auth_user_id],
         'is_public': is_public,
         'members': [auth_user_id],
-        'messages': []
+        'messages': [],
+        'standup_active': False,
+        'standup_messages': [], 
+        'standup_finish': None
     }
     store['channels'].append(channel_dictionary)
     data_store.set(store, user=auth_user_id, key='channel', key_value=1, user_value=1)
@@ -69,7 +72,7 @@ def channels_list_v2(token):
 
     # Checking if token is valid
     # if token can not be decoded
-    # raise AccessError("Invalid token")
+    # raise AccessError(description="Invalid token")
     auth_user_id = validate_token(token)['user_id']
    
     list_of_channel = filter_data_store(store_list='channels', key='members', value=auth_user_id)
@@ -100,7 +103,7 @@ def channels_listall_v2(token):
 
     # Checking if token is valid
     # if token can not be decoded
-    # raise AccessError("Invalid token")
+    # raise AccessError(description="Invalid token")
     validate_token(token)['user_id']
     
     # initilise the returned list

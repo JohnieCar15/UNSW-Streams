@@ -1,5 +1,6 @@
 from datetime import datetime
 import requests
+import time
 from src import config
 from src.error import AccessError
 
@@ -60,8 +61,9 @@ def test_no_channel_dm_message():
     '''
     test when num_users_in_channel_or_dm == 0
     then the utilization_rate should be 0
-    
     '''
+    # make sure this test is not affected by message_sendlater(dm) and standup_send
+    time.sleep(3)
     # clear data_store
     clear()
   
@@ -155,8 +157,7 @@ def test_general():
     global NUM_USERS_IN_CHANNEL_OR_DM
     # register user0
     user0 = user_register('0000@unsw.edu.au', 'password', 'firstname0', 'lastname0')
-    print(users_stats(user0))
-    print()
+
     # create channel public_0
     public_0 = channel_create(user0, 'public_0', True)
     NUM_USERS_IN_CHANNEL_OR_DM += 1
@@ -176,8 +177,6 @@ def test_general():
 
     # invite user1 to private_0
     channel_invite(user2, private_0, user1)
-    print(users_stats(user0))
-    print()
     check_users_stats_of_all_users_and_timestamp_for_specific_key(USERS, keys=[])
 
     # test user1 leave the channel 'public_0'
@@ -186,6 +185,8 @@ def test_general():
 
     # test user1 rejoin the channel 'public_0' and send two message
     channel_join(user1, public_0)
+    print(users_stats(user0))
+    print()
     message_0 = message_send(user1, public_0, '0')
     check_users_stats_of_all_users_and_timestamp_for_specific_key(USERS, keys=[])
 

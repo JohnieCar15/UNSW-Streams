@@ -204,7 +204,7 @@ def test_not_member(register_create):
 
     status = requests.delete(config.url + 'message/remove/v1', json=message_delete_input)
 
-    assert status.status_code == AccessError.code
+    assert status.status_code == InputError.code
 
 # Tests invalid token trying to delete message
 def test_invalid_token(register_create):
@@ -277,4 +277,111 @@ def test_dmmessage_edit():
 
     assert dm_messages['messages'] == []
 
+def test_globalowner_remove_channel():
+    requests.delete(config.url + '/clear/v1')
+
+    auth_register_input1 = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    global_token = requests.post(config.url + '/auth/register/v2', json=auth_register_input1).json()['token'] 
+
+    auth_register_input2 = {
+        'email' : "newperson@gmail.com",
+        'password' : "password123",
+        'name_first' : "New",
+        'name_last' : "Person",
+    }
+
+    normal_token = requests.post(config.url + '/auth/register/v2', json=auth_register_input2).json()['token'] 
+
+    channel_create_input = {
+        'token' : normal_token,
+        'name' : "channel",
+        'is_public' : True
+    }
+
+    channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input).json()['channel_id']
+
+    join_channel_input = {
+        'token' : global_token,
+        'channel_id' : channel_id
+    }
+
+    requests.post(config.url + 'channel/join/v2', json=join_channel_input).json()
+
+    send_message_input = {
+        'token' : normal_token,
+        'channel_id': channel_id,
+        'message': "Hello!"
+    }
+
+    message_id = requests.post(config.url + '/message/send/v1', json=send_message_input).json()['message_id']
+
+    message_remove_input = {
+        'token' : global_token,
+        'message_id' : message_id,
+    }
+
+    status = requests.delete(config.url + 'message/remove/v1', json=message_remove_input)
+
+    assert status.status_code == 200
+
+    channel_messages_input = {
+        'token' : normal_token,
+        'channel_id' : channel_id,
+        'start' : 0
+    }
+
+    channel_messages = requests.get(config.url + '/channel/messages/v2', params=channel_messages_input).json()
+
+    assert channel_messages['messages'] == []
+
+def test_globalowner_remove_dm():
+    requests.delete(config.url + '/clear/v1')
+
+    auth_register_input1 = {
+        'email' : "valid@gmail.com",
+        'password' : "password",
+        'name_first' : "First",
+        'name_last' : "Last",
+    }
+
+    global_member = requests.post(config.url + '/auth/register/v2', json=auth_register_input1).json()
+
+    auth_register_input2 = {
+        'email' : "newperson@gmail.com",
+        'password' : "password123",
+        'name_first' : "First1",
+        'name_last' : "Last1",
+    }
+
+    member_token = requests.post(config.url + '/auth/register/v2', json=auth_register_input2).json()['token']
+
+    dms_create_input = {
+        'token': member_token,
+        'u_ids': [global_member['auth_user_id']]
+    }
+
+    dm_id = requests.post(config.url + 'dm/create/v1', json=dms_create_input).json()['dm_id']
+
+    message_senddm_input = {
+        'token': member_token,
+        'dm_id': dm_id,
+        'message': "message"
+    }
+
+    message_id = requests.post(config.url + 'message/senddm/v1', json=message_senddm_input).json()['message_id']
+
+    message_remove_input = {
+        'token' : global_member['token'],
+        'message_id' : message_id,
+    }
+
+    status = requests.delete(config.url + 'message/remove/v1', json=message_remove_input)
+
+    assert status.status_code == AccessError.code
 
