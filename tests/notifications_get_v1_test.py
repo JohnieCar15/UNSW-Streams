@@ -5,13 +5,22 @@ from datetime import datetime
 from src import config
 from src.error import AccessError, InputError
 
+'''
+notifications_get_v1_test.py: All functions related to testing the notifications_get_v1 function
+'''
 
 @pytest.fixture
 def notifications_get_url():
+    '''
+    This function returns the url to the notifications/get/v1 endpoint
+    '''
     return config.url + 'notifications/get/v1'
 
 @pytest.fixture
 def clear_and_register():
+    '''
+    This function clears the datastore and registers two users and creates a channel and dm
+    '''
     requests.delete(config.url + 'clear/v1')
 
     auth_register_input1 = {
@@ -61,8 +70,10 @@ def clear_and_register():
         }
 
 
-# Testing the error case of passing in an invalid token
 def test_invalid_token(notifications_get_url, clear_and_register):
+    '''
+    Testing the error case of passing in an invalid token
+    '''
     # Creating an invalid token (empty string)
     invalid_token = ''
 
@@ -71,6 +82,9 @@ def test_invalid_token(notifications_get_url, clear_and_register):
 
 
 def test_tagging_in_message_send(notifications_get_url, clear_and_register):
+    '''
+    Testing that a tagged notification is returned when tagging a user in channel message
+    '''
     user_token = clear_and_register['user1_token']
     user_handle = clear_and_register['user1_handle']
     channel_id = clear_and_register['channel_id']
@@ -90,6 +104,9 @@ def test_tagging_in_message_send(notifications_get_url, clear_and_register):
     assert notification['notification_message'] == "firstlast tagged you in Channel: Hello @firstlast, we"
 
 def test_tagging_in_message_senddm(notifications_get_url, clear_and_register):
+    '''
+    Testing that a tagged notification is returned when tagging a user in dm message
+    '''
     user_token = clear_and_register['user1_token']
     user_handle = clear_and_register['user1_handle']
     dm_id = clear_and_register['dm_id']
@@ -109,6 +126,9 @@ def test_tagging_in_message_senddm(notifications_get_url, clear_and_register):
     assert notification['notification_message'] == "firstlast tagged you in firstlast: Hello @firstlast, we"
 
 def test_tagging_in_message_sendlater(notifications_get_url, clear_and_register):
+    '''
+    Testing that a tagged notification is returned when tagging a user in channel message sent later
+    '''
     user_token = clear_and_register['user1_token']
     user_handle = clear_and_register['user1_handle']
     channel_id = clear_and_register['channel_id']
@@ -131,6 +151,9 @@ def test_tagging_in_message_sendlater(notifications_get_url, clear_and_register)
     assert notification['notification_message'] == "firstlast tagged you in Channel: Hello @firstlast, we"
 
 def test_tagging_in_message_sendlaterdm(notifications_get_url, clear_and_register):
+    '''
+    Testing that a tagged notification is returned when tagging a user in dm message sent later
+    '''
     user_token = clear_and_register['user1_token']
     user_handle = clear_and_register['user1_handle']
     dm_id = clear_and_register['dm_id']
@@ -153,6 +176,9 @@ def test_tagging_in_message_sendlaterdm(notifications_get_url, clear_and_registe
     assert notification['notification_message'] == "firstlast tagged you in firstlast: Hello @firstlast, we"
 
 def test_tagging_in_message_edit(notifications_get_url, clear_and_register):
+    '''
+    Testing that a tagged notification is returned when tagging a user in an edited message
+    '''
     user_token = clear_and_register['user1_token']
     user_handle = clear_and_register['user1_handle']
     channel_id = clear_and_register['channel_id']
@@ -178,6 +204,9 @@ def test_tagging_in_message_edit(notifications_get_url, clear_and_register):
     assert notification['notification_message'] == "firstlast tagged you in Channel: Hello @firstlast, we"
 
 def test_tagging_in_message_share(notifications_get_url, clear_and_register):
+    '''
+    Testing that a tagged notification is returned when tagging a user in a share message
+    '''
     user_token = clear_and_register['user1_token']
     user_handle = clear_and_register['user1_handle']
     channel_id = clear_and_register['channel_id']
@@ -205,6 +234,9 @@ def test_tagging_in_message_share(notifications_get_url, clear_and_register):
     assert notification['notification_message'] == "firstlast tagged you in Channel: Hello @firstlast, we"
 
 def test_reacting_to_channel_message(notifications_get_url, clear_and_register):
+    '''
+    Testing that a reacted notification is returned when reacting to a channel message
+    '''
     user_token = clear_and_register['user1_token']
     channel_id = clear_and_register['channel_id']
 
@@ -228,6 +260,9 @@ def test_reacting_to_channel_message(notifications_get_url, clear_and_register):
     assert notification['notification_message'] == "firstlast reacted to your message in Channel"
 
 def test_reacting_to_dm_message(notifications_get_url, clear_and_register):
+    '''
+    Testing that a reacted notification is returned when reacting to a dm message
+    '''
     user_token = clear_and_register['user1_token']
     dm_id = clear_and_register['dm_id']
 
@@ -251,6 +286,9 @@ def test_reacting_to_dm_message(notifications_get_url, clear_and_register):
     assert notification['notification_message'] == "firstlast reacted to your message in firstlast"
 
 def test_inviting_to_channel(notifications_get_url, clear_and_register):
+    '''
+    Testing that a invited notification is returned when inviting a user to a channel
+    '''
     auth_user_token = clear_and_register['user1_token']
     user_token = clear_and_register['user2_token']
     user_id = clear_and_register['user2_id']
@@ -270,6 +308,9 @@ def test_inviting_to_channel(notifications_get_url, clear_and_register):
     assert notification['notification_message'] == "firstlast added you to Channel"
 
 def test_inviting_to_dm(notifications_get_url, clear_and_register):
+    '''
+    Testing that a invited notification is returned when inviting a user to a dm
+    '''
     auth_user_token = clear_and_register['user1_token']
     user_token = clear_and_register['user2_token']
     user_id = clear_and_register['user2_id']
@@ -287,6 +328,9 @@ def test_inviting_to_dm(notifications_get_url, clear_and_register):
     assert notification['notification_message'] == "firstlast added you to firstlast, firstlast0"
 
 def test_over_20_notifications(notifications_get_url, clear_and_register):
+    '''
+    Testing that exactly 20 notifications are returned
+    '''
     user_token = clear_and_register['user1_token']
     user_handle = clear_and_register['user1_handle']
     channel_id = clear_and_register['channel_id']

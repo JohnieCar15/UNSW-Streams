@@ -3,13 +3,22 @@ import requests
 from src import config
 from src.error import AccessError, InputError
 
+'''
+channel_invite_v2_test.py: All functions related to testing the channel_invite_v2 function
+'''
 
 @pytest.fixture
-def channel_invite_url():
+def channel_invites_url():
+    '''
+    This function returns the url to the channel/invite/v2 endpoint
+    '''
     return config.url + 'channel/invite/v2'
 
 @pytest.fixture
 def clear_and_register():
+    '''
+    This function clears the datastore and registers two users
+    '''
     requests.delete(config.url + 'clear/v1')
 
     auth_register_input1 = {
@@ -36,8 +45,10 @@ def clear_and_register():
         }
 
 
-# Testing the general case of inviting a user to a public channel
 def test_public_channel_invite(channel_invite_url, clear_and_register):
+    '''
+    Testing the general case of inviting a user to a public channel
+    '''
     auth_user_token = clear_and_register['user1_token']
     invitee_id = clear_and_register['user2_id']
     
@@ -64,8 +75,10 @@ def test_public_channel_invite(channel_invite_url, clear_and_register):
 
     assert r.status_code == 200 and invitee_id in channel_members_ids
 
-# Testing the general case of inviting a user to a private channel
 def test_private_channel_invite(channel_invite_url, clear_and_register):
+    '''
+    Testing the general case of inviting a user to a private channel
+    '''
     auth_user_token = clear_and_register['user1_token']
     invitee_id = clear_and_register['user2_id']
 
@@ -92,8 +105,10 @@ def test_private_channel_invite(channel_invite_url, clear_and_register):
 
     assert r.status_code == 200 and invitee_id in channel_members_ids
 
-# Testing the error case of passing an invalid token
 def test_invalid_token(channel_invite_url, clear_and_register):
+    '''
+    Testing the error case of passing an invalid token
+    '''
     valid_auth_token = clear_and_register['user1_token']
     valid_invitee_id = clear_and_register['user2_id']
 
@@ -116,8 +131,10 @@ def test_invalid_token(channel_invite_url, clear_and_register):
     
     assert r.status_code == AccessError.code
 
-# Testing the error case of passing an invalid u_id
 def test_invalid_invitee_id(channel_invite_url, clear_and_register):
+    '''
+    Testing the error case of passing an invalid u_id
+    '''
     valid_auth_token = clear_and_register['user1_token']
     valid_auth_id = clear_and_register['user1_id']
     valid_invitee_id = clear_and_register['user2_id']
@@ -143,8 +160,10 @@ def test_invalid_invitee_id(channel_invite_url, clear_and_register):
     
     assert r.status_code == InputError.code
 
-# Testing the error case of passing an invalid channel_id
 def test_invalid_channel_id(channel_invite_url, clear_and_register):
+    '''
+    Testing the error case of passing an invalid channel_id
+    '''
     valid_auth_token = clear_and_register['user1_token']
     valid_invitee_id = clear_and_register['user2_id']
 
@@ -167,8 +186,10 @@ def test_invalid_channel_id(channel_invite_url, clear_and_register):
 
     assert r.status_code == InputError.code
 
-# Testing the error case of passing an invalid token, channel_id and u_id
 def test_all_ids_invalid(channel_invite_url, clear_and_register):
+    '''
+    Testing the error case of passing an invalid token, channel_id and u_id
+    '''
     valid_auth_token = clear_and_register['user1_token']
     valid_auth_id = clear_and_register['user1_id']
     valid_invitee_id = clear_and_register['user2_id']
@@ -200,8 +221,10 @@ def test_all_ids_invalid(channel_invite_url, clear_and_register):
 
     assert r.status_code == AccessError.code
 
-# Testing the error case of inviting a user to a channel twice
 def test_duplicate_invite(channel_invite_url, clear_and_register):
+    '''
+    Testing the error case of inviting a user to a channel twice
+    '''
     auth_token = clear_and_register['user1_token']
     invitee_id = clear_and_register['user2_id']
 
@@ -222,8 +245,10 @@ def test_duplicate_invite(channel_invite_url, clear_and_register):
     
     assert r.status_code == InputError.code
 
-# Testing the error case of inviting a user to a channel that the inviter is not a member of
 def test_inviter_not_in_channel(channel_invite_url, clear_and_register):
+    '''
+    Testing the error case of inviting a user to a channel that the inviter is not a member of
+    '''
     owner_token = clear_and_register['user1_token']
     inviter_token = clear_and_register['user2_token']
 
