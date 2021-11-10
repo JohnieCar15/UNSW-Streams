@@ -226,3 +226,83 @@ def user_profile_sethandle_v1(token, handle):
             store['users'][user_index]['handle_str'] = handle
     data_store.set(store)
     return {}
+
+def user_stats_v1(token):
+    '''
+    uuser_stats_v1: 
+
+    Arguments:
+        token   - string    - token of the user
+
+    Exceptions: 
+        AccessError - token is invalid
+
+    Return Value:
+        Returns {}
+    '''
+    store = data_store.get()
+    # Checking if token is valid
+    # if token can not be decoded
+    # raise AccessError(description="Invalid token")
+    u_id = validate_token(token)['user_id']
+    user = [user for user in (store['users'] + store['removed_users']) if user['id'] == u_id]
+
+    user = user[0]
+    channels_joined = user['channels_joined']
+    dms_joined = user['dms_joined']
+    messages_sent = user['messages_sent']
+    
+
+    num_channels_joined = channels_joined[-1]['num_channels_joined']
+    num_dms_joined = dms_joined[-1]['num_dms_joined']
+    num_messages_sent = messages_sent[-1]['num_messages_sent']
+    store = data_store.get()
+
+    num_channels = store['channels_exist'][-1]['num_channels_exist']
+    num_dms = store['dms_exist'][-1]['num_dms_exist']
+    num_messages = store['messages_exist'][-1]['num_messages_exist']
+    if num_channels + num_dms + num_messages == 0:
+        involvement_rate = 0
+    else: 
+        involvement_rate = (num_channels_joined + num_dms_joined + num_messages_sent)/(num_channels + num_dms + num_messages)
+    
+    return {
+        'user_stats': {
+            'channels_joined': channels_joined,
+            'dms_joined': dms_joined,
+            'messages_sent': messages_sent,
+            'involvement_rate': min(involvement_rate, 1)
+        }
+    }
+
+def users_stats_v1(token):
+    '''
+    uusers_stats_v1: 
+
+    Arguments:
+        token   - string    - token of the user
+
+    Exceptions: 
+        AccessError - token is invalid
+
+    Return Value:
+        Returns {}
+    '''
+    store = data_store.get()
+    # Checking if token is valid
+    # if token can not be decoded
+    # raise AccessError(description="Invalid token")
+    validate_token(token)['user_id']
+
+    # get num_users and num_users_in_cahnnel_or_dm and calculate utilization_rate
+    num_users = len(store['users'])
+    num_users_who_have_joined_at_least_one_channel_or_dm = len(store['users_in_channel_or_dm'])
+    utilization_rate = num_users_who_have_joined_at_least_one_channel_or_dm / num_users
+    return {
+        'users_stats': {
+            'channels_exist': store['channels_exist'],
+            'dms_exist': store['dms_exist'],
+            'messages_exist':  store['messages_exist'],
+            'utilization_rate': utilization_rate
+        }
+    }

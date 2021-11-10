@@ -15,6 +15,10 @@ def clear_v1():
     store['removed_users'] = []
     store['removed_messages'] = []
     store['removed_dms'] = []
+    store['channels_exist'] = []
+    store['dms_exist'] = []
+    store['messages_exist'] = []
+    store['users_in_channel_or_dm'] = []
     data_store.set(store)
 
     return {}

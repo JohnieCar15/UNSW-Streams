@@ -121,7 +121,7 @@ def message_send_v1(token, channel_id, message):
     channel_dict['messages'].insert(0, new_message)
     store['messages'].insert(0, message_store)
 
-    data_store.set(store)
+    data_store.set(store, user=auth_user_id, key='messages', key_value=1, user_value=1)
 
     return { 
         'message_id': new_message['message_id']
@@ -185,7 +185,7 @@ def message_senddm_v1(token, dm_id, message):
     dm_dict['messages'].insert(0, new_message)
     store['messages'].insert(0, message_store)
 
-    data_store.set(store)
+    data_store.set(store, user=auth_user_id, key='messages', key_value=1, user_value=1)
 
     return { 
         'message_id': new_message['message_id']
@@ -240,7 +240,7 @@ def message_remove_v1(token, message_id):
     store['messages'].remove(messagedict)
     channel_dict['messages'].remove(selected_message)
 
-    data_store.set(store)
+    data_store.set(store, user=auth_user_id, key='messages', key_value=-1, user_value=-1)
 
     return {}
     
