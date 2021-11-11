@@ -202,4 +202,3 @@ def test_not_part_of_dm(register_create):
     status = requests.post(config.url + '/message/sendlaterdm/v1', json=message_sendlaterdm_input)
 
     assert status.status_code == AccessError.code
-    requests.delete(config.url + '/clear/v1')

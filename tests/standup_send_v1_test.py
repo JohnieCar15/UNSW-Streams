@@ -221,4 +221,3 @@ def test_invalid_token():
     })
 
     assert standup_send.status_code == AccessError.code
-    requests.delete(config.url + 'clear/v1')

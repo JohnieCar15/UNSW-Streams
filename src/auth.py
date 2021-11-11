@@ -96,7 +96,7 @@ def auth_register_v2(email, password, name_first, name_last):
     auth_user_id = len(store['users']) + len(store['removed_users']) + 1
     session_id = helpers.generate_new_session_id()
     token = helpers.generate_jwt(auth_user_id, session_id)
-    time_stamp = datetime.utcnow().timestamp()
+    time_stamp = int(datetime.utcnow().timestamp())
 
     # Add user to data store
     

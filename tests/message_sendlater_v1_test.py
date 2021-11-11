@@ -204,4 +204,3 @@ def test_not_part_of_channel(register_create):
     status = requests.post(config.url + '/message/sendlater/v1', json=message_sendlater_input)
 
     assert status.status_code == AccessError.code
-    requests.delete(config.url + '/clear/v1')

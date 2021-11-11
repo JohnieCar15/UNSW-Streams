@@ -372,7 +372,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     shared_channel_dict['messages'].insert(0, new_message)
     store['messages'].insert(0, message_store)
 
-    data_store.set(store)
+    data_store.set(store, user=auth_user_id, key='messages', key_value=1, user_value=1)
 
     return {
         'shared_message_id' : new_message['message_id']
@@ -567,7 +567,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     # Stores request sent by user and time they made that request
     store['pending_messages'].insert(0, new_message)
 
-    t = Timer(seconds_difference, message_sendlater_v1_dummy, [channel_id, new_message, channel_dict])
+    t = Timer(seconds_difference, message_sendlater_v1_dummy, [auth_user_id, channel_id, new_message, channel_dict])
     t.start()
 
     data_store.set(store)
@@ -576,7 +576,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
         'message_id' : new_message['message_id']
     }
 
-def message_sendlater_v1_dummy(channel_id, new_message, channel_dict):
+def message_sendlater_v1_dummy(auth_user_id, channel_id, new_message, channel_dict):
     '''
     Dummy function that runs after threading timer is finished 
     '''
@@ -598,7 +598,7 @@ def message_sendlater_v1_dummy(channel_id, new_message, channel_dict):
     # Removes message from pending messages store
     store['pending_messages'].remove(new_message)
 
-    data_store.set(store)
+    data_store.set(store, user=auth_user_id, key='messages', key_value=1, user_value=1)
 
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     '''
@@ -665,7 +665,7 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     # Stores request sent by user and time they made that request
     store['pending_messages'].insert(0, new_message)
 
-    t = Timer(seconds_difference, message_sendlaterdm_v1_dummy, [dm_id, new_message, dm_dict])
+    t = Timer(seconds_difference, message_sendlaterdm_v1_dummy, [auth_user_id, dm_id, new_message, dm_dict])
     t.start()
 
     data_store.set(store)
@@ -674,7 +674,7 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
         'message_id' : new_message['message_id']
     }
 
-def message_sendlaterdm_v1_dummy(dm_id, new_message, dm_dict):
+def message_sendlaterdm_v1_dummy(auth_user_id, dm_id, new_message, dm_dict):
     '''
     Dummy function that runs after threading timer is finished 
     '''
@@ -696,7 +696,7 @@ def message_sendlaterdm_v1_dummy(dm_id, new_message, dm_dict):
     # Removes the message from the pending messages store
     store['pending_messages'].remove(new_message)
 
-    data_store.set(store)
+    data_store.set(store, user=auth_user_id, key='messages', key_value=1, user_value=1)
 
 def message_pin_v1(token, message_id):
     '''

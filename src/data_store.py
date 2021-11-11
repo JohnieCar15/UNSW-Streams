@@ -42,8 +42,7 @@ initial_object = {
     'dms_exist': [],
     'messages_exist': [],
     'users_in_channel_or_dm': [],
-    'pending_messages' : [],
-    'removed_dms': []
+    'pending_messages' : []
 }
 '''
 Data_store dictionary fields:
@@ -139,7 +138,7 @@ def update_store(store, user=None, key=None, key_value=None, user_value=None):
         return store
 
     # get time_stamp and update channels/dms_exist/messages_sent
-    time_stamp = datetime.utcnow().timestamp()
+    time_stamp = int(datetime.utcnow().timestamp())
     update_channels_and_dms_and_messages_exist(store, key, key_value, time_stamp)
 
     # get new key for helper function: update_num_channels_dms_joined_or_message_sent()
