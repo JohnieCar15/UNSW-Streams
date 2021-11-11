@@ -1,11 +1,19 @@
 from src.data_store import data_store
-'''
-clear_v1: Resets internal data to initial state
 
-Return Value:
-    Returns {} on successful run
 '''
+other.py: This file contains the other important functions used in the project
+
+Functions:
+    - clear_v1()
+'''
+
 def clear_v1():
+    '''
+    clear_v1: Resets internal data to initial state
+
+    Return Value:
+        Returns {} on successful run
+    '''
     store = data_store.get()
     # Clear users and channels data store
     store['users'] = []

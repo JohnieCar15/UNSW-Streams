@@ -1,7 +1,21 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store, is_global_owner
+from src.notifications import add_notification
 
+'''
+channel.py: This file contains all functions relating to channel endpoints.
+
+Channel Functions:
+    - channel_join_v2(token, channel_id)
+    - channel_invite_v2(token, channel_id, u_id)
+    - channel_details_v2(token, channel_id)
+    - channel_messages_v2(token, channel_id, start)
+    - channel_leave_v1(token, channel_id)
+    - channel_removeowner_v1(token, channel_id, u_id)
+    - channel_addowner_v1(token, channel_id, u_id)
+
+'''
 
 def channel_join_v2(token, channel_id):
     '''
@@ -83,8 +97,13 @@ def channel_invite_v2(token, channel_id, u_id):
     elif u_id in channel_list[0]['members']:
         raise InputError(description='User already member of channel')
     
+    # Adding user to channel members list
     channel_list[0]['members'].append(u_id)
     
+
+    # Sending a notification to user invited to the channel
+    add_notification(u_id, auth_user_id, channel_id, 'invite')
+
     data_store.set(store, user=u_id, key='channel', key_value=0, user_value=1)
     return {}
 

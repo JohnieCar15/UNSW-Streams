@@ -1,9 +1,31 @@
+from datetime import datetime
+from threading import Timer
 from src import auth, channel
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import is_global_owner, validate_token, filter_data_store
-from datetime import datetime
-from threading import Timer
+from src.notifications import add_notification, find_tagged_users
+
+'''
+message.py: This file contains all functions relating to message endpoints.
+
+Message Functions:
+    - message_edit_v1(token, message_id, message)
+    - message_send_v1(token, channel_id, message)
+    - message_senddm_v1(token, dm_id, message)
+    - message_remove_v1(token, message_id)
+    - message_share_v1(token, og_message_id, message, channel_id, dm_id)
+    - message_react_v1(token, message_id, react_id)
+    - message_unreact_v1(token, message_id, react_id)
+    - message_sendlaterdm_v1(token, dm_id, message, time_sent)
+    - message_sendlater_v1(token, channel_id, message, time_sent)
+    - message_pin_v1(token, message_id)
+    - message_unpin_v1(token, message_id)
+
+Message Helper Functions:
+    - message_sendlater_v1_dummy(channel_id, new_message, channel_dict)
+    - message_sendlaterdm_v1_dummy(dm_id, new_message, dm_dict)
+'''
 
 def message_edit_v1(token, message_id, message):
     '''
@@ -68,6 +90,12 @@ def message_edit_v1(token, message_id, message):
     else:
         messagedict['message']['message'] = message
         selected_message['message'] = message
+
+        # Checking if any users were tagged in the message and sending them a notification
+        tagged_users_list = find_tagged_users(message)
+        for u_id in tagged_users_list:
+            if u_id in channel_dict['members']:
+                add_notification(u_id, auth_user_id, channel_dict['id'], 'tagged', message)
         
     data_store.set(store)
 
@@ -100,7 +128,7 @@ def message_send_v1(token, channel_id, message):
     auth_user_id = validate_token(token)['user_id']
 
     # Checks if channel id is valid
-    if channel_id not in filter_data_store(store_list='channels', key='id', value=None):
+    if channel_id not in filter_data_store(store_list='channels', key='id'):
         raise InputError(description="Invalid channel_id")
 
     # Filters data store for correct channel
@@ -126,6 +154,12 @@ def message_send_v1(token, channel_id, message):
         }],
         'is_pinned' : False
     }
+
+    # Checking if any users were tagged in the message and sending them a notification
+    tagged_users_list = find_tagged_users(message)
+    for u_id in tagged_users_list:
+        if u_id in channel_dict['members']:
+            add_notification(u_id, auth_user_id, channel_id, 'tagged', message)
 
     # Data store creates extra field of channel id for easier identification
     message_store = {
@@ -170,7 +204,7 @@ def message_senddm_v1(token, dm_id, message):
     auth_user_id = validate_token(token)['user_id']
 
     # Checks if channel id is valid
-    if dm_id not in filter_data_store(store_list='dms', key='id', value=None):
+    if dm_id not in filter_data_store(store_list='dms', key='id'):
         raise InputError(description="Invalid dm_id")
 
     # Filters data store for correct channel
@@ -196,6 +230,12 @@ def message_senddm_v1(token, dm_id, message):
         }],
         'is_pinned' : False
     }
+
+    # Checking if any users were tagged in the message and sending them a notification
+    tagged_users_list = find_tagged_users(message)
+    for u_id in tagged_users_list:
+        if u_id in dm_dict['members']:
+            add_notification(u_id, auth_user_id, dm_id, 'tagged', message)
 
     # Data store creates extra field of channel id for easier identification
     message_store = {
@@ -311,13 +351,13 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     check = True
     if dm_id == -1:
         # Checks if channel id is valid
-        if channel_id not in filter_data_store(store_list='channels', key='id', value=None):
+        if channel_id not in filter_data_store(store_list='channels', key='id'):
             raise InputError(description="Invalid channel_id")
         check = False
         final_id = channel_id
     else:
         # Checks if dm id is valid
-        if dm_id not in filter_data_store(store_list='dms', key='id', value=None):
+        if dm_id not in filter_data_store(store_list='dms', key='id'):
             raise InputError(description="Invalid dm_id")
         check = True
         final_id = dm_id
@@ -371,6 +411,12 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
     shared_channel_dict['messages'].insert(0, new_message)
     store['messages'].insert(0, message_store)
+
+    # Checking if any users were tagged in the message and sending them a notification
+    tagged_users_list = find_tagged_users(message)
+    for u_id in tagged_users_list:
+        if u_id in shared_channel_dict['members']:
+            add_notification(u_id, auth_user_id, final_id, 'tagged', message)
 
     data_store.set(store, user=auth_user_id, key='messages', key_value=1, user_value=1)
 
@@ -436,6 +482,9 @@ def message_react_v1(token, message_id, react_id):
     # Append user id to members that have reacted
     react_dict['u_ids'].append(auth_user_id)
     
+    # Sending a notification to user invited to the channel/dm
+    add_notification(selected_message['u_id'], auth_user_id, channel_dict['id'], 'react')
+
     data_store.set(store)
 
     return {}
@@ -531,7 +580,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     auth_user_id = validate_token(token)['user_id']
 
     # Checks if channel id is valid
-    if channel_id not in filter_data_store(store_list='channels', key='id', value=None):
+    if channel_id not in filter_data_store(store_list='channels', key='id'):
         raise InputError(description="Invalid channel_id")
 
     # Filters data store for correct channel
@@ -598,6 +647,12 @@ def message_sendlater_v1_dummy(auth_user_id, channel_id, new_message, channel_di
     # Removes message from pending messages store
     store['pending_messages'].remove(new_message)
 
+    # Checking if any users were tagged in the message and sending them a notification
+    tagged_users_list = find_tagged_users(new_message['message'])
+    for u_id in tagged_users_list:
+        if u_id in channel_dict['members']:
+            add_notification(u_id, new_message['u_id'], channel_id, 'tagged', new_message['message'])
+
     data_store.set(store, user=auth_user_id, key='messages', key_value=1, user_value=1)
 
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
@@ -629,7 +684,7 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     auth_user_id = validate_token(token)['user_id']
 
     # Checks if dm id is valid
-    if dm_id not in filter_data_store(store_list='dms', key='id', value=None):
+    if dm_id not in filter_data_store(store_list='dms', key='id'):
         raise InputError(description="Invalid dm_id")
 
     # Filters data store for correct dm
@@ -695,6 +750,12 @@ def message_sendlaterdm_v1_dummy(auth_user_id, dm_id, new_message, dm_dict):
 
     # Removes the message from the pending messages store
     store['pending_messages'].remove(new_message)
+
+    # Checking if any users were tagged in the message and sending them a notification
+    tagged_users_list = find_tagged_users(new_message['message'])
+    for u_id in tagged_users_list:
+        if u_id in dm_dict['members']:
+            add_notification(u_id, new_message['u_id'], dm_id, 'tagged', new_message['message'])
 
     data_store.set(store, user=auth_user_id, key='messages', key_value=1, user_value=1)
 

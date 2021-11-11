@@ -3,13 +3,22 @@ import requests
 from src import config
 from src.error import AccessError, InputError
 
+'''
+channel_join_v2_test.py: All functions related to testing the channel_invite_v2 function
+'''
 
 @pytest.fixture
 def channel_join_url():
+    '''
+    This function returns the url to the channel/join/v2 endpoint
+    '''
     return config.url + 'channel/join/v2'
 
 @pytest.fixture
 def clear_and_register():
+    '''
+    This function clears the datastore and registers two users
+    '''
     requests.delete(config.url + 'clear/v1')
 
     auth_register_input1 = {
@@ -35,8 +44,10 @@ def clear_and_register():
         'user2_id': user2_payload['auth_user_id']
         }
 
-# Testing the general case of a user joining a public channel
 def test_join_public(channel_join_url, clear_and_register):
+    '''
+    Testing the general case of a user joining a public channel
+    '''
     creator_token = clear_and_register['user1_token']
     user_token = clear_and_register['user2_token']
     user_id = clear_and_register['user2_id']
@@ -63,8 +74,10 @@ def test_join_public(channel_join_url, clear_and_register):
 
     assert r.status_code == 200 and user_id in channel_members_ids
 
-# Testing the error case of passing an invalid token
 def test_invalid_token(channel_join_url, clear_and_register):
+    '''
+    Testing the error case of passing an invalid token
+    '''
     valid_user_token = clear_and_register['user1_token']
 
     channels_create_input = {
@@ -85,8 +98,10 @@ def test_invalid_token(channel_join_url, clear_and_register):
     
     assert r.status_code == AccessError.code
 
-# Testing the error case of passing an invalid channel_id
 def test_invalid_channel_id(channel_join_url, clear_and_register):
+    '''
+    Testing the error case of passing an invalid channel_id
+    '''
     valid_user_token = clear_and_register['user1_token']
 
     channels_create_input = {
@@ -107,8 +122,10 @@ def test_invalid_channel_id(channel_join_url, clear_and_register):
     
     assert r.status_code == InputError.code
 
-# Testing the error case of passing an invalid token and channel_id
 def test_all_ids_invalid(channel_join_url, clear_and_register):
+    '''
+    Testing the error case of passing an invalid token and channel_id
+    '''
     valid_user_token = clear_and_register['user1_token']
 
     channels_create_input = {
@@ -131,8 +148,10 @@ def test_all_ids_invalid(channel_join_url, clear_and_register):
 
     assert r.status_code == AccessError.code
 
-# Testing the error case of a user joining a channel again
 def test_duplicate(channel_join_url, clear_and_register):
+    '''
+    Testing the error case of a user joining a channel again
+    '''
     user_token = clear_and_register['user1_token']
 
     channels_create_input = {
@@ -150,8 +169,10 @@ def test_duplicate(channel_join_url, clear_and_register):
     
     assert r.status_code == InputError.code
 
-# Testing the error case of a non-global owner joining a private channel
 def test_private_channel_without_global_owner(channel_join_url, clear_and_register):
+    '''
+    Testing the error case of a non-global owner joining a private channel
+    '''
     creator_token = clear_and_register['user1_token']
     user_token = clear_and_register['user2_token']
 
@@ -172,8 +193,10 @@ def test_private_channel_without_global_owner(channel_join_url, clear_and_regist
 
 
 
-# Testing the general case of a global owner joining a private channel
 def test_private_channel_with_global_owner(channel_join_url, clear_and_register):
+    '''
+    Testing the general case of a global owner joining a private channel
+    '''
     creator_token = clear_and_register['user2_token']
     global_owner_token = clear_and_register['user1_token']
     global_owner_id = clear_and_register['user1_id']

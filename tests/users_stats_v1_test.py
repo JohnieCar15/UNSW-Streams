@@ -63,7 +63,7 @@ def test_no_channel_dm_message():
     then the utilization_rate should be 0
     '''
     # make sure this test is not affected by message_sendlater(dm) and standup_send
-    time.sleep(2)
+    time.sleep(3)
     # clear data_store
     clear()
   

@@ -58,6 +58,7 @@ user = {
     'channels_joined': [{num_channels_joined, time_stamp}],
     'dms_joined':      [{num_dms_joined, time_stamp}],
     'messages_sent':   [{num_messages_sent, time_stamp}],
+    'notifications': []
 }
 
 channel = {
@@ -90,8 +91,13 @@ message_store = {
     'is_dm' : bool
 }
 
-user_in_channel_or_dm = u_id
+user_in_channel_or_dm = u_id (int)
 
+notification = {
+    'notification_message': str,
+    'channel_id': int,
+    'dm_id':int
+}
 '''
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 class Datastore:

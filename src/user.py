@@ -2,6 +2,20 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store
 import re
+
+'''
+user.py: This file contains all functions relating to user endpoints.
+
+User Functions:
+    - users_all_v1(token)
+    - user_profile_v1(token, u_id)
+    - user_profile_setname_v1(token, name_first, name_last)
+    - user_profile_setemail_v1(token, email)
+    - user_profile_sethandle_v1(token, handle)
+    - user_stats_v1(token)
+    - users_stats_v1(token)
+'''
+
 regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
 def users_all_v1(token):

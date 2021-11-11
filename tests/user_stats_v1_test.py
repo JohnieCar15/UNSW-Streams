@@ -60,6 +60,7 @@ def test_no_channel_dm_message():
         }
     }
     '''
+    # make sure this test is not affected by message_sendlater(dm) and standup_send
     time.sleep(3)
     # clear data_store
     requests.delete(config.url + 'clear/v1')

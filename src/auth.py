@@ -6,6 +6,18 @@ from src.error import InputError
 from src import helpers
 
 
+'''
+auth.py: This file contains all functions relating to auth endpoints.
+
+Auth Functions:
+    - auth_login_v2(email, password)
+    - auth_register_v2(email, password, name_first, name_last)
+    - auth_logout_v1(token)
+
+Auth Helper functions:
+    - generate_handle(name_first, name_last)
+'''
+
 regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
 def auth_login_v2(email, password):
@@ -112,6 +124,7 @@ def auth_register_v2(email, password, name_first, name_last):
         'channels_joined': [{'num_channels_joined': 0, 'time_stamp': time_stamp}],
         'dms_joined':      [{'num_dms_joined': 0, 'time_stamp': time_stamp}],
         'messages_sent':   [{'num_messages_sent': 0, 'time_stamp': time_stamp}],
+        'notifications': []
     }
 
     store['users'].append(user_dict)
