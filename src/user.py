@@ -330,7 +330,7 @@ def users_stats_v1(token):
     num_users_who_have_joined_at_least_one_channel_or_dm = len(store['users_in_channel_or_dm'])
     utilization_rate = num_users_who_have_joined_at_least_one_channel_or_dm / num_users
     return {
-        'users_stats': {
+        'workspace_stats': {
             'channels_exist': store['channels_exist'],
             'dms_exist': store['dms_exist'],
             'messages_exist':  store['messages_exist'],
