@@ -559,7 +559,7 @@ def standup_send(user, channel, message):
         'channel_id': channel['channel_id'],
         'message': message,
     }
-    standup_start = requests.post(config.url + 'standup/send/v1',json=input).json()
+    return requests.post(config.url + 'standup/send/v1',json=input).json()
 
 def clear():
     '''
