@@ -56,7 +56,8 @@ def users_all_v1(token):
                     'email': user['email'],
                     'name_first': user['name_first'],
                     'name_last': user['name_last'],
-                    'handle_str': user['handle_str']
+                    'handle_str': user['handle_str'],
+                    'profile_img_url': user['profile_img_url']
                 }
             )
 
@@ -102,7 +103,8 @@ def user_profile_v1(token, u_id):
         'email': user['email'],
         'name_first': user['name_first'],
         'name_last': user['name_last'],
-        'handle_str': user['handle_str']
+        'handle_str': user['handle_str'],
+        'profile_img_url': user['profile_img_url']
         }
     }
 
