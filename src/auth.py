@@ -5,6 +5,18 @@ from src import helpers
 import re
 import hashlib
 
+'''
+auth.py: This file contains all functions relating to auth endpoints.
+
+Auth Functions:
+    - auth_login_v2(email, password)
+    - auth_register_v2(email, password, name_first, name_last)
+    - auth_logout_v1(token)
+
+Auth Helper functions:
+    - generate_handle(name_first, name_last)
+'''
+
 regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
 def auth_login_v2(email, password):
@@ -106,7 +118,8 @@ def auth_register_v2(email, password, name_first, name_last):
         'name_last': name_last,
         'handle_str': handle_str,
         'permission_id': permission_id,
-        'session_list': [session_id]
+        'session_list': [session_id],
+        'notifications': []
     }
 
     store['users'].append(user_dict)

@@ -3,12 +3,22 @@ import requests
 from src import config
 from src.error import AccessError, InputError
 
+'''
+admin_user_remove_v1_test.py: All functions related to testing the admin_user_remove_v1 function
+'''
+
 @pytest.fixture
 def admin_user_remove_url():
+    '''
+    This function returns the url to the admin/user/remove/v1 endpoint
+    '''
     return config.url + 'admin/user/remove/v1'
 
 @pytest.fixture
 def clear_and_register():
+    '''
+    This function clears the datastore and registers two users
+    '''
     requests.delete(config.url + 'clear/v1')
 
     auth_register_input1 = {
@@ -34,8 +44,10 @@ def clear_and_register():
         'user2_id': user2_payload['auth_user_id']
         }
 
-# Testing the general case of removing a user from Streams
 def test_remove_user(admin_user_remove_url, clear_and_register):
+    '''
+    Testing the general case of removing a user from Streams
+    '''
     auth_user_token = clear_and_register['user1_token']
     user_id = clear_and_register['user2_id']
     user_token = clear_and_register['user2_token']
@@ -148,8 +160,10 @@ def test_remove_user(admin_user_remove_url, clear_and_register):
     assert setemail_request.status_code == 200 and sethandle_request.status_code == 200
 
 
-# Testing the error case of passing in an invalid token
 def test_invalid_token(admin_user_remove_url, clear_and_register):
+    '''
+    Testing the error case of passing in an invalid token
+    '''
     user_id = clear_and_register['user2_id']
 
     # Creating an invalid token (empty string)
@@ -163,8 +177,10 @@ def test_invalid_token(admin_user_remove_url, clear_and_register):
 
     assert r.status_code == AccessError.code
 
-# Testing the error case of passing in an invalid u_id
 def test_invalid_u_id(admin_user_remove_url, clear_and_register):
+    '''
+    Testing the error case of passing in an invalid u_id
+    '''
     auth_user_token = clear_and_register['user1_token']
     auth_user_id = clear_and_register['user1_id']
     valid_user_id = clear_and_register['user2_id']
@@ -182,8 +198,10 @@ def test_invalid_u_id(admin_user_remove_url, clear_and_register):
 
     assert r.status_code == InputError.code
 
-# Testing the error case of when the auth_user is not a global owner
 def test_auth_not_global_owner(admin_user_remove_url, clear_and_register):
+    '''
+    Testing the error case of when the auth_user is not a global owner
+    '''
     non_global_owner_token = clear_and_register['user2_id']
     non_global_owner_id = clear_and_register['user2_id']
 
@@ -195,8 +213,10 @@ def test_auth_not_global_owner(admin_user_remove_url, clear_and_register):
 
     assert r.status_code == AccessError.code
 
-# Testing the error case of when the removed user is the only global owner
 def test_user_only_global_owner(admin_user_remove_url, clear_and_register):
+    '''
+    Testing the error case of when the removed user is the only global owner
+    '''
     global_owner_token = clear_and_register['user1_token']
     global_owner_id = clear_and_register['user1_id']
 
@@ -208,8 +228,10 @@ def test_user_only_global_owner(admin_user_remove_url, clear_and_register):
 
     assert r.status_code == InputError.code
 
-# Testing the error case of when both the auth_user_id and u_id are invalid
 def test_invalid_auth_id_and_u_id(admin_user_remove_url, clear_and_register):
+    '''
+    Testing the error case of when both the auth_user_id and u_id are invalid
+    '''
     non_global_auth_token = clear_and_register['user2_token']
     non_global_auth_id = clear_and_register['user2_id']
     valid_user_id = clear_and_register['user1_id']

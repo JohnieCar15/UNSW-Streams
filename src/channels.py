@@ -3,6 +3,15 @@ from src.error import InputError
 from src.error import AccessError
 from src.helpers import validate_token, filter_data_store
 
+'''
+channels.py: This file contains all functions relating to channels endpoints.
+
+Channels Functions:
+    - channels_create_v2(token, name, is_public)
+    - channels_list_v2(token)
+    - channels_listall_v2(token)
+
+'''
 
 def channels_create_v2(token, name, is_public):
     '''
