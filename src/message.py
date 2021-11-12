@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from threading import Timer
 from src import auth, channel
 from src.data_store import data_store
@@ -147,7 +147,7 @@ def message_send_v1(token, channel_id, message):
         'message_id': len(store['messages']) + len(store['removed_messages']) + len(store['pending_messages']) + 1,
         'u_id': auth_user_id,
         'message': message,
-        'time_created': int(datetime.utcnow().timestamp()),
+        'time_created': int(datetime.now(timezone.utc).timestamp()),
         'reacts' : [{
             'react_id' : 1,
             'u_ids' : [],
@@ -223,7 +223,7 @@ def message_senddm_v1(token, dm_id, message):
         'message_id': len(store['messages']) + len(store['removed_messages']) + len(store['pending_messages']) + 1,
         'u_id': auth_user_id,
         'message': message,
-        'time_created': int(datetime.utcnow().timestamp()),
+        'time_created': int(datetime.now(timezone.utc).timestamp()),
         'reacts' : [{
             'react_id' : 1,
             'u_ids' : [],
@@ -394,7 +394,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         'message_id': len(store['messages']) + len(store['removed_messages']) + len(store['pending_messages'])+ 1,
         'u_id': auth_user_id,
         'message': f"{message}" + "\n\n" + f'"""\n{og_selected_message["message"]}\n"""',
-        'time_created': int(datetime.utcnow().timestamp()),
+        'time_created': int(datetime.now(timezone.utc).timestamp()),
         'reacts' : [{
             'react_id' : 1,
             'u_ids' : [],
@@ -595,7 +595,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
         raise InputError(description="Invalid message")
 
     # Calculate number of seconds into the future for timer to run
-    seconds_difference = int(time_sent) - int(datetime.utcnow().timestamp())
+    seconds_difference = int(time_sent) - int(datetime.now(timezone.utc).timestamp())
 
     # Negative seconds implies time was sent in past 
     if seconds_difference < 0:  
@@ -605,7 +605,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
         'message_id': len(store['messages']) + len(store['removed_messages']) + len(store['pending_messages']) + 1,
         'u_id': auth_user_id,
         'message': message,
-        'time_created': int(datetime.utcnow().timestamp()),
+        'time_created': int(datetime.now(timezone.utc).timestamp()),
         'reacts' : [{
             'react_id' : 1,
             'u_ids' : [],
@@ -632,7 +632,7 @@ def message_sendlater_v1_dummy(auth_user_id, channel_id, new_message, channel_di
     store = data_store.get()
 
     # Modifies new time to be when message is being sent
-    new_message['time_created'] = int(datetime.utcnow().timestamp())
+    new_message['time_created'] = int(datetime.now(timezone.utc).timestamp())
 
     # Data store creates extra field of channel id for easier identification
     message_store = {
@@ -699,7 +699,7 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
         raise InputError(description="Invalid message")
 
     # Calculate number of seconds into the future for timer to run
-    seconds_difference = int(time_sent) - int(datetime.utcnow().timestamp())
+    seconds_difference = int(time_sent) - int(datetime.now(timezone.utc).timestamp())
 
     # Negative seconds implies that time was sent in the past
     if seconds_difference < 0:
@@ -709,7 +709,7 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
         'message_id': len(store['messages']) + len(store['removed_messages']) + len(store['pending_messages']) + 1,
         'u_id': auth_user_id,
         'message': message,
-        'time_created': int(datetime.utcnow().timestamp()),
+        'time_created': int(datetime.now(timezone.utc).timestamp()),
         'reacts' : [{
             'react_id' : 1,
             'u_ids' : [],
@@ -736,7 +736,7 @@ def message_sendlaterdm_v1_dummy(auth_user_id, dm_id, new_message, dm_dict):
     store = data_store.get()
 
     # Modifies new time to be when message is being sent
-    new_message['time_created'] = int(datetime.utcnow().timestamp())
+    new_message['time_created'] = int(datetime.now(timezone.utc).timestamp())
 
     # Data store creates extra field of channel id for easier identification
     message_store = {

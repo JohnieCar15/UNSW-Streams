@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import pickle
 import urllib.request
 '''
@@ -147,7 +147,7 @@ def update_store(store, user=None, key=None, key_value=None, user_value=None):
         return store
 
     # get time_stamp and update channels/dms_exist/messages_sent
-    time_stamp = int(datetime.utcnow().timestamp())
+    time_stamp = int(datetime.now(timezone.utc).timestamp())
     update_channels_and_dms_and_messages_exist(store, key, key_value, time_stamp)
 
     # get new key for helper function: update_num_channels_dms_joined_or_message_sent()

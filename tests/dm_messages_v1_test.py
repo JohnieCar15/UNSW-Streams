@@ -1,6 +1,6 @@
 import pytest
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 from src import config
 from src.error import AccessError, InputError
 
@@ -62,7 +62,7 @@ def send_message(register_create, length):
     message_id_list = []
 
     for _ in range (length):
-        timelist.insert(0, int(datetime.utcnow().timestamp()))
+        timelist.insert(0, int(datetime.now(timezone.utc).timestamp()))
         message_id_list.insert(0, requests.post(config.url + 'message/senddm/v1', json=send_messagedm_input).json()['message_id'])
     
     return {

@@ -2,7 +2,7 @@ import pytest
 import requests
 from src import config 
 from src.error import AccessError, InputError
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import time
 '''
 standup_active_v1_test.py: All functions related to testing the standup_active_v1 function
@@ -51,7 +51,7 @@ def test_standup_active_sucess(clear_and_register_channel):
         'channel_id': channel_id,
         'length': 60,
     })
-    cur_time = datetime.utcnow()
+    cur_time = datetime.now(timezone.utc)
     time_finish = int((cur_time + timedelta(seconds = 60)).timestamp())
 
     standup_active = requests.get(config.url + 'standup/active/v1', params={

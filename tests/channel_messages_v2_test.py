@@ -57,7 +57,7 @@ def send_message(register_create, length):
             'message': f"Hello!{x}"
         }
         # Append time created of message to timelist
-        timelist.insert(0, int(datetime.utcnow().timestamp()))
+        timelist.insert(0, int(datetime.now(timezone.utc).timestamp()))
         # Append message IDs to message_id_list
         message_id_list.insert(0, requests.post(config.url + '/message/send/v1', json=send_message_input).json()['message_id'])
     
