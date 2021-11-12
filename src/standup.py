@@ -89,7 +89,7 @@ def standup_end(channel_dict, auth_user_id, time_finish):
     channel_dict['standup_active'] = False
     # set finish time to none
     channel_dict['standup_finish'] = None
-    data_store.set(store)
+    data_store.set(store, user=auth_user_id, key='messages', key_value=1, user_value=1)
 
 def standup_active_v1(token, channel_id):
     '''

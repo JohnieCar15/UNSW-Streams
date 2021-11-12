@@ -55,7 +55,7 @@ def channel_join_v2(token, channel_id):
     else:
         channel_list[0]['members'].append(auth_user_id)
     
-    data_store.set(store)
+    data_store.set(store, user=auth_user_id, key='channel', key_value=0, user_value=1)
     return {}
 
 def channel_invite_v2(token, channel_id, u_id):
@@ -99,11 +99,12 @@ def channel_invite_v2(token, channel_id, u_id):
     
     # Adding user to channel members list
     channel_list[0]['members'].append(u_id)
+    
 
     # Sending a notification to user invited to the channel
     add_notification(u_id, auth_user_id, channel_id, 'invite')
 
-    data_store.set(store)
+    data_store.set(store, user=u_id, key='channel', key_value=0, user_value=1)
     return {}
 
 def channel_details_v2(token, channel_id):
@@ -280,7 +281,7 @@ def channel_leave_v1(token, channel_id):
     # remove auth_user_id from members list
     channel_dict['members'].remove(auth_user_id)
     
-    data_store.set(store)
+    data_store.set(store, user=auth_user_id, key='channel', key_value=0, user_value=-1)
         
     return {}
 

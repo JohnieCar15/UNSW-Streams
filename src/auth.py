@@ -1,9 +1,10 @@
+import re
+import hashlib
+from datetime import datetime
 from src.data_store import data_store
 from src.error import InputError
 from src import helpers
 
-import re
-import hashlib
 
 '''
 auth.py: This file contains all functions relating to auth endpoints.
@@ -107,6 +108,7 @@ def auth_register_v2(email, password, name_first, name_last):
     auth_user_id = len(store['users']) + len(store['removed_users']) + 1
     session_id = helpers.generate_new_session_id()
     token = helpers.generate_jwt(auth_user_id, session_id)
+    time_stamp = int(datetime.utcnow().timestamp())
 
     # Add user to data store
     
@@ -119,10 +121,17 @@ def auth_register_v2(email, password, name_first, name_last):
         'handle_str': handle_str,
         'permission_id': permission_id,
         'session_list': [session_id],
+        'channels_joined': [{'num_channels_joined': 0, 'time_stamp': time_stamp}],
+        'dms_joined':      [{'num_dms_joined': 0, 'time_stamp': time_stamp}],
+        'messages_sent':   [{'num_messages_sent': 0, 'time_stamp': time_stamp}],
         'notifications': []
     }
 
     store['users'].append(user_dict)
+    if len(store['users']) == 1:
+        store['channels_exist'].append({'num_channels_exist': 0, 'time_stamp': time_stamp})
+        store['dms_exist'].append({'num_dms_exist': 0, 'time_stamp': time_stamp})
+        store['messages_exist'].append({'num_messages_exist': 0, 'time_stamp': time_stamp})
     data_store.set(store)
     
     return {

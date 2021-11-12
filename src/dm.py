@@ -62,7 +62,7 @@ def dm_create_v1(token, u_ids):
         'messages': []
     }
     store['dms'].append(dm_dictionary)
-    data_store.set(store)
+    data_store.set(store, user=u_ids, key='dm', key_value=1, user_value=1)
 
     for u_id in dm_dictionary['members']:
         if u_id != auth_user_id:
@@ -140,7 +140,7 @@ def dm_leave_v1(token, dm_id):
     if not found:
         raise InputError(description='dm_id does not refer to valid DM')
 
-    data_store.set(store)
+    data_store.set(store, user=auth_user_id, key='dm', key_value=0, user_value=-1)
     
     return {}
 
@@ -281,6 +281,7 @@ def dm_remove_v1(token, dm_id):
     auth_user_id = validate_token(token)['user_id']
 
     found = False
+    u_ids = []
 
     for dm in store['dms']:
         if dm['id'] == dm_id:
@@ -297,7 +298,9 @@ def dm_remove_v1(token, dm_id):
                 store['messages'].remove(message_store)
                 store['removed_messages'].append(message_store)
 
-
+            u_ids = dm['members']
+            u_ids.extend(dm['owner'])
+            u_ids = list(set(u_ids))
             dm['owner'] = []
             dm['members'] = []
             store['removed_dms'].append(dm)
@@ -306,6 +309,6 @@ def dm_remove_v1(token, dm_id):
     if not found:
         raise InputError(description='dm_id does not refer to valid DM')
 
-    data_store.set(store)
+    data_store.set(store, user=u_ids, key='dm', key_value=-1, user_value=-1)
 
     return {}

@@ -220,4 +220,4 @@ def test_invalid_token():
         'message': 1001*'a'
     })
 
-    assert standup_send.status_code == AccessError.code 
+    assert standup_send.status_code == AccessError.code
