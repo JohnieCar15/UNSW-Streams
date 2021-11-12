@@ -42,12 +42,12 @@ def test_valid_dm_authorised_member(clear_and_register):
         'token': token,
         'u_id': id_num 
     }).json()
-    url_one = url_one_data['profile_img_url']
+    url_one = url_one_data['user']['profile_img_url']
     url_two_data = requests.get(config.url + 'user/profile/v1', params={
         'token': token_2,
         'u_id': id_num_2 
     }).json()
-    url_two = url_two_data['profile_img_url']
+    url_two = url_two_data['user']['profile_img_url']
 
     assert dm_details_data == {
         'name': 'firstnamelastname, namename',
@@ -89,12 +89,12 @@ def test_valid_dm_authorised_member_2(clear_and_register):
         'token': token,
         'u_id': id_num 
     }).json()
-    url_one = url_one_data['profile_img_url']
+    url_one = url_one_data['user']['profile_img_url']
     url_two_data = requests.get(config.url + 'user/profile/v1', params={
         'token': token_2,
         'u_id': id_num_2 
     }).json()
-    url_two = url_two_data['profile_img_url']
+    url_two = url_two_data['user']['profile_img_url']
     assert dm_details_data == {
         'name': 'firstnamelastname, namename',
         'members': [

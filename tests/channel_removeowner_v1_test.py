@@ -73,6 +73,11 @@ def test_valid_channel_remove_channel_owner(clear_and_channel_2_members):
 
     channel_details = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': channel_id})
     channel_details_data = channel_details.json()
+    url_one_data = requests.get(config.url + 'user/profile/v1', params={
+        'token': token,
+        'u_id': u_id
+    }).json()
+    url_one = url_one_data['user']['profile_img_url']
     assert channel_details_data['owner_members'] == [
             {
                 'u_id': u_id,
@@ -80,6 +85,7 @@ def test_valid_channel_remove_channel_owner(clear_and_channel_2_members):
                 'name_first': 'firstname',
                 'name_last': 'lastname',
                 'handle_str': 'firstnamelastname',
+                'profile_img_url': url_one
             } ,
         ]
 

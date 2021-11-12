@@ -61,6 +61,7 @@ def test_valid_channel_channel_owner(clear_and_channel_2_members):
     when token is valid, channel is valid, called by a channel owner 
     '''
     token = clear_and_channel_2_members['token']
+    token_2 = clear_and_channel_2_members['token_2']
     u_id = clear_and_channel_2_members['u_id']
     u_id_2 = clear_and_channel_2_members['u_id_2']
     channel_id = clear_and_channel_2_members['channel_id']
@@ -75,6 +76,16 @@ def test_valid_channel_channel_owner(clear_and_channel_2_members):
         'channel_id': channel_id
     })
     channel_details_data = channel_details.json()
+    url_one_data = requests.get(config.url + 'user/profile/v1', params={
+        'token': token,
+        'u_id': u_id
+    }).json()
+    url_one = url_one_data['user']['profile_img_url']
+    url_two_data = requests.get(config.url + 'user/profile/v1', params={
+        'token': token_2,
+        'u_id': u_id_2
+    }).json()
+    url_two = url_two_data['user']['profile_img_url']
     assert channel_details_data['owner_members'] == [
             {
                 'u_id': u_id,
@@ -82,6 +93,7 @@ def test_valid_channel_channel_owner(clear_and_channel_2_members):
                 'name_first': 'firstname',
                 'name_last': 'lastname',
                 'handle_str': 'firstnamelastname',
+                'profile_img_url': url_one
             } ,
 
             {
@@ -90,6 +102,7 @@ def test_valid_channel_channel_owner(clear_and_channel_2_members):
                 'name_first': 'name',
                 'name_last': 'name',
                 'handle_str': 'namename',
+                'profile_img_url': url_two
             }
         ]
 

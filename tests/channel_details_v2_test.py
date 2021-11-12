@@ -55,7 +55,7 @@ def test_valid_channel_authorised(clear_and_register):
         'token': token,
         'u_id': id_num 
     }).json()
-    url_one = url_one_data['profile_img_url']
+    url_one = url_one_data['user']['profile_img_url']
     assert channel_details_data == {
         'name': 'name',
         'is_public': True,
@@ -108,7 +108,7 @@ def test_user_not_a_member(clear_and_register):
         'token': token,
         'u_id': id_num 
     }).json()
-    url_one = url_one_data['profile_img_url']
+    url_one = url_one_data['user']['profile_img_url']
     assert channel_details_data == {
         'name': 'name',
         'is_public': True,
@@ -169,12 +169,12 @@ def test_valid_channel_2_members(clear_and_register):
         'token': token,
         'u_id': id_num 
     }).json()
-    url_one = url_one_data['profile_img_url']
+    url_one = url_one_data['user']['profile_img_url']
     url_two_data = requests.get(config.url + 'user/profile/v1', params={
         'token': register_data['token'],
         'u_id': id_num_2
     }).json()
-    url_two = url_two_data['profile_img_url']
+    url_two = url_two_data['user']['profile_img_url']
     assert channel_details_data == {
         'name': 'name',
         'is_public': True,
