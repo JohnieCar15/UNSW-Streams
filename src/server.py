@@ -11,8 +11,16 @@ from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_mes
 from src.channel import channel_details_v2, channel_invite_v2, channel_join_v2, channel_messages_v2, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1
 from src.channels import channels_create_v2, channels_list_v2, channels_listall_v2
 from src.message import message_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1, message_share_v1, message_react_v1, message_unreact_v1, message_sendlater_v1, message_sendlaterdm_v1, message_pin_v1, message_unpin_v1
+from src.notifications import notifications_get_v1
 from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
+from src.user import user_stats_v1, users_stats_v1
 from src.other import clear_v1
+from src.search import search_v1
+from src.standup import standup_start_v1, standup_active_v1, standup_send_v1
+
+'''
+server.py: This file contains all functions relating to the http endpoints.
+'''
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -187,7 +195,7 @@ def dm_remove_v1_ep():
 def dm_details_v1_endpoint():
     token = request.args.get('token')
     dm_id = int(request.args.get('dm_id'))
-    return dumps (dm_details_v1(token, dm_id))
+    return dumps(dm_details_v1(token, dm_id))
 
 
 @APP.route("/dm/leave/v1", methods=['POST'])
@@ -256,12 +264,46 @@ def admin_userpermission_change_v1_ep():
     data = request.get_json()
     return dumps(admin_userpermission_change_v1(data['token'], data['u_id'], data['permission_id']))
 
+@APP.route("/user/stats/v1", methods=['GET'])
+def user_stats_v1_ep():
+    token = request.args.get('token')
+    return dumps(user_stats_v1(token))
 
+@APP.route("/users/stats/v1", methods=['GET'])
+def users_stats_v1_ep():
+    token = request.args.get('token')
+    return dumps(users_stats_v1(token))
+
+@APP.route("/standup/start/v1", methods=['POST'])
+def standup_start_v1_ep():
+    data = request.get_json()
+    return dumps(standup_start_v1(data['token'], data['channel_id'], data['length']))
+
+@APP.route("/standup/active/v1", methods=['GET'])
+def standup_active_v1_ep():
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+    return dumps(standup_active_v1(token, channel_id))
+
+@APP.route("/search/v1", methods=['GET'])
+def search_v1_ep():
+    token = request.args.get('token')
+    query_str = request.args.get('query_str')
+    return dumps(search_v1(token, query_str))
+
+@APP.route("/standup/send/v1", methods=['POST'])
+def standup_send_v1_ep():
+    data = request.get_json()
+    return dumps(standup_send_v1(data['token'], data['channel_id'], data['message']))
+    
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear_v1_ep():
     return dumps(clear_v1())
-    
 
+@APP.route("/notifications/get/v1", methods=['GET'])
+def notifications_get_v1_ep():
+    token = request.args.get('token')
+    return dumps(notifications_get_v1(token))
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":

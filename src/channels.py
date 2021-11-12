@@ -3,6 +3,15 @@ from src.error import InputError
 from src.error import AccessError
 from src.helpers import validate_token, filter_data_store
 
+'''
+channels.py: This file contains all functions relating to channels endpoints.
+
+Channels Functions:
+    - channels_create_v2(token, name, is_public)
+    - channels_list_v2(token)
+    - channels_listall_v2(token)
+
+'''
 
 def channels_create_v2(token, name, is_public):
     '''
@@ -41,10 +50,13 @@ def channels_create_v2(token, name, is_public):
         'owner': [auth_user_id],
         'is_public': is_public,
         'members': [auth_user_id],
-        'messages': []
+        'messages': [],
+        'standup_active': False,
+        'standup_messages': [], 
+        'standup_finish': None
     }
     store['channels'].append(channel_dictionary)
-    data_store.set(store)
+    data_store.set(store, user=auth_user_id, key='channel', key_value=1, user_value=1)
     return {
         'channel_id': new_id
     }

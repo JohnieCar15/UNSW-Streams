@@ -3,12 +3,22 @@ import requests
 from src import config
 from src.error import AccessError, InputError
 
+'''
+admin_userpermission_change_v1_test.py: All functions related to testing the admin_userpermission_change_v1 function
+'''
+
 @pytest.fixture
 def admin_userpermission_change_url():
+    '''
+    This function returns the url to the admin/userpermission/change/v1 endpoint
+    '''
     return config.url + 'admin/userpermission/change/v1'
 
 @pytest.fixture
 def clear_and_register():
+    '''
+    This function clears the datastore and registers two users
+    '''
     requests.delete(config.url + 'clear/v1')
 
     auth_register_input1 = {
@@ -34,8 +44,10 @@ def clear_and_register():
         'user2_id': user2_payload['auth_user_id']
         }
 
-# Testing the general case of changing an owner to a member
 def test_change_to_member(admin_userpermission_change_url, clear_and_register):
+    '''
+    Testing the general case of changing an owner to a member
+    '''
     owner_token = clear_and_register['user1_token']
     owner_id = clear_and_register['user1_id']
     new_owner_token = clear_and_register['user2_token']
@@ -73,6 +85,8 @@ def test_change_to_member(admin_userpermission_change_url, clear_and_register):
 
 # Testing the general case of changing an member to a owner
 def test_change_to_owner(admin_userpermission_change_url, clear_and_register):
+    '''
+    '''
     auth_user_token = clear_and_register['user1_token']
     user_token = clear_and_register['user2_token']
     user_id = clear_and_register['user2_id']
@@ -99,8 +113,10 @@ def test_change_to_owner(admin_userpermission_change_url, clear_and_register):
 
     assert r.status_code == 200 and channel_join_status_code == 200
 
-# Testing the error case of passing in an invalid token
 def test_invalid_token(admin_userpermission_change_url, clear_and_register):
+    '''
+    Testing the error case of passing in an invalid token
+    '''
     user_id = clear_and_register['user2_id']
 
     # Creating an invalid token (empty string)
@@ -115,8 +131,10 @@ def test_invalid_token(admin_userpermission_change_url, clear_and_register):
 
     assert r.status_code == AccessError.code
 
-# Testing the error case of passing in an invalid u_id
 def test_invalid_u_id(admin_userpermission_change_url, clear_and_register):
+    '''
+    Testing the error case of passing in an invalid u_id
+    '''
     auth_user_token = clear_and_register['user1_token']
     auth_user_id = clear_and_register['user1_id']
     valid_user_id = clear_and_register['user2_id']
@@ -135,8 +153,10 @@ def test_invalid_u_id(admin_userpermission_change_url, clear_and_register):
 
     assert r.status_code == InputError.code
 
-# Testing the error case of passing in an invalid permission_id
 def test_invalid_permission_id(admin_userpermission_change_url, clear_and_register):
+    '''
+    Testing the error case of passing in an invalid permission_id
+    '''
     auth_user_token = clear_and_register['user1_token']
     user_id = clear_and_register['user2_id']
 
@@ -150,8 +170,10 @@ def test_invalid_permission_id(admin_userpermission_change_url, clear_and_regist
 
     assert r.status_code == InputError.code
 
-# Testing the error case of when the auth_user is not a global owner
 def test_auth_not_global_owner(admin_userpermission_change_url, clear_and_register):
+    '''
+    Testing the error case of when the auth_user is not a global owner
+    '''
     non_global_owner_token = clear_and_register['user2_token']
     non_global_owner_id = clear_and_register['user2_id']
 
@@ -164,8 +186,10 @@ def test_auth_not_global_owner(admin_userpermission_change_url, clear_and_regist
 
     assert r.status_code == AccessError.code
 
-# Testing the error case of when the demoted user is the only global owner
 def test_demoting_only_global_owner(admin_userpermission_change_url, clear_and_register):
+    '''
+    Testing the error case of when the demoted user is the only global owner
+    '''
     global_owner_token = clear_and_register['user1_token']
     global_owner_id = clear_and_register['user1_id']
 
@@ -178,8 +202,10 @@ def test_demoting_only_global_owner(admin_userpermission_change_url, clear_and_r
 
     assert r.status_code == InputError.code
 
-# Testing the error case of when the auth_user_id, u_id and permission_id are invalid
 def test_all_invalid_inputs(admin_userpermission_change_url, clear_and_register):
+    '''
+    Testing the error case of when the auth_user_id, u_id and permission_id are invalid
+    '''
     non_global_auth_token = clear_and_register['user2_token']
     non_global_auth_id = clear_and_register['user2_id']
     valid_user_id = clear_and_register['user1_id']

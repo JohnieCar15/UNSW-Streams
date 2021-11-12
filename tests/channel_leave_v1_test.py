@@ -4,8 +4,15 @@ import json
 from src import config
 from src.error import InputError, AccessError
 
+'''
+channel_leave_v1_test.py: All functions relating to testing the function channel_leave_v1
+'''
 @pytest.fixture
 def clear_and_register():
+    '''
+    clears then registers a user
+    The user creates a channel as well 
+    '''
     # clear then register a user 
     requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={
@@ -31,9 +38,10 @@ def clear_and_register():
         'auth_user_id': register_data['auth_user_id']
         }
 
-
-# testing a valid channel called by authorised member
 def test_valid_channel_authorised_owner(clear_and_register):
+    '''
+    Testing success case
+    '''
     token = clear_and_register['token']
     channel_id = clear_and_register['channel_id']
     register = requests.post(config.url + 'auth/register/v2', json={
@@ -77,6 +85,9 @@ def test_valid_channel_authorised_owner(clear_and_register):
     }
 
 def test_valid_channel_authorised_member(clear_and_register):
+    '''
+    Testing success case and there exists a user who isn't part of the channel 
+    '''
     token = clear_and_register['token']
     channel_id = clear_and_register['channel_id']
     id_num = clear_and_register['auth_user_id']
@@ -121,8 +132,10 @@ def test_valid_channel_authorised_member(clear_and_register):
         ],
     }
 
-# testing a valid channel calleed by an unauthorised member
 def test_valid_channel_unauthorised(clear_and_register):
+    '''
+    Testing case where non-member of channel calls function 
+    '''
     channel_id = clear_and_register['channel_id']
     register = requests.post(config.url + 'auth/register/v2', json={
         'email': "yes2@yes.com", 
@@ -135,14 +148,18 @@ def test_valid_channel_unauthorised(clear_and_register):
     channel_leave = requests.post(config.url + 'channel/leave/v1', json={'token': token_2, 'channel_id': channel_id})
     assert channel_leave.status_code == AccessError.code
 
-# testing a valid channel called by an invalid token
 def test_valid_channel_invalid_token(clear_and_register):
+    '''
+    Testing a valid channel called by an invalid token
+    '''
     channel_id = clear_and_register['channel_id']
     channel_leave = requests.post(config.url + 'channel/leave/v1', json={'token': "", 'channel_id': channel_id})
     assert channel_leave.status_code == AccessError.code
 
-# testing an invalid channel called by valid token
 def test_invalid_channel_valid_token():
+    '''
+    testing an invalid channel called by valid token
+    '''
     requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={
         'email': "yes@yes.com", 
@@ -155,8 +172,10 @@ def test_invalid_channel_valid_token():
     channel_leave = requests.post(config.url + 'channel/leave/v1', json={'token': token, 'channel_id': 1})
     assert channel_leave.status_code == InputError.code
 
-# testing an invalid channel called by invalid token
 def test_invalid_channel_invalid_token():
+    '''
+    testing an invalid channel called by invalid token
+    '''
     requests.delete(config.url + 'clear/v1')
     channel_leave = requests.post(config.url + 'channel/leave/v1', json={'token': 1, 'channel_id': 1})
     assert channel_leave.status_code == AccessError.code
