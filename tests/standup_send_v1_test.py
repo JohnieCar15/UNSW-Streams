@@ -4,7 +4,9 @@ from src import config
 from src.error import AccessError, InputError
 from datetime import datetime, timedelta
 import time
-
+'''
+standup_send_v1_test: All functions related to testing the standup_send_v1 function 
+'''
 @pytest.fixture 
 def clear_and_register_channel():
     requests.delete(config.url + 'clear/v1')
