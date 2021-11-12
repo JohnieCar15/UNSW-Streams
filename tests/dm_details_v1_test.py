@@ -4,9 +4,15 @@ import json
 from src import config
 from src.error import InputError, AccessError
 
-
+'''
+dm_details_v1_test.py: All functions related to testing the dm_details_v1 function 
+'''
 @pytest.fixture
 def clear_and_register():
+    '''
+    clears then registers 2 users
+    The users are added to a dm 
+    '''
     requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={'email': "yes@yes.com", 'password': "aaaaaa", 'name_first': "firstname", "name_last": "lastname"})
     register_data = register.json()
@@ -20,8 +26,10 @@ def clear_and_register():
 
     return {'token': token, 'dm_id':dm_create_data['dm_id'], 'u_id': register_data['auth_user_id'], 'u_id_2': register_2_data['auth_user_id']}
 
-# a valid dm and authorised member
-def test_valid_channel_authorised_member(clear_and_register):
+def test_valid_dm_authorised_member(clear_and_register):
+    '''
+    Testing success case
+    '''
     token = clear_and_register['token']
     dm_id = clear_and_register['dm_id']
     id_num = clear_and_register['u_id']
@@ -51,8 +59,10 @@ def test_valid_channel_authorised_member(clear_and_register):
 
     }
 
-# a valid dm and member who isn't part of dm 
-def test_valid_channel_authorised_member_2(clear_and_register):
+def test_valid_dm_authorised_member_2(clear_and_register):
+    '''
+    Testing success case and there exists a user who isn't part of the dm 
+    '''
     token = clear_and_register['token']
     dm_id = clear_and_register['dm_id']
     id_num = clear_and_register['u_id']
@@ -81,8 +91,11 @@ def test_valid_channel_authorised_member_2(clear_and_register):
         ],
 
     }
-# a valid dm and unauthorised member
-def test_valid_channel_unauthorised_member(clear_and_register):
+
+def test_valid_dm_unauthorised_member(clear_and_register):
+    '''
+    Testing user who calls function isn't a member of the DM 
+    '''
     dm_id = clear_and_register['dm_id']
     
     register = requests.post(config.url + 'auth/register/v2', json={'email': "yes3@yes.com", 'password': "aaaaaa", 'name_first': "name", "name_last": "name"})
@@ -92,14 +105,18 @@ def test_valid_channel_unauthorised_member(clear_and_register):
     dm_details = requests.get(config.url + 'dm/details/v1', params={'token': token_2, 'dm_id': dm_id})
     assert dm_details.status_code == AccessError.code
 
-# a valid dm invalid token
-def test_valid_channel_invalid_token(clear_and_register):
+def test_valid_dm_invalid_token(clear_and_register):
+    '''
+    Testing an invalid token being passed for a valid dm 
+    '''
     dm_id = clear_and_register['dm_id']
     dm_details = requests.get(config.url + 'dm/details/v1', params={'token': "", "dm_id": dm_id})
     assert dm_details.status_code == AccessError.code
 
-# an invalid dm valid token
-def test_nvalid_channel_invalid_token():
+def test_invalid_dm_valid_token():
+    '''
+    Testing an invalid dm being passed 
+    '''
     requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={'email': "yes@yes.com", 'password': "aaaaaa", 'name_first': "firstname", "name_last": "lastname"})
     register_data = register.json()
@@ -107,8 +124,10 @@ def test_nvalid_channel_invalid_token():
     dm_details = requests.get(config.url + 'dm/details/v1', params={'token': token, 'dm_id': 1})
     assert dm_details.status_code == InputError.code
     
-# an invalid channel invalid token 
-def test_invalid_channel_invalid_token():
+def test_invalid_dm_invalid_token():
+    '''
+    Testing an invalid dm and invalid token being passed
+    '''
     requests.delete(config.url + 'clear/v1')
     dm_details = requests.get(config.url + 'dm/details/v1', params={'token': 1, 'dm_id': 1})
     assert dm_details.status_code == AccessError.code
