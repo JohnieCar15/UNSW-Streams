@@ -6,7 +6,7 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config
 from src.channel import channel_details_v2, channel_invite_v2, channel_join_v2, channel_messages_v2
-from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
+from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1, auth_passwordreset_request_v1, auth_passwordreset_reset_v1
 from src.dm import dm_create_v1, dm_list_v1
 from src.channels import channels_create_v2, channels_list_v2, channels_listall_v2
 from src.user import users_all_v1, user_profile_v1
@@ -83,6 +83,16 @@ def channel_invite_v2_ep():
 def auth_logout_v1_ep():
     data = request.get_json()
     return dumps(auth_logout_v1(data['token']))
+
+@APP.route("/auth/passwordreset/request/v1", methods=['POST'])
+def auth_passwordreset_request_v1_ep():
+    data = request.get_json()
+    return dumps(auth_passwordreset_request_v1(data['email']))
+
+@APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
+def auth_passwordreset_reset_v1_ep():
+    data = request.get_json()
+    return dumps(auth_passwordreset_reset_v1(data['reset_code'], data['new_password']))
 
 @APP.route("/dm/list/v1", methods=['GET'])
 def dm_list_v1_ep():
