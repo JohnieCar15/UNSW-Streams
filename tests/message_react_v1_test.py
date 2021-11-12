@@ -3,9 +3,15 @@ import requests
 from src import config
 from src.error import InputError, AccessError
 
-# Clears datastore, registers user and creates a channel (making the user a member)
+'''
+message_react_v1_test.py: All tests relating to message_react_v1 function
+'''
+
 @pytest.fixture
 def register_create_channel():
+    '''
+    Clears datastore, registers user and creates a channel (making the user a member)
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -30,9 +36,12 @@ def register_create_channel():
         'valid_user_id': user_id['auth_user_id'], 
         'valid_channel_id': channel_id
     }
-# Clears datastore, registers user and creates a dm (making the user a member)
+
 @pytest.fixture
 def register_create_dm():
+    '''
+    Clears datastore, registers user and creates a dm (making the user a member)
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -57,11 +66,11 @@ def register_create_dm():
         'valid_dm_id': dm_id
     }
 
-
-
-# HELPER FUNCTION
-# Sends a number of messages to specific endpoint
 def send_message(register_create, length):
+    '''
+    HELPER FUNCTION
+    Sends a number of messages to specific endpoint
+    '''
     send_message_input = {
         'token' : register_create['valid_token'],
         'channel_id': register_create['valid_channel_id'],
@@ -77,10 +86,12 @@ def send_message(register_create, length):
         'message_id_list' : message_id_list
     }
 
-# HELPER FUNCTION
-# Creates input for channel_messages and returns messages
-# Assumes that tests require valid input, otherwise register_create tokens/channel_ids are directly modified
 def get_messages(register_create, start):
+    '''
+    HELPER FUNCTION
+    Creates input for channel_messages and returns messages
+    Assumes that tests require valid input, otherwise register_create tokens/channel_ids are directly modified
+    '''
     channel_messages_input = {
         'token' : register_create['valid_token'],
         'channel_id' : register_create['valid_channel_id'],
@@ -124,6 +135,7 @@ def test_normal_react_dm(register_create_dm):
         'message': "Hello!"
     }
 
+    # Send message to DM
     message_id = requests.post(config.url + '/message/senddm/v1', json=send_messagedm_input).json()['message_id']
 
     message_react_input = {
@@ -140,6 +152,7 @@ def test_normal_react_dm(register_create_dm):
         'start' : 0
     }
 
+    # Get message from DM
     dm_messages = requests.get(config.url + '/dm/messages/v1', params=dm_messages_input).json()
 
     assert dm_messages['messages'][0]['reacts'][0] == {
@@ -162,6 +175,7 @@ def test_member_react(register_create_channel):
         'name_last' : "Person",
     }
 
+    # Register new user
     member = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
 
     channel_join_input = {
@@ -169,6 +183,7 @@ def test_member_react(register_create_channel):
         'channel_id' : register_create_channel['valid_channel_id']
     }
 
+    # User joins channel
     requests.post(config.url + '/channel/join/v2', json=channel_join_input)
 
     message_react_input = {
@@ -177,6 +192,7 @@ def test_member_react(register_create_channel):
         'react_id' : 1
     }
 
+    # User reacts to owner's message
     requests.post(config.url + '/message/react/v1', json=message_react_input).json()
 
     channel_messages = get_messages(register_create_channel, 0)
@@ -231,6 +247,7 @@ def test_already_reacted(register_create_channel):
         'react_id' : 1
     }
 
+    # React the first time
     requests.post(config.url + '/message/react/v1', json=message_react_input).json()
 
     message_react_input = {
@@ -272,6 +289,7 @@ def test_not_part_of_channel(register_create_channel):
         'name_last' : "Person",
     }
 
+    # Register new user
     member = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
 
     message_react_input = {
@@ -280,6 +298,7 @@ def test_not_part_of_channel(register_create_channel):
         'react_id' : 1
     }
 
+    # User attempts to react to message in channel they are not part of
     status = requests.post(config.url + '/message/react/v1', json=message_react_input)
 
     assert status.status_code == InputError.code
