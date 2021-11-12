@@ -3,6 +3,10 @@ import requests
 from src import config
 from src.error import AccessError
 
+'''
+channels_list_v2_test.py: All functions related to testing the channels_list_v2 function
+'''
+
 # Help functions:
 
 # Sorts list of channels by channel_id

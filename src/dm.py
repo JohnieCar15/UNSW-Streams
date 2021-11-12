@@ -1,6 +1,19 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store
+from src.notifications import add_notification
+
+'''
+dm.py: This file contains all functions relating to dm endpoints.
+
+Dm Functions:
+    - dm_create_v1(token, u_ids)
+    - dm_list_v1(token)
+    - dm_leave_v1(token, dm_id)
+    - dm_details_v1(token, dm_id)
+    - dm_messages_v1(token, dm_id, start)
+    - dm_remove_v1(token, dm_id)
+'''
 
 def dm_create_v1(token, u_ids):
     '''
@@ -49,7 +62,13 @@ def dm_create_v1(token, u_ids):
         'messages': []
     }
     store['dms'].append(dm_dictionary)
-    data_store.set(store)
+    data_store.set(store, user=u_ids, key='dm', key_value=1, user_value=1)
+
+    for u_id in dm_dictionary['members']:
+        if u_id != auth_user_id:
+            # Sending a notification to users invited to the dm
+            add_notification(u_id, auth_user_id, new_id, 'invite')
+
     return {
         'dm_id': new_id
     }
@@ -121,7 +140,7 @@ def dm_leave_v1(token, dm_id):
     if not found:
         raise InputError(description='dm_id does not refer to valid DM')
 
-    data_store.set(store)
+    data_store.set(store, user=auth_user_id, key='dm', key_value=0, user_value=-1)
     
     return {}
 
@@ -262,6 +281,7 @@ def dm_remove_v1(token, dm_id):
     auth_user_id = validate_token(token)['user_id']
 
     found = False
+    u_ids = []
 
     for dm in store['dms']:
         if dm['id'] == dm_id:
@@ -272,12 +292,15 @@ def dm_remove_v1(token, dm_id):
             for message in dm['messages']:
                 message_store = {
                     'message': message,
-                    'channel_id': dm_id
+                    'channel_id': dm_id,
+                    'is_dm' : True
                 }
                 store['messages'].remove(message_store)
                 store['removed_messages'].append(message_store)
 
-
+            u_ids = dm['members']
+            u_ids.extend(dm['owner'])
+            u_ids = list(set(u_ids))
             dm['owner'] = []
             dm['members'] = []
             store['removed_dms'].append(dm)
@@ -286,6 +309,6 @@ def dm_remove_v1(token, dm_id):
     if not found:
         raise InputError(description='dm_id does not refer to valid DM')
 
-    data_store.set(store)
+    data_store.set(store, user=u_ids, key='dm', key_value=-1, user_value=-1)
 
     return {}

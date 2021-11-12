@@ -5,6 +5,21 @@ from src import config
 import re
 import urllib.request
 from PIL import Image
+
+'''
+user.py: This file contains all functions relating to user endpoints.
+
+User Functions:
+    - users_all_v1(token)
+    - user_profile_v1(token, u_id)
+    - user_profile_setname_v1(token, name_first, name_last)
+    - user_profile_setemail_v1(token, email)
+    - user_profile_sethandle_v1(token, handle)
+    - user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end)
+    - user_stats_v1(token)
+    - users_stats_v1(token)
+'''
+
 regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
 def users_all_v1(token):
@@ -275,3 +290,99 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     data_store.set(store)
 
     return {}
+def user_stats_v1(token):
+    '''
+    user_stats_v1: Fetches the required statistics about this user's use of UNSW Streams.
+
+    Arguments:
+        token   - string    - token of the user
+
+    Exceptions: 
+        AccessError - token is invalid
+
+    Return Value:
+        Returns {
+            'user_stats': {
+                channels_joined: [{num_channels_joined, time_stamp}],
+                dms_joined: [{num_dms_joined, time_stamp}], 
+                messages_sent: [{num_messages_sent, time_stamp}], 
+                involvement_rate: sum(num_channels_joined, num_dms_joined, num_msgs_sent)/
+                                    sum(num_channels, num_dms, num_msgs). 
+                    # If the denominator is 0, involvement should be 0. 
+                    # If the involvement is greater than 1, it should be capped at 1.
+            }
+        }
+    '''
+    store = data_store.get()
+    # Checking if token is valid
+    # if token can not be decoded
+    # raise AccessError(description="Invalid token")
+    u_id = validate_token(token)['user_id']
+    user = [user for user in (store['users'] + store['removed_users']) if user['id'] == u_id]
+
+    user = user[0]
+    channels_joined = user['channels_joined']
+    dms_joined = user['dms_joined']
+    messages_sent = user['messages_sent']
+    
+
+    num_channels_joined = channels_joined[-1]['num_channels_joined']
+    num_dms_joined = dms_joined[-1]['num_dms_joined']
+    num_messages_sent = messages_sent[-1]['num_messages_sent']
+    store = data_store.get()
+
+    num_channels = store['channels_exist'][-1]['num_channels_exist']
+    num_dms = store['dms_exist'][-1]['num_dms_exist']
+    num_messages = store['messages_exist'][-1]['num_messages_exist']
+    if num_channels + num_dms + num_messages == 0:
+        involvement_rate = 0
+    else: 
+        involvement_rate = (num_channels_joined + num_dms_joined + num_messages_sent)/(num_channels + num_dms + num_messages)
+    
+    return {
+        'user_stats': {
+            'channels_joined': channels_joined,
+            'dms_joined': dms_joined,
+            'messages_sent': messages_sent,
+            'involvement_rate': min(involvement_rate, 1)
+        }
+    }
+
+def users_stats_v1(token):
+    '''
+    users_stats_v1: Fetches the required statistics about the use of UNSW Streams.
+
+    Arguments:
+        token   - string    - token of the user
+
+    Exceptions: 
+        AccessError - token is invalid
+
+    Return Value:
+        Returns {
+            'users_stats':  {
+                channels_exist: [{num_channels_exist, time_stamp}], 
+                dms_exist: [{num_dms_exist, time_stamp}], 
+                messages_exist: [{num_messages_exist, time_stamp}], 
+                utilization_rate: num_users_who_have_joined_at_least_one_channel_or_dm / num_users
+            }
+        }
+    '''
+    store = data_store.get()
+    # Checking if token is valid
+    # if token can not be decoded
+    # raise AccessError(description="Invalid token")
+    validate_token(token)['user_id']
+
+    # get num_users and num_users_in_cahnnel_or_dm and calculate utilization_rate
+    num_users = len(store['users'])
+    num_users_who_have_joined_at_least_one_channel_or_dm = len(store['users_in_channel_or_dm'])
+    utilization_rate = num_users_who_have_joined_at_least_one_channel_or_dm / num_users
+    return {
+        'workspace_stats': {
+            'channels_exist': store['channels_exist'],
+            'dms_exist': store['dms_exist'],
+            'messages_exist':  store['messages_exist'],
+            'utilization_rate': utilization_rate
+        }
+    }

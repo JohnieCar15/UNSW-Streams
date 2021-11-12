@@ -3,9 +3,14 @@ import requests
 import json
 from src import config
 from src.error import InputError, AccessError
-
+'''
+channels_create_v2_test.py: All functions related to testing the channels_create_v2 function 
+'''
 @pytest.fixture
 def clear_and_register():
+    '''
+    clears then registers a user
+    '''
     requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={
         'email': 'yes@yes.com',
@@ -17,6 +22,9 @@ def clear_and_register():
     return register_data['token']
 
 def test_valid_id_valid_name_public(clear_and_register):
+    '''
+    Testing the case of a valid id and valid name for a public channel 
+    '''
     token = clear_and_register
     channels_create = requests.post(config.url + 'channels/create/v2', json={
         'token': token,
@@ -31,7 +39,10 @@ def test_valid_id_valid_name_public(clear_and_register):
     
     assert channels_create_id == channels_list_id
 
-def test_valid_id_invalid_short_channel_name_public(clear_and_register):
+def test_valid_id_invalid_channel_name(clear_and_register):
+    '''
+    Testing the case of an invalid short channel name for a public channel 
+    '''
     token = clear_and_register
     channels_create = requests.post(config.url + 'channels/create/v2', json={
         'token': token, 
@@ -41,7 +52,10 @@ def test_valid_id_invalid_short_channel_name_public(clear_and_register):
 
     assert channels_create.status_code == InputError.code
 
-def test_valid_id_invalid_long_channel_name_public(clear_and_register):
+def test_valid_id_invalid_channel_name_2(clear_and_register):
+    '''
+    Testing the case of an invalid long channel name for a public channel 
+    '''
     token = clear_and_register
     channels_create = requests.post(config.url + 'channels/create/v2', json={
         'token': token, 
@@ -51,7 +65,10 @@ def test_valid_id_invalid_long_channel_name_public(clear_and_register):
 
     assert channels_create.status_code == InputError.code
 
-def test_invalid_token_invalid_short_channel_name_public():
+def test_invalid_token_invalid_channel_name():
+    '''
+    Testing an invalid token passed in with an invalid short channel name for a public channel 
+    '''
     channels_create = requests.post(config.url + 'channels/create/v2', json={
         'token': 1, 
         'name': "" , 
@@ -60,7 +77,10 @@ def test_invalid_token_invalid_short_channel_name_public():
 
     assert channels_create.status_code == AccessError.code
 
-def test_invalid_token_invalid_long_channel_name_public():
+def test_invalid_token_invalid_channel_name_2():
+    '''
+    Testing an invalid token passed in with an invalid long channel name for a public channel 
+    '''
     channels_create = requests.post(config.url + 'channels/create/v2', json={
         'token': 1, 
         'name': 'aaaaaaaaaaaaaaaaaaaaa', 
@@ -70,6 +90,9 @@ def test_invalid_token_invalid_long_channel_name_public():
     assert channels_create.status_code == AccessError.code
 
 def test_invalid_id_valid_name_public():
+    '''
+    Testing an invalid id passed in with a valid channel name for a public channel 
+    '''
     channels_create = requests.post(config.url + 'channels/create/v2', json={
         'token': 1, 
         'name': 'name', 
