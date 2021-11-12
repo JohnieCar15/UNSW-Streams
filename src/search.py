@@ -47,4 +47,4 @@ def search_v1(token, query_str):
                 messages_list.append(message)
     data_store.set(store)
     # return messages list
-    return messages_list
+    return {'messages': messages_list}
