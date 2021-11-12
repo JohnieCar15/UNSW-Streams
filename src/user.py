@@ -2,6 +2,8 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store
 import re
+import urllib.request
+from PIL import Image
 regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
 def users_all_v1(token):
@@ -225,4 +227,34 @@ def user_profile_sethandle_v1(token, handle):
         if store['users'][user_index]['id'] == u_id:
             store['users'][user_index]['handle_str'] = handle
     data_store.set(store)
+    return {}
+
+def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):    
+    if not img_url.endswith(".jpg"):
+        raise InputError(description='Image uploaded is not a JPG')
+
+    if x_end < x_start:
+        raise InputError(description='x_end is less than x_start')
+
+    if y_end < y_start:
+        raise InputError(description='y_end is less than y_start')
+
+    if x_start < 0 or y_start < 0:
+        raise InputError(description='Given dimensions are not within the dimensions of the image at the URL')
+
+    u_id = validate_token(token)['user_id']
+
+    urllib.request.urlretrieve(img_url, f"images/{u_id}.jpg")
+
+    image_object = Image.open(f"images/{u_id}.jpg")
+
+    width, height = image_object.size
+
+    if x_end > width or y_end > height:
+        raise InputError(description='Given dimensions are not within the dimensions of the image at the URL')
+
+    cropped_image = image_object.crop((x_start, y_start, x_end, y_end))
+
+    cropped_image.save(f"images/{u_id}.jpg")
+
     return {}
