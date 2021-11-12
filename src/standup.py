@@ -37,6 +37,8 @@ def standup_start_v1(token, channel_id, length):
 
     '''
     store = data_store.get()
+    # calculate time_finish
+    time_finish = int(datetime.utcnow().timestamp() + (length))
     # check valid token 
     auth_user_id = validate_token(token)['user_id']
     # check valid channel id
@@ -54,8 +56,6 @@ def standup_start_v1(token, channel_id, length):
         raise InputError(description="Already an active standup")
     # set standup to be True 
     channel_dict['standup_active'] = True
-    # calculate time_finish
-    time_finish = int(datetime.utcnow().timestamp() + (length))
     channel_dict['standup_finish'] = time_finish
     # threading after length set standup to be False 
     t = threading.Timer(length, standup_end, [channel_dict, auth_user_id, time_finish])
