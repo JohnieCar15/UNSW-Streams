@@ -4,7 +4,9 @@ from src import config
 from src.error import AccessError, InputError
 from datetime import datetime
 import time
-
+'''
+standup_start_v1_test.py: All functions related to testing the standup_start_v1 function
+'''
 @pytest.fixture 
 def clear_and_register_channel():
     '''
