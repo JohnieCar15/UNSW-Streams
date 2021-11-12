@@ -3,6 +3,10 @@ import requests
 from src import config
 from src.error import AccessError, InputError
 
+'''
+user_profile_setemail_v1_test.py: All functions related to testing the user_profile_setemail_v1_test function
+'''
+
 # assumption: when token and email are valid, but the email
 # entered by the user is same with previous email, InputError will be raised
 

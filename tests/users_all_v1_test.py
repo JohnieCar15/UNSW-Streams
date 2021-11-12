@@ -4,7 +4,7 @@ from src import config
 from src.error import AccessError
 
 '''
-users_all_v1_test,py: All functions related to testing the users_all_v1 function
+users_all_v1_test.py: All functions related to testing the users_all_v1 function
 '''
 
 # define global variable for default profile_img_url
