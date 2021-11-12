@@ -185,7 +185,8 @@ def dm_details_v1(token, dm_id):
                 'email': member['email'],
                 'name_first': member['name_first'],
                 'name_last': member['name_last'],
-                'handle_str': member['handle_str']
+                'handle_str': member['handle_str'],
+                'profile_img_url': member['profile_img_url']
             }
             all_members_list.append(member_dict)
 

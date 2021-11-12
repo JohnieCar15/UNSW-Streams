@@ -51,6 +51,11 @@ def test_valid_channel_authorised(clear_and_register):
         'channel_id': channel_id
     })
     channel_details_data = channel_details.json()
+    url_one_data = requests.get(config.url + 'user/profile/v1', params={
+        'token': token,
+        'u_id': id_num 
+    }).json()
+    url_one = url_one_data['user']['profile_img_url']
     assert channel_details_data == {
         'name': 'name',
         'is_public': True,
@@ -61,6 +66,7 @@ def test_valid_channel_authorised(clear_and_register):
                 'name_first': 'firstname',
                 'name_last': 'lastname',
                 'handle_str': 'firstnamelastname',
+                'profile_img_url': url_one
             }
         ],
         'all_members': [
@@ -70,6 +76,7 @@ def test_valid_channel_authorised(clear_and_register):
                 'name_first': 'firstname',
                 'name_last': 'lastname',
                 'handle_str': 'firstnamelastname',
+                'profile_img_url': url_one
             }
         ],
     }
@@ -97,6 +104,11 @@ def test_user_not_a_member(clear_and_register):
         'channel_id': channel_id
     })
     channel_details_data = channel_details.json()
+    url_one_data = requests.get(config.url + 'user/profile/v1', params={
+        'token': token,
+        'u_id': id_num 
+    }).json()
+    url_one = url_one_data['user']['profile_img_url']
     assert channel_details_data == {
         'name': 'name',
         'is_public': True,
@@ -107,6 +119,7 @@ def test_user_not_a_member(clear_and_register):
                 'name_first': 'firstname',
                 'name_last': 'lastname',
                 'handle_str': 'firstnamelastname',
+                'profile_img_url': url_one
             }
         ],
         'all_members': [
@@ -116,6 +129,7 @@ def test_user_not_a_member(clear_and_register):
                 'name_first': 'firstname',
                 'name_last': 'lastname',
                 'handle_str': 'firstnamelastname',
+                'profile_img_url': url_one
             }
         ],
     }
@@ -151,7 +165,16 @@ def test_valid_channel_2_members(clear_and_register):
         'channel_id': channel_id
     })
     channel_details_data = channel_details.json()
-
+    url_one_data = requests.get(config.url + 'user/profile/v1', params={
+        'token': token,
+        'u_id': id_num 
+    }).json()
+    url_one = url_one_data['user']['profile_img_url']
+    url_two_data = requests.get(config.url + 'user/profile/v1', params={
+        'token': register_data['token'],
+        'u_id': id_num_2
+    }).json()
+    url_two = url_two_data['user']['profile_img_url']
     assert channel_details_data == {
         'name': 'name',
         'is_public': True,
@@ -162,6 +185,7 @@ def test_valid_channel_2_members(clear_and_register):
                 'name_first': 'firstname',
                 'name_last': 'lastname',
                 'handle_str': 'firstnamelastname',
+                'profile_img_url': url_one
             }
         ],
         'all_members': [
@@ -171,6 +195,7 @@ def test_valid_channel_2_members(clear_and_register):
                 'name_first': 'firstname',
                 'name_last': 'lastname',
                 'handle_str': 'firstnamelastname',
+                'profile_img_url': url_one
             } ,
 
             {
@@ -179,6 +204,7 @@ def test_valid_channel_2_members(clear_and_register):
                 'name_first': 'name',
                 'name_last': 'name',
                 'handle_str': 'namename',
+                'profile_img_url': url_two
             }
         ],
     }
