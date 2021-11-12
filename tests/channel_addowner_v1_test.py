@@ -4,10 +4,15 @@ import json
 from src import config
 from src.error import InputError, AccessError
 
-
+'''
+channel_addowner_v1_test.py: All functions related to testing the channel_addowner_v1 function
+'''
 @pytest.fixture
 def clear_and_channel_2_members():
-    
+    '''
+    clears and then registers two users 
+    Creates a channel with the two users 
+    '''
     requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={
         'email': "yes@yes.com", 
@@ -50,8 +55,11 @@ def clear_and_channel_2_members():
         'channel_id': channel_id
         }
 
-# when token is valid, channel is valid, called by a channel owner 
+
 def test_valid_channel_channel_owner(clear_and_channel_2_members):
+    '''
+    when token is valid, channel is valid, called by a channel owner 
+    '''
     token = clear_and_channel_2_members['token']
     u_id = clear_and_channel_2_members['u_id']
     u_id_2 = clear_and_channel_2_members['u_id_2']
@@ -85,9 +93,10 @@ def test_valid_channel_channel_owner(clear_and_channel_2_members):
             }
         ]
 
-
-# when token is valid, channel is valid and called by global owner who isn't a member
 def test_nonmember_global_owner():
+    '''
+    when token is valid, channel is valid and called by global owner who isn't a member
+    '''
     requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={
         'email': "yes@yes.com", 
@@ -137,9 +146,10 @@ def test_nonmember_global_owner():
     })
     assert channel_addowner.status_code == AccessError.code
 
-
-# when token is valid but channel id is invalid
 def test_invalid_channel():
+    '''
+    when token is valid but channel id is invalid
+    '''
     requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={
         'email': "yes@yes.com", 
@@ -157,8 +167,10 @@ def test_invalid_channel():
     })
     assert channel_addowner.status_code == InputError.code
 
-# when token is valid but u_id is invalid
 def test_invalid_u_id(clear_and_channel_2_members):
+    '''
+    when token is valid but u_id is invalid
+    '''
     token = clear_and_channel_2_members['token']
     u_id = clear_and_channel_2_members['u_id']
     u_id_2 = clear_and_channel_2_members['u_id_2']
@@ -175,8 +187,10 @@ def test_invalid_u_id(clear_and_channel_2_members):
     })
     assert channel_addowner.status_code == InputError.code
 
-# when token is valid, channel is valid but user not a member
 def test_invaid_u_id_not_member(clear_and_channel_2_members):
+    '''
+    when token is valid, channel is valid but user not a member
+    '''
     token = clear_and_channel_2_members['token']
     channel_id = clear_and_channel_2_members['channel_id']
 
@@ -195,8 +209,10 @@ def test_invaid_u_id_not_member(clear_and_channel_2_members):
     })
     assert channel_addowner.status_code == InputError.code 
     
-# when token is valid, channel is valid but user_id not a real user 
 def test_invalid_u_id_not_user(clear_and_channel_2_members):
+    '''
+    when token is valid, channel is valid but user_id not a real user 
+    '''
     token = clear_and_channel_2_members['token']
     u_id = clear_and_channel_2_members['u_id']
     u_id_2 = clear_and_channel_2_members['u_id_2']
@@ -212,8 +228,10 @@ def test_invalid_u_id_not_user(clear_and_channel_2_members):
     })
     assert channel_addowner.status_code == InputError.code
 
-# when token is valid, channel is valid but user_id is already channel owner
 def test_already_channel_owner(clear_and_channel_2_members):
+    '''
+    when token is valid, channel is valid but user_id is already channel owner
+    '''
     token = clear_and_channel_2_members['token']
     u_id = clear_and_channel_2_members['u_id']
     channel_id = clear_and_channel_2_members['channel_id']
@@ -224,8 +242,10 @@ def test_already_channel_owner(clear_and_channel_2_members):
     })
     assert channel_addowner.status_code == InputError.code
 
-# valid token, valid channel, valid u_id, no owner permissions 
 def test_no_owner_permissions(clear_and_channel_2_members):
+    '''
+    valid token, valid channel, valid u_id, no owner permissions 
+    '''
     token_2 = clear_and_channel_2_members['token_2']
     u_id_2 = clear_and_channel_2_members['u_id_2']
     channel_id = clear_and_channel_2_members['channel_id']
@@ -236,8 +256,10 @@ def test_no_owner_permissions(clear_and_channel_2_members):
     })
     assert channel_addowner.status_code == AccessError.code
 
-# invalid token, valid channel, valid u_id
 def test_invalid_token_valid_channel_valid_u_id(clear_and_channel_2_members):
+    '''
+    invalid token, valid channel, valid u_id
+    '''
     token = clear_and_channel_2_members['token']
     token_2 = clear_and_channel_2_members['token_2']
     u_id_2 = clear_and_channel_2_members['u_id_2']
@@ -254,8 +276,10 @@ def test_invalid_token_valid_channel_valid_u_id(clear_and_channel_2_members):
     })
     assert channel_addowner.status_code == AccessError.code
 
-# invaid token, invalid channel 
 def test_no_owner_permissions_invalid_channel(clear_and_channel_2_members):
+    '''
+    invaid token, invalid channel 
+    '''
     u_id_2 = clear_and_channel_2_members['u_id_2']
     channel_id = clear_and_channel_2_members['channel_id']
     

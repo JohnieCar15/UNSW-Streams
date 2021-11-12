@@ -4,9 +4,15 @@ import json
 from src import config
 from src.error import AccessError, InputError
 
+'''
+channel_removeowner_v1_test.py: All functions related to testing the channel_removeowner_v1 function
+'''
 @pytest.fixture
 def clear_and_channel_2_members():
-    
+    '''
+    clears and then registers 2 members
+    Two members are part of a channel 
+    '''
     requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={
         'email': "yes@yes.com", 
@@ -45,8 +51,10 @@ def clear_and_channel_2_members():
         'channel_id': channel_id
         }
 
-# when valid token, valid channel, removes a channel owner 
 def test_valid_channel_remove_channel_owner(clear_and_channel_2_members):
+    '''
+    when valid token, valid channel, removes a channel owner 
+    '''
     token = clear_and_channel_2_members['token']
     u_id = clear_and_channel_2_members['u_id']
     u_id_2 = clear_and_channel_2_members['u_id_2']
@@ -74,8 +82,11 @@ def test_valid_channel_remove_channel_owner(clear_and_channel_2_members):
                 'handle_str': 'firstnamelastname',
             } ,
         ]
-# when a nonmember is a global owner tries to remove owner of a channel
+
 def test_nonmeber_global_owner_removeowner():
+    '''
+    when a nonmember is a global owner tries to remove owner of a channel
+    '''
     requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={
         'email': "yes@yes.com", 
@@ -132,8 +143,10 @@ def test_nonmeber_global_owner_removeowner():
 
     assert channel_removeowner.status_code == AccessError.code
 
-# valid token, invalid channel
 def test_invalid_channel():
+    '''
+    Testing valid token, invalid channel
+    '''
     requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={
         'email': "yes@yes.com", 
@@ -151,8 +164,10 @@ def test_invalid_channel():
     })
     assert channel_removeowner.status_code == InputError.code
 
-# valid token, valid channel, invalid u_id
 def test_invalid_u_id(clear_and_channel_2_members):
+    '''
+    Testing valid token, valid channel, invalid u_id
+    '''
     token = clear_and_channel_2_members['token']
     u_id = clear_and_channel_2_members['u_id']
     u_id_2 = clear_and_channel_2_members['u_id_2']
@@ -168,9 +183,10 @@ def test_invalid_u_id(clear_and_channel_2_members):
     })
     assert channel_removeowner.status_code == InputError.code
 
-
-# valid token, valid channel, not an owner
 def test_not_channel_owner(clear_and_channel_2_members):
+    '''
+    Testing valid token, valid channel, not an owner
+    '''
     token = clear_and_channel_2_members['token']
     u_id_2 = clear_and_channel_2_members['u_id_2']
     channel_id = clear_and_channel_2_members['channel_id']
@@ -182,8 +198,10 @@ def test_not_channel_owner(clear_and_channel_2_members):
     })
     assert channel_removeowner.status_code == InputError.code
 
-# valid token, valid channel, only owner
 def test_only_channel_owner(clear_and_channel_2_members):
+    '''
+    Testing valid token, valid channel, only owner
+    '''
     token = clear_and_channel_2_members['token']
     u_id = clear_and_channel_2_members['u_id']
     channel_id = clear_and_channel_2_members['channel_id']
@@ -195,8 +213,10 @@ def test_only_channel_owner(clear_and_channel_2_members):
     })
     assert channel_removeowner.status_code == InputError.code
 
-# valid token, valid channel, no owner permissions
 def test_no_owner_permissions(clear_and_channel_2_members):
+    '''
+    Testing valid token, valid channel, no owner permissions
+    '''
     token_2 = clear_and_channel_2_members['token_2']
     u_id = clear_and_channel_2_members['u_id']
     channel_id = clear_and_channel_2_members['channel_id']
@@ -208,8 +228,10 @@ def test_no_owner_permissions(clear_and_channel_2_members):
     })
     assert channel_removeowner.status_code == AccessError.code
 
-# invalid token, valid channel
 def test_invalid_token_valid_channel(clear_and_channel_2_members):
+    '''
+    Testing invalid token, valid channel
+    '''
     token = clear_and_channel_2_members['token']
     token_2 = clear_and_channel_2_members['token_2']
     u_id_2 = clear_and_channel_2_members['u_id_2']
@@ -231,8 +253,10 @@ def test_invalid_token_valid_channel(clear_and_channel_2_members):
     })
     assert channel_removeowner.status_code == AccessError.code
 
-# invalid token , invalid channel
 def test_invalid_token_invalid_channel(clear_and_channel_2_members):
+    '''
+    Testing invalid token , invalid channel
+    '''
     token = clear_and_channel_2_members['token']
     token_2 = clear_and_channel_2_members['token_2']
     u_id_2 = clear_and_channel_2_members['u_id_2']
