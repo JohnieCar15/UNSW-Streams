@@ -113,7 +113,7 @@ def test_valid_dm_invalid_token(clear_and_register):
     dm_details = requests.get(config.url + 'dm/details/v1', params={'token': "", "dm_id": dm_id})
     assert dm_details.status_code == AccessError.code
 
-def test_invalid_dm_invalid_token():
+def test_invalid_dm_valid_token():
     '''
     Testing an invalid dm being passed 
     '''
