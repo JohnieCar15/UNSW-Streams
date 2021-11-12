@@ -3,10 +3,14 @@ import requests
 import json
 from src import config
 from src.error import InputError, AccessError
-
+'''
+channel_details_v2_test.py: All functions related to testing the channel_details_v2 function 
+'''
 @pytest.fixture
 def clear_and_register():
-    # clear then register a user 
+    '''
+    clear then register a user 
+    '''
     requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={
         'email': "yes@yes.com", 
@@ -31,7 +35,6 @@ def clear_and_register():
         'channel_id': channel_create_data["channel_id"]
         }
 
-# testing a valid channel called by authorised member 
 def test_valid_channel_authorised(clear_and_register):
     '''
     A test to check channel_details when channel id is valid and called by authorised member 
@@ -118,6 +121,9 @@ def test_user_not_a_member(clear_and_register):
     }
 
 def test_valid_channel_2_members(clear_and_register):
+    '''
+    Testing a valid channel with 2 members
+    '''
     
     # get token for 1st user
     token = clear_and_register['token']
@@ -177,10 +183,10 @@ def test_valid_channel_2_members(clear_and_register):
         ],
     }
 
-# def test_valid_channel_two_owners
-
 def test_valid_channel_unauthorised(clear_and_register):
-
+    '''
+    Testing function being called by user who isn't member of channel 
+    '''
     channel_id = clear_and_register['channel_id']
 
     # get token for 2nd user
@@ -200,6 +206,9 @@ def test_valid_channel_unauthorised(clear_and_register):
     assert channel_details.status_code == AccessError.code
 
 def test_valid_channel_invalid_token(clear_and_register):
+    '''
+    Testing function being called by an invalid token 
+    '''
     channel_id = clear_and_register['channel_id']
     channel_details = requests.get(config.url + 'channel/details/v2', params={
         'token': "", 
@@ -208,6 +217,9 @@ def test_valid_channel_invalid_token(clear_and_register):
     assert channel_details.status_code == AccessError.code
 
 def test_invalid_channel_unauthorised_valid_id():
+    '''
+    Testing function being called with an invalid channel_id
+    '''
     requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={
         'email': "yes@yes.com", 
@@ -221,7 +233,10 @@ def test_invalid_channel_unauthorised_valid_id():
     channel_details = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': 1})
     assert channel_details.status_code == InputError.code
 
-def test_invalid_channel_invalid_id():
+def test_invalid_channel_invalid_token():
+    '''
+    Testing invalid channel id and invalid token passed
+    '''
     requests.delete(config.url + 'clear/v1')
     channel_details = requests.get(config.url + 'channel/details/v2', params={'token': 1, 'channel_id': 1})
     assert channel_details.status_code == AccessError.code

@@ -1,5 +1,6 @@
 from datetime import datetime
 import pickle
+import urllib.request
 '''
 data_store.py
 
@@ -28,6 +29,7 @@ Example usage:
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 session_tracker = 0
+img_tracker = 1
 SECRET = 'JOjQqnzcMKrLVsTVLNc2hzA4iWkqqcQB'
 
 initial_object = {
@@ -106,6 +108,7 @@ class Datastore:
           self.__store = pickle.load(open("data_store.p", "rb"))
         except Exception:
           self.__store = initial_object
+        urllib.request.urlretrieve("http://www.ll-mm.com/images/placeholders/masonry3-placeholder.jpg", "src/images/0.jpg")
 
     def get(self):
         return self.__store

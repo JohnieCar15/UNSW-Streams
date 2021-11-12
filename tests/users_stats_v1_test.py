@@ -327,7 +327,7 @@ def check_related_num_of_all_key_and_timestamp_for_specific_key(user, keys):
     check_num_of_existing_channels_dms_messages(user)
     check_utilization_rate(return_dict)
     for key in keys:
-        assert return_dict['users_stats'][key][-1]['time_stamp'] - timestamp_now < 2
+        assert return_dict['workspace_stats'][key][-1]['time_stamp'] - timestamp_now < 2
 
 def check_num_of_existing_channels_dms_messages(user):
     '''
@@ -335,9 +335,9 @@ def check_num_of_existing_channels_dms_messages(user):
     by comparing the input and the return value of users_stats
     '''
     return_dict = users_stats(user)
-    assert return_dict['users_stats']['channels_exist'][-1]['num_channels_exist'] == NUM_CHANNELS_EXIST
-    assert return_dict['users_stats']['dms_exist'][-1]['num_dms_exist'] == NUM_DMS_EXIST
-    assert return_dict['users_stats']['messages_exist'][-1]['num_messages_exist'] == NUM_MESSAGES_EXIST
+    assert return_dict['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == NUM_CHANNELS_EXIST
+    assert return_dict['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == NUM_DMS_EXIST
+    assert return_dict['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == NUM_MESSAGES_EXIST
 
 def check_utilization_rate(return_dict):
     '''
@@ -346,7 +346,7 @@ def check_utilization_rate(return_dict):
     '''
     
     expected_utilization_rate = NUM_USERS_IN_CHANNEL_OR_DM / NUM_USERS
-    assert return_dict['users_stats']['utilization_rate'] == expected_utilization_rate
+    assert return_dict['workspace_stats']['utilization_rate'] == expected_utilization_rate
 
 # below is the helper functions for calling the functions in server for test
 def user_register(email, password, name_first, name_last):

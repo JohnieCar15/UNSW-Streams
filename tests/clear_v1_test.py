@@ -3,9 +3,14 @@ import requests
 from src import config
 from src.error import InputError
 
+'''
+clear_v1_test.py: All tests relating to clear_v1 function
+'''
 
-# Tests logging in after clearing data store
 def test_register_login():
+    '''
+    Tests logging in after clearing data store
+    '''
     requests.delete(config.url + '/clear/v1')
     auth_register_input = {
         'email' : "valid@gmail.com",
@@ -14,6 +19,7 @@ def test_register_login():
         'name_last' : "Last",
     }
 
+    # Register new user
     requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
 
     requests.delete(config.url + '/clear/v1')
@@ -23,10 +29,13 @@ def test_register_login():
         'password' : "password",
     }
 
+    # Attempt to login with user that was registered before clear
     assert requests.post(config.url + '/auth/login/v2', json=auth_login_input).status_code == InputError.code
 
-# Tests if registering again after clearing works
 def test_register_twice():
+    '''
+    Tests if registering again after clearing works
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -36,6 +45,7 @@ def test_register_twice():
         'name_last' : "Last",
     }
 
+    # Register user
     requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
 
     requests.delete(config.url + '/clear/v1')
@@ -47,10 +57,13 @@ def test_register_twice():
         'name_last' : "Last",
     }
 
+    # Assert that no error is raised 
     assert requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
 
-# Tests checking channel details after clearing data store
 def test_channel_details():
+    '''
+    Tests checking channel details after clearing data store
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input1 = {
@@ -60,6 +73,7 @@ def test_channel_details():
         'name_last' : "Last",
     }
 
+    # Register new user
     token1 = requests.post(config.url + '/auth/register/v2', json=auth_register_input1).json()['token']
 
     channel_create_input = {
@@ -68,6 +82,7 @@ def test_channel_details():
         'is_public' : True
     }
 
+    # Create new channel
     channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input).json()['channel_id']
 
     requests.delete(config.url + '/clear/v1')
@@ -86,10 +101,13 @@ def test_channel_details():
         'channel_id' : channel_id
     }
 
+    # Attempt to get details of channel after clear
     assert requests.get(config.url + '/channel/details/v2', params = channel_details_input).status_code == InputError.code
 
-# Tests checking channel joining after clearing data store
 def test_channel_join():
+    '''
+    Tests checking channel joining after clearing data store
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input1 = {
@@ -107,6 +125,7 @@ def test_channel_join():
         'is_public' : True
     }
 
+    # Create new channel
     channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input).json()['channel_id']
 
     requests.delete(config.url + '/clear/v1')
@@ -125,10 +144,13 @@ def test_channel_join():
         'channel_id' : channel_id
     }
 
+    # Attempt to join channel after clear
     assert requests.post(config.url + '/channel/join/v2', json=channel_join_input).status_code == InputError.code
 
-# Tests checking channel messages after clearing data store
 def test_channel_message():
+    '''
+    Tests checking channel messages after clearing data store
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input1 = {
@@ -146,6 +168,7 @@ def test_channel_message():
         'is_public' : True
     }
 
+    # Create new channel
     channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input).json()['channel_id']
 
     requests.delete(config.url + '/clear/v1')
@@ -165,4 +188,5 @@ def test_channel_message():
         'start' : 0
     }
 
+    # Attempt to access messages after store is cleared
     assert requests.get(config.url + '/channel/messages/v2', params = channel_message_input).status_code == InputError.code
