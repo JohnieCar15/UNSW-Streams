@@ -28,11 +28,11 @@ def clear_and_request():
 
     mail.select("inbox")
 
-    result, data = mail.search(None, "ALL")
+    data = mail.search(None, "ALL")[1]
 
     latest_email_id = data[0].split()[-1]
 
-    result, data = mail.fetch(latest_email_id, "(RFC822)")
+    data = mail.fetch(latest_email_id, "(RFC822)")[1]
 
     raw_email = data[0][1].decode('utf-8')
 
