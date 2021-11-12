@@ -4,9 +4,15 @@ from src import config
 from src.error import InputError, AccessError
 from datetime import datetime
 
-# Clears datastore, registers user and creates a channel (making the user a member)
+'''
+message_unpin_v1_test.py: All tests relating to message_unpin_v1 function
+'''
+
 @pytest.fixture
 def register_create_channel():
+    '''
+    Clears datastore, registers user and creates channel, making the user the owner
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -32,9 +38,11 @@ def register_create_channel():
         'valid_channel_id': channel_id
     }
 
-# Clears datastore, registers user and creates a dm (making the user a member)
 @pytest.fixture
 def register_create_dm():
+    '''
+    Clears datastore, registers user and creates dm, making the user the owner
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -59,10 +67,11 @@ def register_create_dm():
         'valid_dm_id': dm_id
     }
 
-
-# HELPER FUNCTION
-# Sends a number of messages to specific endpoint
 def send_message(token, channel_id, length):
+    '''
+    HELPER FUNCTION
+    Sends a number of messages to specific endpoint (channel)
+    '''
     send_message_input = {
         'token' : token,
         'channel_id': channel_id,
@@ -78,10 +87,13 @@ def send_message(token, channel_id, length):
         'message_id_list' : message_id_list
     }
 
-# HELPER FUNCTION
-# Creates input for channel_messages and returns messages
-# Assumes that tests require valid input, otherwise register_create tokens/channel_ids are directly modified
+
 def get_messages(register_create, start):
+    '''
+    HELPER FUNCTION
+    Creates input for channel_messages and returns messages
+    Assumes that tests require valid input, otherwise register_create tokens/channel_ids are directly modified
+    '''
     channel_messages_input = {
         'token' : register_create['valid_token'],
         'channel_id' : register_create['valid_channel_id'],
@@ -92,9 +104,11 @@ def get_messages(register_create, start):
 
     return channel_messages
 
-# HELPER FUNCTION
-# Pins message given a message id
 def pin_message(token, message_id):
+    '''
+    HELPER FUNCTION
+    Pins message given a message id
+    '''
     message_pin_input = {
         'token' : token,
         'message_id' : message_id 
@@ -135,6 +149,7 @@ def test_unpinned_dm(register_create_dm):
         'message': "Hello!"
     }
 
+    # Send message to DM
     message_id = requests.post(config.url + '/message/senddm/v1', json=send_messagedm_input).json()['message_id']
 
     pin_message(register_create_dm['valid_token'], message_id)
@@ -215,6 +230,7 @@ def test_not_owner(register_create_channel):
         'name_last' : "Last",
     }
 
+    # Register new user
     member = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
 
     channel_join_input = {
@@ -222,6 +238,7 @@ def test_not_owner(register_create_channel):
         'channel_id': register_create_channel['valid_channel_id']
     }
 
+    # User joins channel
     requests.post(config.url + 'channel/join/v2', json=channel_join_input).json()
 
     messagedict = send_message(register_create_channel['valid_token'], register_create_channel['valid_channel_id'], 1)
@@ -233,6 +250,7 @@ def test_not_owner(register_create_channel):
         'message_id' : messagedict['message_id_list'][0]
     }
 
+    # User tries to unpin user's message
     status = requests.post(config.url + 'message/unpin/v1', json=message_unpin_input)
 
     assert status.status_code == AccessError.code
@@ -248,6 +266,7 @@ def test_not_member(register_create_channel):
         'name_last' : "Last",
     }
 
+    # Register new user
     member = requests.post(config.url + '/auth/register/v2', json=auth_register_input).json()
 
     messagedict = send_message(register_create_channel['valid_token'], register_create_channel['valid_channel_id'], 1)
@@ -257,6 +276,7 @@ def test_not_member(register_create_channel):
         'message_id' : messagedict['message_id_list'][0]
     }
 
+    # User tries to access message in channel they aren't part of
     status = requests.post(config.url + 'message/unpin/v1', json=message_unpin_input)
 
     assert status.status_code == InputError.code
@@ -274,6 +294,7 @@ def test_global_owner_channel():
         'name_last' : "Last",
     }
 
+    # Register first user who is global owner
     global_token = requests.post(config.url + '/auth/register/v2', json=auth_register_input1).json()['token']
 
     auth_register_input2 = {
@@ -283,6 +304,7 @@ def test_global_owner_channel():
         'name_last' : "Last1",
     }
 
+    # Register new user
     member_token = requests.post(config.url + '/auth/register/v2', json=auth_register_input2).json()['token']
 
     channel_create_input = {
@@ -291,6 +313,7 @@ def test_global_owner_channel():
         'is_public' : True
     }
 
+    # New user creates channel
     channel_id = requests.post(config.url + '/channels/create/v2', json=channel_create_input).json()['channel_id']
 
     channel_join_input = {
@@ -298,6 +321,7 @@ def test_global_owner_channel():
         'channel_id': channel_id
     }
 
+    # Global owner joins channel
     requests.post(config.url + 'channel/join/v2', json=channel_join_input)
 
     messagedict = send_message(member_token, channel_id, 1)
@@ -309,6 +333,7 @@ def test_global_owner_channel():
         'message_id' : messagedict['message_id_list'][0]
     }
 
+    # Check the global owner is able to unpin the message
     status = requests.post(config.url + 'message/unpin/v1', json=message_unpin_input)
 
     assert status.status_code == 200
@@ -326,6 +351,7 @@ def test_global_owner_dm():
         'name_last' : "Last",
     }
 
+    # Register first user who is global owner
     global_member = requests.post(config.url + '/auth/register/v2', json=auth_register_input1).json()
 
     auth_register_input2 = {
@@ -335,6 +361,7 @@ def test_global_owner_dm():
         'name_last' : "Last1",
     }
 
+    # Register new user
     member_token = requests.post(config.url + '/auth/register/v2', json=auth_register_input2).json()['token']
 
     dms_create_input = {
@@ -342,6 +369,7 @@ def test_global_owner_dm():
         'u_ids': [global_member['auth_user_id']]
     }
 
+    # New user creates DM with global owner as member
     dm_id = requests.post(config.url + 'dm/create/v1', json=dms_create_input).json()['dm_id']
 
     message_senddm_input = {
@@ -359,6 +387,7 @@ def test_global_owner_dm():
         'message_id' : message_id
     }
 
+    # Check the global owner is unable to unpin the message
     status = requests.post(config.url + 'message/unpin/v1', json=message_unpin_input)
 
     assert status.status_code == AccessError.code
