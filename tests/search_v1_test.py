@@ -3,7 +3,9 @@ import requests
 from src import config
 from src.error import AccessError, InputError
 from datetime import datetime
-
+'''
+search_v1_test.py: All functions related to testing the search_v1 function
+'''
 @pytest.fixture
 def clear_and_send_messages():
     '''

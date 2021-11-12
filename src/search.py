@@ -1,7 +1,12 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store, is_global_owner
+'''
+search.py: This file contains the function search endpoints.
 
+Functions:
+    - search_v1(token, query_str)
+'''
 def search_v1(token, query_str):
     '''
     search_v1:
