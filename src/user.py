@@ -1,6 +1,7 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
-from src.helpers import validate_token, filter_data_store
+from src.helpers import validate_token, filter_data_store, generate_new_img_id
+from src import config
 import re
 import urllib.request
 from PIL import Image
@@ -243,13 +244,18 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise InputError(description='Given dimensions are not within the dimensions of the image at the URL')
 
     u_id = validate_token(token)['user_id']
+
+    img_id = generate_new_img_id()
+
+    img_path = f"src/images/{img_id}.jpg"
+
     try:
-        urllib.request.urlretrieve(img_url, f"src/images/{u_id}.jpg")
+        urllib.request.urlretrieve(img_url, img_path)
     except:
         raise InputError(description='Invalid img_url')
 
 
-    image_object = Image.open(f"src/images/{u_id}.jpg")
+    image_object = Image.open(img_path)
 
     width, height = image_object.size
 
@@ -258,6 +264,14 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     cropped_image = image_object.crop((x_start, y_start, x_end, y_end))
 
-    cropped_image.save(f"src/images/{u_id}.jpg")
+    cropped_image.save(img_path)
+
+    store = data_store.get()
+    
+    user = filter_data_store(store_list='users', key='id', value=u_id)[0]
+
+    user['profile_img_url'] = f"{config.url}/images/{img_id}.jpg"
+
+    data_store.set(store)
 
     return {}
