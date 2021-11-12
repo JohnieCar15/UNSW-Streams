@@ -4,7 +4,7 @@ import time
 from src import config
 from src.error import AccessError
 '''
-user_stats_v1_test,py: All functions related to testing the user_stats_v1 function
+user_stats_v1_test.py: All functions related to testing the user_stats_v1 function
 
 the test function:
     test_invalid_user_token()

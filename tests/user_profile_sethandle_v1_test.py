@@ -3,6 +3,10 @@ import requests
 from src import config
 from src.error import AccessError, InputError
 
+'''
+user_profile_sethandle_v1_test.py: All functions related to testing the user_profile_sethandle_v1_test function
+'''
+
 # assumption: when token and handle are valid, but the handle
 # entered by the user is same with previous handle, InputError will be raised
 

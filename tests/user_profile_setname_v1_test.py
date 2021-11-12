@@ -3,6 +3,10 @@ import requests
 from src import config
 from src.error import AccessError, InputError
 
+'''
+user_profile_setname_v1_test.py: All functions related to testing the user_profile_setname_v1_test function
+'''
+
 # assumption: when token and name are valid, but the firstname/lastname
 # entered by the user is same with previous name, InputError will be raised
 
