@@ -1,7 +1,7 @@
 import pytest
 import requests
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from src import config
 from src.error import AccessError, InputError
 
@@ -138,7 +138,7 @@ def test_tagging_in_message_sendlater(notifications_get_url, clear_and_register)
         'token': user_token,
         'channel_id': channel_id,
         'message': message_string,
-        'time_sent': int(datetime.utcnow().timestamp()) + 1
+        'time_sent': int(datetime.now(timezone.utc).timestamp()) + 1
     }).json()['message_id']
 
     time.sleep(1)
@@ -163,7 +163,7 @@ def test_tagging_in_message_sendlaterdm(notifications_get_url, clear_and_registe
         'token': user_token,
         'dm_id': dm_id,
         'message': message_string,
-        'time_sent': int(datetime.utcnow().timestamp()) + 1
+        'time_sent': int(datetime.now(timezone.utc).timestamp()) + 1
     }).json()['message_id']
 
     time.sleep(1)

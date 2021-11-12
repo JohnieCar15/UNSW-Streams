@@ -2,7 +2,7 @@ import pytest
 import requests
 from src import config
 from src.error import AccessError, InputError
-from datetime import datetime
+from datetime import datetime, timezone
 '''
 search_v1_test.py: All functions related to testing the search_v1 function
 '''
@@ -61,7 +61,7 @@ def message_dict(message_id, auth_user_id, message):
         'message_id': message_id,
         'u_id': auth_user_id,
         'message': message,
-        'time_created': int(datetime.utcnow().timestamp()),
+        'time_created': int(datetime.now(timezone.utc).timestamp()),
         'reacts': [{
             'react_id': 1,
             'u_ids': [],

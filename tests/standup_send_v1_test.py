@@ -2,7 +2,7 @@ import pytest
 import requests
 from src import config 
 from src.error import AccessError, InputError
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import time
 '''
 standup_send_v1_test: All functions related to testing the standup_send_v1 function 
@@ -32,7 +32,7 @@ def clear_and_register_channel():
         'length': 3,
     })
     # not sure if correct
-    time_finish = int(datetime.utcnow().timestamp() + 3)
+    time_finish = int(datetime.now(timezone.utc).timestamp() + 3)
     return {
         'token': token, 
         'u_id': register_data['auth_user_id'], 

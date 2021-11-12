@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import requests
 import time
 from src import config
@@ -321,7 +321,7 @@ def test_message_sendlaterin_channel_dm_and_standup_send():
     num_dms_exist += 1
 
     # test message sendlater dm by user0, check user_stats
-    message_sendlaterdm(user0, dm_0, '0', int(datetime.utcnow().timestamp()) + 1)
+    message_sendlaterdm(user0, dm_0, '0', int(datetime.now(timezone.utc).timestamp()) + 1)
     time.sleep(2)
     num_messages_exist += 1
     input0 = get_input(0, 1, 1, num_channels_exist, num_dms_exist, num_messages_exist)
@@ -336,7 +336,7 @@ def test_message_sendlaterin_channel_dm_and_standup_send():
     channel_join(user1, public_0)
     
     # test message send later in channel by user0, check user_stats
-    message_sendlater(user0, public_0, '1', int(datetime.utcnow().timestamp()) + 1)
+    message_sendlater(user0, public_0, '1', int(datetime.now(timezone.utc).timestamp()) + 1)
     time.sleep(2)
     num_messages_exist += 1
     input0 = get_input(1, 1, 2, num_channels_exist, num_dms_exist, num_messages_exist)
@@ -459,7 +459,7 @@ def check_num_and_time_stamp(user, key, num, check_time=False):
     check_time (Boolean) should be true, when it is called by 
         check_related_num_of_all_key_and_timestamp_for_specific_key
     '''
-    timestamp_now = int(datetime.utcnow().timestamp())
+    timestamp_now = int(datetime.now(timezone.utc).timestamp())
     return_dict = user_stats(user)
     assert return_dict['user_stats'][key][-1]['num_' + key] == num
     if check_time:
