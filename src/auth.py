@@ -1,6 +1,6 @@
 from src.data_store import data_store
 from src.error import InputError
-from src import helpers
+from src import helpers, config
 
 import re
 import hashlib
@@ -110,7 +110,8 @@ def auth_register_v2(email, password, name_first, name_last):
         'permission_id': permission_id,
         'session_list': [session_id],
         'is_removed': False,
-        'reset_code': 0
+        'reset_code': 0,
+        'profile_img_url': f"{config.url}/images/0.jpg"
     }
 
     store['users'].append(user_dict)
@@ -200,10 +201,10 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
 
     store = data_store.get()
 
-    for user in store['users']:
-        if user['reset_code'] == hashlib.sha256(reset_code.encode()).hexdigest():
-            user['reset_code'] = 0
-            user['password'] = hashlib.sha256(new_password.encode()).hexdigest()
+    user = helpers.filter_data_store(store_list='users', key='reset_code', value=hashlib.sha256(reset_code.encode()).hexdigest())[0]
+
+    user['reset_code'] = 0
+    user['password'] = hashlib.sha256(new_password.encode()).hexdigest()
     
     data_store.set(store)
 
