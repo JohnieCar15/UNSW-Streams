@@ -8,7 +8,7 @@ users_all_v1_test.py: All functions related to testing the users_all_v1 function
 '''
 
 # define global variable for default profile_img_url
-DEFAULT_PROFILE_IMG_URL = f'{config.url}images/0.jpg'
+global DEFAULT_PROFILE_IMG_URL
 
 # clear and registers first user
 @pytest.fixture
@@ -23,6 +23,15 @@ def clear_and_register_user0():
     }
     user0 = requests.post(config.url + 'auth/register/v2', json=user0_register).json()
     
+    profile_input = {
+        'token': user0['token'],
+        'u_id': user0['auth_user_id']
+    }
+
+    # set global variable for default profile_img_url
+    global DEFAULT_PROFILE_IMG_URL
+    DEFAULT_PROFILE_IMG_URL = requests.get(config.url + 'user/profile/v1', params=profile_input).json()['user']['profile_img_url']
+
     return {
         'token_valid': user0['token'],
         'u_id': user0['auth_user_id']
