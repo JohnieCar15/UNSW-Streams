@@ -43,13 +43,13 @@ def test_invalid_token():
     uploadphoto_return = requests.post(config.url + 'user/profile/uploadphoto/v1', json=uploadphoto_input)
 
     assert uploadphoto_return.status_code == AccessError.code
-'''
+
 def test_invalid_img_url(clear_and_register):
     token = clear_and_register
 
     uploadphoto_input = {
         'token': token, 
-        'img_url': "http://www.ll-mm.com/images/placeholders/masonry3-placeholder-asdasdasd.jpg", 
+        'img_url': "asdkajsflkanf.jpg", 
         'x_start': 0, 
         'y_start': 0, 
         'x_end': 1, 
@@ -59,7 +59,23 @@ def test_invalid_img_url(clear_and_register):
     uploadphoto_return = requests.post(config.url + 'user/profile/uploadphoto/v1', json=uploadphoto_input)
 
     assert uploadphoto_return.status_code == InputError.code
-'''
+
+def test_https_img_url(clear_and_register):
+    token = clear_and_register
+
+    uploadphoto_input = {
+        'token': token, 
+        'img_url': "https://tinyjpg.com/images/social/website.jpg", 
+        'x_start': 0, 
+        'y_start': 0, 
+        'x_end': 1000, 
+        'y_end': 500
+    }
+
+    uploadphoto_return = requests.post(config.url + 'user/profile/uploadphoto/v1', json=uploadphoto_input)
+
+    assert uploadphoto_return.status_code == 200
+
 def test_invalid_x_start(clear_and_register):
     token = clear_and_register
 

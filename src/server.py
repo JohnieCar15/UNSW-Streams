@@ -253,7 +253,8 @@ def user_profile_uploadphoto_v1_ep():
 
 @APP.route("/images/<path:path>")
 def send_js(path):
-    return send_from_directory('', path)
+    print('PATH', path)
+    return send_from_directory('images/', path)
 
 @APP.route("/admin/user/remove/v1", methods=['DELETE'])
 def admin_user_remove_v1_ep():

@@ -230,7 +230,7 @@ def user_profile_sethandle_v1(token, handle):
     return {}
 
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):    
-    if not img_url.endswith(".jpg"):
+    if not img_url.endswith(".jpg") and not img_url.endswith(".jpeg"):
         raise InputError(description='Image uploaded is not a JPG')
 
     if x_end < x_start:
@@ -243,10 +243,13 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise InputError(description='Given dimensions are not within the dimensions of the image at the URL')
 
     u_id = validate_token(token)['user_id']
+    try:
+        urllib.request.urlretrieve(img_url, f"src/images/{u_id}.jpg")
+    except:
+        raise InputError(description='Invalid img_url')
 
-    urllib.request.urlretrieve(img_url, f"images/{u_id}.jpg")
 
-    image_object = Image.open(f"images/{u_id}.jpg")
+    image_object = Image.open(f"src/images/{u_id}.jpg")
 
     width, height = image_object.size
 
@@ -255,6 +258,6 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     cropped_image = image_object.crop((x_start, y_start, x_end, y_end))
 
-    cropped_image.save(f"images/{u_id}.jpg")
+    cropped_image.save(f"src/images/{u_id}.jpg")
 
     return {}
