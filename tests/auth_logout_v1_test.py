@@ -25,7 +25,9 @@ def test_auth_logout_v1():
 
     requests.post(config.url + 'auth/register/v2', json=another_auth_register_input).json()['token']
 
-    requests.post(config.url + 'auth/logout/v1', json={'token': token})
+    logout_return = requests.post(config.url + 'auth/logout/v1', json={'token': token})
+
+    assert logout_return.status_code == 200
 
     logout_return = requests.post(config.url + 'auth/logout/v1', json={'token': token})
 

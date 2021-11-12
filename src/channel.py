@@ -1,7 +1,21 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store, is_global_owner
+from src.notifications import add_notification
 
+'''
+channel.py: This file contains all functions relating to channel endpoints.
+
+Channel Functions:
+    - channel_join_v2(token, channel_id)
+    - channel_invite_v2(token, channel_id, u_id)
+    - channel_details_v2(token, channel_id)
+    - channel_messages_v2(token, channel_id, start)
+    - channel_leave_v1(token, channel_id)
+    - channel_removeowner_v1(token, channel_id, u_id)
+    - channel_addowner_v1(token, channel_id, u_id)
+
+'''
 
 def channel_join_v2(token, channel_id):
     '''
@@ -41,7 +55,7 @@ def channel_join_v2(token, channel_id):
     else:
         channel_list[0]['members'].append(auth_user_id)
     
-    data_store.set(store)
+    data_store.set(store, user=auth_user_id, key='channel', key_value=0, user_value=1)
     return {}
 
 def channel_invite_v2(token, channel_id, u_id):
@@ -83,14 +97,19 @@ def channel_invite_v2(token, channel_id, u_id):
     elif u_id in channel_list[0]['members']:
         raise InputError(description='User already member of channel')
     
+    # Adding user to channel members list
     channel_list[0]['members'].append(u_id)
     
-    data_store.set(store)
+
+    # Sending a notification to user invited to the channel
+    add_notification(u_id, auth_user_id, channel_id, 'invite')
+
+    data_store.set(store, user=u_id, key='channel', key_value=0, user_value=1)
     return {}
 
 def channel_details_v2(token, channel_id):
     '''
-    channel_details_v2: Given a valid authroised token and valid channel_id displays details for that channel 
+    channel_details_v2: Given a valid authorised token and valid channel_id displays details for that channel 
 
     Arguments:
         token (string) - token string used to authorise and authenticate the user 
@@ -110,12 +129,11 @@ def channel_details_v2(token, channel_id):
     auth_user_id = validate_token(token)['user_id']
     
     # check if channel_id refers to a valid id
-    channel_list = [channel['id'] for channel in store['channels']]
-    if len(channel_list) == 0:
+    if channel_id not in filter_data_store(store_list='channels',key='id'):
         raise InputError(description="Invalid channel_id")
     
     # check if user is member of channel
-    channel_dict =  [channel for channel in store['channels'] if channel_id == channel['id']][0]
+    channel_dict = filter_data_store(store_list='channels',key='id',value=channel_id)[0]
     if auth_user_id not in channel_dict['members']:
         raise AccessError(description="Not a member of channel")
 
@@ -185,7 +203,7 @@ def channel_messages_v2(token, channel_id, start):
     auth_user_id = validate_token(token)['user_id']
 
   # Checks if channel id is valid
-    if channel_id not in filter_data_store(store_list='channels', key='id', value=None):
+    if channel_id not in filter_data_store(store_list='channels', key='id'):
         raise InputError(description="Invalid channel_id")
   # Finds the channel with the correct id
     new_channel = filter_data_store(store_list='channels', key='id', value=channel_id)[0]
@@ -216,6 +234,174 @@ def channel_messages_v2(token, channel_id, start):
         messages_dict['end'] = start + 50
         messages_dict['messages'] = new_channel['messages'][start:start + 50]
 
-    data_store.set(store)
+    for message in messages_dict['messages']:
+        for react in message['reacts']:
+            react['is_this_user_reacted'] = True if auth_user_id in react['u_ids'] else False
         
+    data_store.set(store)
+
     return messages_dict
+
+def channel_leave_v1(token, channel_id):
+    '''
+    channel_leave_v1: Given a valid authorised token and valid channel_id displays removes token as a member of channel
+
+    Arguments:
+        token (string) - token string used to authorise and authenticate the user 
+        channel_id    - id of the channel from which details are pulled 
+        
+
+    Exceptions:
+        InputError  - Occurs when channel_id does not refer to a valid channel
+        AccessError - Occurs when channel_id is valid but authorised user is not a member of the channel
+        AccessError - Occurs when token isn't valid 
+
+    Return Value:
+        Returns {}
+
+    '''
+    store = data_store.get()
+
+    # check if token is valid
+    auth_user_id = validate_token(token)['user_id']
+
+    # check if channel_id is valid
+    if channel_id not in filter_data_store(store_list='channels',key='id'):
+        raise InputError(description="Invalid channel_id")
+    
+    # check if auth_user_id member of channel
+    channel_dict = filter_data_store(store_list='channels',key='id',value=channel_id)[0]
+    if auth_user_id not in channel_dict['members']:
+        raise AccessError(description="Not a member of channel")
+    
+    # remove auth_user_id from owner list if owner
+    if auth_user_id in channel_dict['owner']:
+        channel_dict['owner'].remove(auth_user_id)
+   
+    # remove auth_user_id from members list
+    channel_dict['members'].remove(auth_user_id)
+    
+    data_store.set(store, user=auth_user_id, key='channel', key_value=0, user_value=-1)
+        
+    return {}
+
+def channel_removeowner_v1(token, channel_id, u_id):
+    '''
+    channel_removeowner_v1: 
+    Given a valid authorised token, channel_id and u_id, it removes the user as an owner of channel
+
+    Arguments:
+        token (string) - token string used to authorise and authenticate the user 
+        channel_id (int)   - id of the channel from which details are pulled 
+        u_id  (int)  - id of the user to remove as owner 
+        
+
+    Exceptions:
+        InputError  - Occurs when channel_id does not refer to a valid channel
+        InputError  - Occurs when u_id does not refer to a valid user
+        InputError  - Occurs when u_id does not refer to an owner of the channel
+        InputError  - Occurs when u_id refers to a user who is currently the only owner of the channel
+        AccessError - Occurs when channel_id is valid but authorised user is not a member of the channel
+        AccessError - Occurs when token isn't valid 
+
+    Return Value:
+        Returns {}
+
+    '''
+    store = data_store.get()
+
+    # check if token is valid
+    auth_user_id = validate_token(token)['user_id']
+
+    # check if channel id is valid
+    if channel_id not in filter_data_store(store_list='channels',key='id'):
+        raise InputError(description="Invalid channel_id")
+
+    channel_dict = filter_data_store(store_list='channels',key='id',value=channel_id)[0]
+
+    # check if user has owner permissions
+    user_dict = filter_data_store(store_list='users',key='id',value=auth_user_id)[0]
+    if auth_user_id not in channel_dict['owner'] and user_dict['permission_id'] != 1:
+        raise AccessError(description='User does not have owner permissions in channel')
+    
+    # check if global owner they are a member of channel
+    if auth_user_id not in channel_dict['members']:
+        raise AccessError(description='User does not have owner permissions in channel')
+
+    # check if u_id is valid
+    if u_id not in filter_data_store(store_list='users', key='id'): 
+        raise InputError(description="Invalid user_id")
+
+    # check if user is an owner of the channel
+    if u_id not in channel_dict['owner']:
+        raise InputError(description="Not an owner in channel")
+
+    # check if user isn't only owner 
+    if u_id in channel_dict['owner'] and len(channel_dict['owner']) == 1:
+        raise InputError(description="Only owner of channel")
+    
+    # remove u_id as owner
+    channel_dict['owner'].remove(u_id)
+
+    data_store.set(store)
+
+    return {}
+
+def channel_addowner_v1(token, channel_id, u_id):
+    '''
+    channel_addowner_v1: Given a valid authorised token with owner_permissions and valid channel_id makes u_id an owner of channel
+
+    Arguments:
+        token (string) - token string used to authorise and authenticate the user 
+        channel_id    - id of the channel from which details are pulled 
+        u_id - user_id of the one to be made an owner
+        
+
+    Exceptions:
+        InputError  - Occurs when channel_id does not refer to a valid channel
+        InputError  - Occurs when u_id does not refer to a valid user
+        InputError - Occurs when channel_id is valid but authorised user is not a member of the channel
+        InputError - When u_id is already an owner of channel
+        AccessError - token has no owner permissions in channel
+        AccessError - Occurs when token isn't valid 
+
+    Return Value:
+        Returns {}
+
+    '''
+    store = data_store.get()
+
+    #check if token is valid
+    auth_user_id = validate_token(token)['user_id']
+
+    # check if channel id is valid
+    if channel_id not in filter_data_store(store_list='channels',key='id'):
+        raise InputError(description="Invalid channel_id")
+
+    # check if token has owner permissions, is in owner or has global permissions
+    user_dict = filter_data_store(store_list='users',key='id',value=auth_user_id)[0]
+    channel_dict = filter_data_store(store_list='channels',key='id',value=channel_id)[0]
+    if auth_user_id not in channel_dict['owner'] and user_dict['permission_id'] != 1:
+        raise AccessError(description='User does not have owner permissions in channel')
+    
+    # if is global owner check that they are a member of the channel 
+    if auth_user_id not in channel_dict['members']:
+        raise AccessError(description='User does not have owner permissions in channel')
+
+    # check if u_id is valid
+    if u_id not in filter_data_store(store_list='users', key='id'): 
+        raise InputError(description="Invalid user_id")
+
+    # check if u_id is member of channel
+    if u_id not in channel_dict['members']:
+        raise InputError(description="Not a member of channel")
+    
+    # check if u_id already owner of channel
+    if u_id in channel_dict['owner']:
+        raise InputError(description='Already an owner of channel')
+    
+    # make u_id owner of channel 
+    channel_dict['owner'].append(u_id)
+    data_store.set(store)
+
+    return {}

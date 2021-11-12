@@ -1,3 +1,6 @@
+import re
+import hashlib
+from datetime import datetime
 from src.data_store import data_store
 from src.error import InputError
 from src import helpers, config
@@ -6,6 +9,18 @@ import re
 import hashlib
 import smtplib, ssl
 from random import randint
+
+'''
+auth.py: This file contains all functions relating to auth endpoints.
+
+Auth Functions:
+    - auth_login_v2(email, password)
+    - auth_register_v2(email, password, name_first, name_last)
+    - auth_logout_v1(token)
+
+Auth Helper functions:
+    - generate_handle(name_first, name_last)
+'''
 
 regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
@@ -22,7 +37,7 @@ def auth_login_v2(email, password):
                         - Occurs when password is not correct
 
     Return Value:
-        Returns auth_user_id, token on registered email and correct password
+        Returns {auth_user_id, token} on registered email and correct password
     '''
     store = data_store.get()
 
@@ -41,9 +56,9 @@ def auth_login_v2(email, password):
                     'token': helpers.generate_jwt(user['id'], session_id)
                 }
             else:
-                raise InputError("Incorrect password")
+                raise InputError(description="Incorrect password")
     
-    raise InputError("Email is not registered")
+    raise InputError(description="Email is not registered")
 
 def auth_register_v2(email, password, name_first, name_last):
     '''
@@ -64,20 +79,20 @@ def auth_register_v2(email, password, name_first, name_last):
                         - Occurs when both name_first and name_last do not contain any alphanumeric characters
 
     Return Value:
-        Returns auth_user_id, token on valid email, password, name_first and name_last
+        Returns {auth_user_id, token} on valid email, password, name_first and name_last
     '''
     # Checking if email is valid
     if not re.fullmatch(regex, email):
-        raise InputError("Invalid email")
+        raise InputError(description="Invalid email")
 
     if len(password) < 6:
-        raise InputError("Password must be at least 6 characters long")
+        raise InputError(description="Password must be at least 6 characters long")
     
     if len(name_first) < 1 or len(name_first) > 50:
-        raise InputError("First name must be between 1 and 50 characters long")
+        raise InputError(description="First name must be between 1 and 50 characters long")
 
     if len(name_last) < 1 or len(name_last) > 50:
-        raise InputError("Last name must be between 1 and 50 characters long")
+        raise InputError(description="Last name must be between 1 and 50 characters long")
 
     store = data_store.get()
 
@@ -85,18 +100,19 @@ def auth_register_v2(email, password, name_first, name_last):
     user_email_list =  helpers.filter_data_store(store_list='users', key='email')
 
     if email in user_email_list:
-       raise InputError("Email address already in use")
+       raise InputError(description="Email address already in use")
 
     handle_str = generate_handle(name_first, name_last)
 
     # Setting the first registered user to owner (id 1) otherwise member (id 2)
     permission_id = 2
-    if len(store['users']) == 0:
+    if len(store['users']) + len(store['removed_users']) == 0:
         permission_id = 1
 
-    auth_user_id = len(store['users']) + 1
+    auth_user_id = len(store['users']) + len(store['removed_users']) + 1
     session_id = helpers.generate_new_session_id()
     token = helpers.generate_jwt(auth_user_id, session_id)
+    time_stamp = int(datetime.utcnow().timestamp())
 
     # Add user to data store
     
@@ -111,10 +127,18 @@ def auth_register_v2(email, password, name_first, name_last):
         'session_list': [session_id],
         'is_removed': False,
         'reset_code': 0,
-        'profile_img_url': f"{config.url}/images/0.jpg"
+        'profile_img_url': f"{config.url}/images/0.jpg",
+        'channels_joined': [{'num_channels_joined': 0, 'time_stamp': time_stamp}],
+        'dms_joined':      [{'num_dms_joined': 0, 'time_stamp': time_stamp}],
+        'messages_sent':   [{'num_messages_sent': 0, 'time_stamp': time_stamp}],
+        'notifications': []
     }
 
     store['users'].append(user_dict)
+    if len(store['users']) == 1:
+        store['channels_exist'].append({'num_channels_exist': 0, 'time_stamp': time_stamp})
+        store['dms_exist'].append({'num_dms_exist': 0, 'time_stamp': time_stamp})
+        store['messages_exist'].append({'num_messages_exist': 0, 'time_stamp': time_stamp})
     data_store.set(store)
     
     return {
@@ -218,7 +242,7 @@ def generate_handle(name_first, name_last):
     handle_str = re.sub('[^0-9a-z]+', '', handle_str)[:20]
 
     if len(handle_str) == 0:
-        raise InputError("First name and last name do not contain any alphanumeric characters")
+        raise InputError(description="First name and last name do not contain any alphanumeric characters")
 
     # If there is 1 of the same handle, add a 0 to the end
     # If there is more than 1 of the same handle, remove the last character and add the count
