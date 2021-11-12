@@ -3,6 +3,13 @@ import requests
 from src import config
 from src.error import AccessError
 
+'''
+users_all_v1_test.py: All functions related to testing the users_all_v1 function
+'''
+
+# define global variable for default profile_img_url
+DEFAULT_PROFILE_IMG_URL = f'{config.url}images/0.jpg'
+
 # clear and registers first user
 @pytest.fixture
 def clear_and_register_user0():
@@ -37,7 +44,8 @@ def test_vaild_token_with_one_user_registered(clear_and_register_user0):
             'email': '0000@unsw.edu.au', 
             'name_first': 'firstname0', 
             'name_last': 'lastname0',
-            'handle_str': 'firstname0lastname0'}
+            'handle_str': 'firstname0lastname0',
+            'profile_img_url': DEFAULT_PROFILE_IMG_URL }
         ]
     } 
 
@@ -71,18 +79,21 @@ def test_vaild_token_with_many_user_registered():
             'email': '0000@unsw.edu.au',
             'name_first': 'firstname0',
             'name_last': 'lastname0',
-            'handle_str': 'firstname0lastname0'},
+            'handle_str': 'firstname0lastname0',
+            'profile_img_url': DEFAULT_PROFILE_IMG_URL},
 
             {'u_id': user1['auth_user_id'], 
             'email': '0001@unsw.edu.au', 
             'name_first': 'firstname1', 
             'name_last': 'lastname1',
-            'handle_str': 'firstname1lastname1'},
+            'handle_str': 'firstname1lastname1',
+            'profile_img_url': DEFAULT_PROFILE_IMG_URL},
 
             {'u_id': user2['auth_user_id'], 
             'email': '0002@unsw.edu.au', 
             'name_first': 'firstname2', 
             'name_last': 'lastname2',
-            'handle_str': 'firstname2lastname2'}
+            'handle_str': 'firstname2lastname2',
+            'profile_img_url': DEFAULT_PROFILE_IMG_URL}
     ]}
     assert requests.get(config.url + 'users/all/v1', params=input_token).json() == result

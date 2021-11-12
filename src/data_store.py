@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import pickle
+import urllib.request
 '''
 data_store.py
 
@@ -28,6 +29,7 @@ Example usage:
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 session_tracker = 0
+img_tracker = 1
 SECRET = 'JOjQqnzcMKrLVsTVLNc2hzA4iWkqqcQB'
 
 initial_object = {
@@ -106,6 +108,7 @@ class Datastore:
           self.__store = pickle.load(open("data_store.p", "rb"))
         except Exception:
           self.__store = initial_object
+        urllib.request.urlretrieve("http://www.ll-mm.com/images/placeholders/masonry3-placeholder.jpg", "src/images/0.jpg")
 
     def get(self):
         return self.__store
@@ -144,7 +147,7 @@ def update_store(store, user=None, key=None, key_value=None, user_value=None):
         return store
 
     # get time_stamp and update channels/dms_exist/messages_sent
-    time_stamp = int(datetime.utcnow().timestamp())
+    time_stamp = int(datetime.now(timezone.utc).timestamp())
     update_channels_and_dms_and_messages_exist(store, key, key_value, time_stamp)
 
     # get new key for helper function: update_num_channels_dms_joined_or_message_sent()

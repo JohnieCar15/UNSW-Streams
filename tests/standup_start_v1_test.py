@@ -2,7 +2,7 @@ import pytest
 import requests
 from src import config 
 from src.error import AccessError, InputError
-from datetime import datetime
+from datetime import datetime, timezone
 import time
 '''
 standup_start_v1_test.py: All functions related to testing the standup_start_v1 function
@@ -50,7 +50,7 @@ def test_successful_case(clear_and_register_channel):
         'length': 60,
     }).json()
     # calculate time_finish
-    time_finish = int(datetime.utcnow().timestamp() + 60)
+    time_finish = int(datetime.now(timezone.utc).timestamp() + 60)
     assert standup_start['time_finish'] == time_finish
 
 def test_successful_case_after_time_finish(clear_and_register_channel):
@@ -73,7 +73,7 @@ def test_successful_case_after_time_finish(clear_and_register_channel):
         'channel_id': channel_id,
         'length': 60,
     }).json()
-    time_finish = int(datetime.utcnow().timestamp() + 60)
+    time_finish = int(datetime.now(timezone.utc).timestamp() + 60)
     assert standup_start['time_finish'] == time_finish
 
 def test_invalid_channel_id(clear_and_register_channel):

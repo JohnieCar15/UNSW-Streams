@@ -1,6 +1,6 @@
 import jwt
 from src.error import AccessError
-from src.data_store import data_store, session_tracker, SECRET
+from src.data_store import data_store, session_tracker, SECRET, img_tracker
 
 
 def generate_new_session_id():
@@ -10,6 +10,14 @@ def generate_new_session_id():
     global session_tracker
     session_tracker += 1
     return session_tracker
+
+def generate_new_img_id():
+    '''
+    generate_new_img_id: Creates a new img_id when uploading a new profile photo
+    '''
+    global img_tracker
+    img_tracker += 1
+    return img_tracker
 
 def generate_jwt(user_id, session_id):
     '''

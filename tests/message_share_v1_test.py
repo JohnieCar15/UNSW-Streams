@@ -3,11 +3,17 @@ import pytest
 import requests
 from src import config
 from src.error import InputError, AccessError
-from datetime import datetime
+from datetime import datetime, timezone
 
-# Clears datastore, registers user and creates a channel (making the user a member)
+'''
+message_share_v1_test.py: All tests relating to message_share_v1 function
+'''
+
 @pytest.fixture
 def register_create_channel():
+    '''
+    Clears datastore, registers user and creates channel, making the user the owner
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -33,9 +39,11 @@ def register_create_channel():
         'valid_channel_id': channel_id
     }
 
-# Clears datastore, registers user and creates a dm (making the user a member)
 @pytest.fixture
 def register_create_dm():
+    '''
+    Clears datastore, registers user and creates dm, making the user the owner
+    '''
     requests.delete(config.url + 'clear/v1')
 
     auth_register_input = {
@@ -60,9 +68,11 @@ def register_create_dm():
         'valid_dm_id': dm_id
     }
 
-# HELPER FUNCTION
-# Sends a number of messages to specific endpoint
 def send_message(token, channel_id, length):
+    '''
+    HELPER FUNCTION
+    Sends a number of messages to specific endpoint (channel)
+    '''
     send_message_input = {
         'token' : token,
         'channel_id': channel_id,
@@ -73,7 +83,7 @@ def send_message(token, channel_id, length):
     timelist = []
 
     for _ in range (length):
-        timelist.insert(0, int(datetime.utcnow().timestamp()))
+        timelist.insert(0, int(datetime.now(timezone.utc).timestamp()))
         message_id_list.insert(0, requests.post(config.url + '/message/send/v1', json=send_message_input).json()['message_id'])
     
     return {
@@ -81,9 +91,13 @@ def send_message(token, channel_id, length):
         'message_id_list' : message_id_list
     }
 
-# HELPER FUNCTION
-# Sends a number of messages to specific endpoint
+
 def send_messagedm(token, dm_id, length):
+    '''
+    HELPER FUNCTION
+    Sends a number of messages to specific endpoint (dm)
+    '''
+
     send_messagedm_input = {
         'token' : token,
         'dm_id': dm_id,
@@ -94,7 +108,7 @@ def send_messagedm(token, dm_id, length):
     timelist = []
 
     for _ in range (length):
-        timelist.insert(0, int(datetime.utcnow().timestamp()))
+        timelist.insert(0, int(datetime.now(timezone.utc).timestamp()))
         message_id_list.insert(0, requests.post(config.url + '/message/senddm/v1', json=send_messagedm_input).json()['message_id'])
     
     return {
@@ -102,10 +116,12 @@ def send_messagedm(token, dm_id, length):
         'message_id_list' : message_id_list
     }
 
-# HELPER FUNCTION
-# Creates input for channel_messages and returns messages
-# Assumes that tests require valid input, otherwise register_create tokens/channel_ids are directly modified
 def get_messages(token, channel_id, start):
+    '''
+    HELPER FUNCTION
+    Creates input for channel_messages and returns messages
+    Assumes that tests require valid input, otherwise register_create tokens/channel_ids are directly modified
+    '''
     channel_messages_input = {
         'token' : token,
         'channel_id' : channel_id,
@@ -126,8 +142,10 @@ def test_share_channel_to_channel(register_create_channel):
         'is_public' : True
     }
 
+    # Create new channel
     new_channel_id = requests.post(config.url + '/channels/create/v2', json=new_channel_create_input).json()['channel_id']
 
+    # Send message to first channel
     messagedict = send_message(register_create_channel['valid_token'], register_create_channel['valid_channel_id'], 1)
 
     message_share_input = {
@@ -138,6 +156,7 @@ def test_share_channel_to_channel(register_create_channel):
         'dm_id': -1
     }
 
+    # Share message from first channel to new channel
     shared_message_id = requests.post(config.url + '/message/share/v1', json=message_share_input).json()['shared_message_id']
 
     channel_messages = get_messages(register_create_channel['valid_token'], new_channel_id, 0)
@@ -158,8 +177,10 @@ def test_share_channel_to_dm(register_create_dm):
         'is_public' : True
     }
 
+    # Create new channel
     new_channel_id = requests.post(config.url + '/channels/create/v2', json=new_channel_create_input).json()['channel_id']
 
+    # Send message to new channel
     messagedict = send_message(register_create_dm['valid_token'], new_channel_id, 1)
 
     message_share_input = {
@@ -170,6 +191,7 @@ def test_share_channel_to_dm(register_create_dm):
         'dm_id': register_create_dm['valid_dm_id']
     }
 
+    # Share message from new channel to DM
     shared_message_id = requests.post(config.url + 'message/share/v1', json=message_share_input).json()['shared_message_id']
 
     dm_messages_input = {
@@ -196,8 +218,10 @@ def test_share_dm_to_channel(register_create_dm):
         'is_public' : True
     }
 
+    # Create new channel
     new_channel_id = requests.post(config.url + '/channels/create/v2', json=new_channel_create_input).json()['channel_id']
 
+    # Send message to DM
     messagedict = send_messagedm(register_create_dm['valid_token'], register_create_dm['valid_dm_id'], 1)
 
     message_share_input = {
@@ -208,6 +232,7 @@ def test_share_dm_to_channel(register_create_dm):
         'dm_id': -1
     }
 
+    # Share new message from DM to new channel
     shared_message_id = requests.post(config.url + 'message/share/v1', json=message_share_input).json()['shared_message_id']
 
     channel_messages = get_messages(register_create_dm['valid_token'], new_channel_id, 0)
@@ -226,8 +251,10 @@ def test_share_dm_to_dm(register_create_dm):
         'u_ids' : []
     }
 
+    # Create new DM
     new_dm_id = requests.post(config.url + '/dm/create/v1', json=new_dm_create_input).json()['dm_id']
 
+    # Send message to old DM
     messagedict = send_messagedm(register_create_dm['valid_token'], register_create_dm['valid_dm_id'], 1)
 
     message_share_input = {
@@ -238,6 +265,7 @@ def test_share_dm_to_dm(register_create_dm):
         'dm_id': new_dm_id
     }
 
+    # Share message from old DM to new DM
     shared_message_id = requests.post(config.url + 'message/share/v1', json=message_share_input).json()['shared_message_id']
 
     dm_messages_input = {
@@ -264,8 +292,10 @@ def test_invalid_channel_id_diff(register_create_channel):
         'is_public' : True
     }
 
+    # Create new channel
     new_channel_id = requests.post(config.url + '/channels/create/v2', json=new_channel_create_input).json()['channel_id']
 
+    # Send message to new channel
     messagedict = send_message(register_create_channel['valid_token'], new_channel_id, 1)
 
     message_share_input = {
@@ -291,8 +321,10 @@ def test_invalid_channel_id_minus_one(register_create_channel):
         'is_public' : True
     }
 
+    # Create new channel
     new_channel_id = requests.post(config.url + '/channels/create/v2', json=new_channel_create_input).json()['channel_id']
 
+    # Send message to new channel
     messagedict = send_message(register_create_channel['valid_token'], new_channel_id, 1)
 
     message_share_input = {
@@ -309,9 +341,10 @@ def test_invalid_channel_id_minus_one(register_create_channel):
 
 def test_invalid_channel_id(register_create_dm):
     '''
-    Tests invalid channel id that does not exists
+    Tests invalid channel id that does not exist
     '''
 
+    # Send message to initial DM
     messagedict = send_messagedm(register_create_dm['valid_token'], register_create_dm['valid_dm_id'], 1)
 
     message_share_input = {
@@ -328,9 +361,10 @@ def test_invalid_channel_id(register_create_dm):
 
 def test_invalid_dm_id(register_create_channel):
     '''
-    Tests invalid channel id
+    Tests invalid dm id
     '''
 
+    # Send message to inital channel
     messagedict = send_message(register_create_channel['valid_token'], register_create_channel['valid_channel_id'], 1)
 
     message_share_input = {
@@ -356,8 +390,10 @@ def test_invalid_message_id_shared(register_create_channel):
         'is_public' : True
     }
 
+    # Create new channel
     new_channel_id = requests.post(config.url + '/channels/create/v2', json=new_channel_create_input).json()['channel_id']
 
+    # Send message to new channel
     messagedict = send_message(register_create_channel['valid_token'], new_channel_id, 1)
 
     message_share_input = {
@@ -382,8 +418,10 @@ def test_invalid_message_id_og(register_create_channel):
         'is_public' : True
     }
 
+    # Create new channel
     new_channel_id = requests.post(config.url + '/channels/create/v2', json=new_channel_create_input).json()['channel_id']
 
+    # Send message to old channel
     messagedict = send_message(register_create_channel['valid_token'], register_create_channel['valid_channel_id'], 1)
 
     auth_register_input = {
@@ -393,6 +431,7 @@ def test_invalid_message_id_og(register_create_channel):
         'name_last': "Last"
     }
 
+    # Register new member
     member = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
 
     channel_join_input = {
@@ -400,6 +439,7 @@ def test_invalid_message_id_og(register_create_channel):
         'channel_id' : new_channel_id
     }
 
+    # User joins new channel
     requests.post(config.url + '/channel/join/v2', json=channel_join_input)
 
     message_share_input = {
@@ -410,6 +450,7 @@ def test_invalid_message_id_og(register_create_channel):
         'dm_id': -1
     }
 
+    # Since user did not join old channel, message does not exist for them
     status = requests.post(config.url + 'message/share/v1', json=message_share_input)
 
     assert status.status_code == InputError.code 
@@ -424,8 +465,10 @@ def test_invalid_message(register_create_channel):
         'is_public' : True
     }
 
+    # Create new channel
     new_channel_id = requests.post(config.url + '/channels/create/v2', json=new_channel_create_input).json()['channel_id']
 
+    # Send message to new channel
     messagedict = send_message(register_create_channel['valid_token'], new_channel_id, 1)
 
     message_share_input = {
@@ -450,8 +493,10 @@ def test_invalid_token(register_create_channel):
         'is_public' : True
     }
 
+    # Create new channel
     new_channel_id = requests.post(config.url + '/channels/create/v2', json=new_channel_create_input).json()['channel_id']
 
+    # Send message to new channel
     messagedict = send_message(register_create_channel['valid_token'], new_channel_id, 1)
 
     message_share_input = {
@@ -477,6 +522,7 @@ def test_not_member_shared_channel(register_create_channel):
         'name_last': "Last"
     }
 
+    # Register new user
     user_id = requests.post(config.url + 'auth/register/v2', json=auth_register_input).json()
 
     new_channel_create_input = {
@@ -485,6 +531,7 @@ def test_not_member_shared_channel(register_create_channel):
         'is_public' : True
     }
 
+    # Global owner creates new channel
     new_channel_id = requests.post(config.url + '/channels/create/v2', json=new_channel_create_input).json()['channel_id']
 
     messagedict = send_message(register_create_channel['valid_token'], new_channel_id, 1)

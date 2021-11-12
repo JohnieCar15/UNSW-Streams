@@ -1,7 +1,7 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store, is_global_owner
-from datetime import datetime
+from datetime import datetime, timezone
 import threading
 import time
 
@@ -38,7 +38,7 @@ def standup_start_v1(token, channel_id, length):
     '''
     store = data_store.get()
     # calculate time_finish
-    time_finish = int(datetime.utcnow().timestamp() + (length))
+    time_finish = int(datetime.now(timezone.utc).timestamp() + (length))
     # check valid token 
     auth_user_id = validate_token(token)['user_id']
     # check valid channel id

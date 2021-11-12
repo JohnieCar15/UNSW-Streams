@@ -1,10 +1,14 @@
 import re
 import hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 from src.data_store import data_store
 from src.error import InputError
-from src import helpers
+from src import helpers, config
 
+import re
+import hashlib
+import smtplib, ssl
+from random import randint
 
 '''
 auth.py: This file contains all functions relating to auth endpoints.
@@ -108,7 +112,7 @@ def auth_register_v2(email, password, name_first, name_last):
     auth_user_id = len(store['users']) + len(store['removed_users']) + 1
     session_id = helpers.generate_new_session_id()
     token = helpers.generate_jwt(auth_user_id, session_id)
-    time_stamp = int(datetime.utcnow().timestamp())
+    time_stamp = int(datetime.now(timezone.utc).timestamp())
 
     # Add user to data store
     
@@ -121,6 +125,9 @@ def auth_register_v2(email, password, name_first, name_last):
         'handle_str': handle_str,
         'permission_id': permission_id,
         'session_list': [session_id],
+        'is_removed': False,
+        'reset_code': 0,
+        'profile_img_url': f"{config.url}images/0.jpg",
         'channels_joined': [{'num_channels_joined': 0, 'time_stamp': time_stamp}],
         'dms_joined':      [{'num_dms_joined': 0, 'time_stamp': time_stamp}],
         'messages_sent':   [{'num_messages_sent': 0, 'time_stamp': time_stamp}],
@@ -163,6 +170,66 @@ def auth_logout_v1(token):
         if user['id'] == user_id:
             user['session_list'].remove(session_id)
 
+    data_store.set(store)
+
+    return {}
+
+def auth_passwordreset_request_v1(email):
+    '''
+    TODO
+    '''
+    user_email_list = helpers.filter_data_store(store_list='users', key='email')
+
+    if email not in user_email_list:
+        return {}
+
+    port = 465  # For SSL
+    smtp_server = "smtp.gmail.com"
+    sender_email = "t13abeagle@gmail.com"  # Enter your address
+    receiver_email = "t13abeagle@gmail.com"  # Enter receiver address
+    password = "t13abeaglecs1531"
+    message = """\
+    Password Reset Code
+
+    Your password reset code is: """
+    reset_code = str(randint(10000, 99999))
+    message += reset_code
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message)
+
+    store = data_store.get()
+
+    user = helpers.filter_data_store(store_list='users', key='email', value=email)[0]
+    
+    user['reset_code'] = hashlib.sha256(reset_code.encode()).hexdigest()
+    user['session_list'] = []
+    
+    data_store.set(store)
+
+    return {}
+
+def auth_passwordreset_reset_v1(reset_code, new_password):
+    '''
+    TODO
+    '''
+    user_reset_code_list = helpers.filter_data_store(store_list='users', key='reset_code')
+
+    if hashlib.sha256(reset_code.encode()).hexdigest() not in user_reset_code_list:
+        raise InputError(description="reset_code is not a valid reset code")
+    
+    if len(new_password) < 6:
+        raise InputError(description="Password entered is less than 6 characters long")
+
+    store = data_store.get()
+
+    user = helpers.filter_data_store(store_list='users', key='reset_code', value=hashlib.sha256(reset_code.encode()).hexdigest())[0]
+
+    user['reset_code'] = 0
+    user['password'] = hashlib.sha256(new_password.encode()).hexdigest()
+    
     data_store.set(store)
 
     return {}
