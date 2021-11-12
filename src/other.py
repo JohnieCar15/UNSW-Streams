@@ -1,4 +1,6 @@
 from src.data_store import data_store
+import os
+import glob
 
 '''
 other.py: This file contains the other important functions used in the project
@@ -28,6 +30,12 @@ def clear_v1():
     store['dms_exist'] = []
     store['messages_exist'] = []
     store['users_in_channel_or_dm'] = []
+
+    files = glob.glob('src/images/*')
+    for f in files:
+        if f != "src/images/0.jpg":
+            os.remove(f)
+
     data_store.set(store)
 
     return {}

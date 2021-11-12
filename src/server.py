@@ -1,7 +1,7 @@
 import sys
 import signal
 from json import dumps
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 from src.error import InputError
 from src import config
@@ -13,7 +13,7 @@ from src.channels import channels_create_v2, channels_list_v2, channels_listall_
 from src.message import message_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1, message_share_v1, message_react_v1, message_unreact_v1, message_sendlater_v1, message_sendlaterdm_v1, message_pin_v1, message_unpin_v1
 from src.notifications import notifications_get_v1
 from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
-from src.user import user_stats_v1, users_stats_v1
+from src.user import user_stats_v1, users_stats_v1, user_profile_uploadphoto_v1
 from src.other import clear_v1
 from src.search import search_v1
 from src.standup import standup_start_v1, standup_active_v1, standup_send_v1
@@ -253,6 +253,16 @@ def user_profile_setemail_v1_ep():
 def user_profile_sethandle_v1_ep():
     data = request.get_json()
     return dumps(user_profile_sethandle_v1(data['token'], data['handle_str']))
+
+@APP.route("/user/profile/uploadphoto/v1", methods=['POST'])
+def user_profile_uploadphoto_v1_ep():
+    data = request.get_json()
+    return dumps(user_profile_uploadphoto_v1(data['token'], data['img_url'], data['x_start'], data['y_start'], data['x_end'], data['y_end']))
+
+@APP.route("/images/<path:path>")
+def send_js(path):
+    print('PATH', path)
+    return send_from_directory('images/', path)
 
 @APP.route("/admin/user/remove/v1", methods=['DELETE'])
 def admin_user_remove_v1_ep():
