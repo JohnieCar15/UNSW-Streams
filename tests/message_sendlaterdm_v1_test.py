@@ -3,7 +3,7 @@ import requests
 import time
 from src import config
 from src.error import InputError, AccessError
-from datetime import datetime
+from datetime import datetime, timezone
 
 '''
 message_sendlaterdm_v1_test.py: All tests relating to message_sendlater_v1 function
@@ -63,7 +63,7 @@ def test_normal(register_create):
         'token' : register_create['valid_token'],
         'dm_id' : register_create['valid_dm_id'],
         'message' : "Hello!",
-        'time_sent' : int(datetime.utcnow().timestamp()) + 3
+        'time_sent' : int(datetime.now(timezone.utc).timestamp()) + 3
     }
 
     message_id = requests.post(config.url + '/message/sendlaterdm/v1', json=message_sendlaterdm_input).json()['message_id']
@@ -82,7 +82,7 @@ def test_normal(register_create):
     assert dm_messages['messages'][0]['message_id'] == message_id
     assert dm_messages['messages'][0]['u_id'] == register_create['valid_user_id']
     assert dm_messages['messages'][0]['message'] == "Hello!"
-    assert abs(int(datetime.utcnow().timestamp()) - dm_messages['messages'][0]['time_created']) < 2
+    assert abs(int(datetime.now(timezone.utc).timestamp()) - dm_messages['messages'][0]['time_created']) < 2
 
 def test_send_message_inbetween(register_create):
     '''
@@ -92,7 +92,7 @@ def test_send_message_inbetween(register_create):
         'token' : register_create['valid_token'],
         'dm_id' : register_create['valid_dm_id'],
         'message' : "World!",
-        'time_sent' : int(datetime.utcnow().timestamp()) + 3
+        'time_sent' : int(datetime.now(timezone.utc).timestamp()) + 3
     }
 
     # Send a message before the sendlaterdm message is due to be sent
@@ -115,7 +115,7 @@ def test_send_message_inbetween(register_create):
     assert dm_messages['messages'][0]['message_id'] == message_id
     assert dm_messages['messages'][0]['u_id'] == register_create['valid_user_id']
     assert dm_messages['messages'][0]['message'] == "World!"
-    assert abs(int(datetime.utcnow().timestamp()) - dm_messages['messages'][0]['time_created']) < 2
+    assert abs(int(datetime.now(timezone.utc).timestamp()) - dm_messages['messages'][0]['time_created']) < 2
 
 def test_invalid_token(register_create):
     '''
@@ -125,7 +125,7 @@ def test_invalid_token(register_create):
         'token' : " ",
         'dm_id' : register_create['valid_dm_id'],
         'message' : "Hello!",
-        'time_sent' : int(datetime.utcnow().timestamp()) + 3
+        'time_sent' : int(datetime.now(timezone.utc).timestamp()) + 3
     }
 
     status = requests.post(config.url + '/message/sendlaterdm/v1', json=message_sendlaterdm_input)
@@ -140,7 +140,7 @@ def test_invalid_dm_id(register_create):
         'token' : register_create['valid_token'],
         'dm_id' : register_create['valid_dm_id'] + 1,
         'message' : "Hello!",
-        'time_sent' : int(datetime.utcnow().timestamp()) + 5
+        'time_sent' : int(datetime.now(timezone.utc).timestamp()) + 5
     }
 
     status = requests.post(config.url + '/message/sendlaterdm/v1', json=message_sendlaterdm_input)
@@ -155,7 +155,7 @@ def test_invalid_message_over_1000(register_create):
         'token' : register_create['valid_token'],
         'dm_id' : register_create['valid_dm_id'],
         'message' : 'a' * 1001,
-        'time_sent' : int(datetime.utcnow().timestamp()) + 5
+        'time_sent' : int(datetime.now(timezone.utc).timestamp()) + 5
     }
 
     status = requests.post(config.url + '/message/sendlaterdm/v1', json=message_sendlaterdm_input)
@@ -170,7 +170,7 @@ def test_invalid_message_empty(register_create):
         'token' : register_create['valid_token'],
         'dm_id' : register_create['valid_dm_id'],
         'message' : "",
-        'time_sent' : int(datetime.utcnow().timestamp()) + 5
+        'time_sent' : int(datetime.now(timezone.utc).timestamp()) + 5
     }
 
     status = requests.post(config.url + '/message/sendlaterdm/v1', json=message_sendlaterdm_input)
@@ -185,7 +185,7 @@ def test_invalid_time(register_create):
         'token' : register_create['valid_token'],
         'dm_id' : register_create['valid_dm_id'],
         'message' : "Hello!",
-        'time_sent' : int(datetime.utcnow().timestamp()) - 5
+        'time_sent' : int(datetime.now(timezone.utc).timestamp()) - 5
     }
 
     status = requests.post(config.url + '/message/sendlaterdm/v1', json=message_sendlaterdm_input)
@@ -211,7 +211,7 @@ def test_not_part_of_dm(register_create):
         'token' : user_token,
         'dm_id' : register_create['valid_dm_id'],
         'message' : "Hello!",
-        'time_sent' : int(datetime.utcnow().timestamp()) + 5
+        'time_sent' : int(datetime.now(timezone.utc).timestamp()) + 5
     }
 
     status = requests.post(config.url + '/message/sendlaterdm/v1', json=message_sendlaterdm_input)

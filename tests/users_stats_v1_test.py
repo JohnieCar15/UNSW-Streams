@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import requests
 import time
 from src import config
@@ -253,7 +253,7 @@ def test_message_sendlater_in_channel_dm_and_standup_send():
     check_users_stats_of_all_users_and_timestamp_for_specific_key(USERS, keys=['dms_exist'])
 
     # test message send later dm
-    message_sendlaterdm(user0, dm_0, '0', int(datetime.utcnow().timestamp()) + 1)
+    message_sendlaterdm(user0, dm_0, '0', int(datetime.now(timezone.utc).timestamp()) + 1)
     time.sleep(2)
     check_users_stats_of_all_users_and_timestamp_for_specific_key(USERS, keys=['messages_exist'])
 
@@ -266,7 +266,7 @@ def test_message_sendlater_in_channel_dm_and_standup_send():
     check_users_stats_of_all_users_and_timestamp_for_specific_key(USERS, keys=[])
     
     # test message send later in channel
-    message_sendlater(user0, public_0, '1', int(datetime.utcnow().timestamp()) + 1)
+    message_sendlater(user0, public_0, '1', int(datetime.now(timezone.utc).timestamp()) + 1)
     time.sleep(2)
     check_users_stats_of_all_users_and_timestamp_for_specific_key(USERS, keys=['messages_exist'])
 
@@ -322,7 +322,7 @@ def check_related_num_of_all_key_and_timestamp_for_specific_key(user, keys):
         so num_channels_exist, num_dms_exist, num_messages_exist is checked
     then check the time_stamp of specific_key
     '''
-    timestamp_now = int(datetime.utcnow().timestamp())
+    timestamp_now = int(datetime.now(timezone.utc).timestamp())
     return_dict = users_stats(user)
     check_num_of_existing_channels_dms_messages(user)
     check_utilization_rate(return_dict)

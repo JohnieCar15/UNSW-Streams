@@ -3,7 +3,7 @@ import pytest
 import requests
 from src import config
 from src.error import InputError, AccessError
-from datetime import datetime
+from datetime import datetime, timezone
 
 '''
 message_share_v1_test.py: All tests relating to message_share_v1 function
@@ -83,7 +83,7 @@ def send_message(token, channel_id, length):
     timelist = []
 
     for _ in range (length):
-        timelist.insert(0, int(datetime.utcnow().timestamp()))
+        timelist.insert(0, int(datetime.now(timezone.utc).timestamp()))
         message_id_list.insert(0, requests.post(config.url + '/message/send/v1', json=send_message_input).json()['message_id'])
     
     return {
@@ -108,7 +108,7 @@ def send_messagedm(token, dm_id, length):
     timelist = []
 
     for _ in range (length):
-        timelist.insert(0, int(datetime.utcnow().timestamp()))
+        timelist.insert(0, int(datetime.now(timezone.utc).timestamp()))
         message_id_list.insert(0, requests.post(config.url + '/message/senddm/v1', json=send_messagedm_input).json()['message_id'])
     
     return {

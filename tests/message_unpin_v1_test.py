@@ -2,7 +2,7 @@ import pytest
 import requests
 from src import config
 from src.error import InputError, AccessError
-from datetime import datetime
+from datetime import datetime, timezone
 
 '''
 message_unpin_v1_test.py: All tests relating to message_unpin_v1 function
