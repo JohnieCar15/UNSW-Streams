@@ -15,6 +15,7 @@ from src.notifications import notifications_get_v1
 from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 from src.user import user_stats_v1, users_stats_v1
 from src.other import clear_v1
+from src.search import search_v1
 from src.standup import standup_start_v1, standup_active_v1, standup_send_v1
 
 '''
@@ -284,10 +285,17 @@ def standup_active_v1_ep():
     channel_id = int(request.args.get('channel_id'))
     return dumps(standup_active_v1(token, channel_id))
 
+@APP.route("/search/v1", methods=['GET'])
+def search_v1_ep():
+    token = request.args.get('token')
+    query_str = request.args.get('query_str')
+    return dumps(search_v1(token, query_str))
+
 @APP.route("/standup/send/v1", methods=['POST'])
 def standup_send_v1_ep():
     data = request.get_json()
     return dumps(standup_send_v1(data['token'], data['channel_id'], data['message']))
+    
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear_v1_ep():
     return dumps(clear_v1())
