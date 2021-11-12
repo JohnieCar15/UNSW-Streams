@@ -8,8 +8,7 @@ users_all_v1_test.py: All functions related to testing the users_all_v1 function
 '''
 
 # define global variable for default profile_img_url
-DEFAULT_PROFILE_IMG_URL
-# DEFAULT_PROFILE_IMG_URL = ''
+DEFAULT_PROFILE_IMG_URL = f'{config.url}images/0.jpg'
 
 # clear and registers first user
 @pytest.fixture

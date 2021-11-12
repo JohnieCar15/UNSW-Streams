@@ -127,7 +127,7 @@ def auth_register_v2(email, password, name_first, name_last):
         'session_list': [session_id],
         'is_removed': False,
         'reset_code': 0,
-        'profile_img_url': f"{config.url}/images/0.jpg",
+        'profile_img_url': f"{config.url}images/0.jpg",
         'channels_joined': [{'num_channels_joined': 0, 'time_stamp': time_stamp}],
         'dms_joined':      [{'num_dms_joined': 0, 'time_stamp': time_stamp}],
         'messages_sent':   [{'num_messages_sent': 0, 'time_stamp': time_stamp}],

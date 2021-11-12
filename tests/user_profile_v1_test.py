@@ -8,10 +8,9 @@ users_profile_v1_test,py: All functions related to testing the users_profile_v1 
 '''
 
 # define global variable for default profile_img_url
-DEFAULT_PROFILE_IMG_URL
-# DEFAULT_PROFILE_IMG_URL = ''
-# clear and registers first user
+DEFAULT_PROFILE_IMG_URL = f'{config.url}images/0.jpg'
 
+# clear and registers first user
 @pytest.fixture
 def clear_and_register_user0():
     requests.delete(config.url + 'clear/v1')
