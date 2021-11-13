@@ -57,10 +57,16 @@ user = {
     'handle_str': str,
     'permission_id': int,
     'session_list': [int session_id],
-    'channels_joined': [{num_channels_joined, time_stamp}],
-    'dms_joined':      [{num_dms_joined, time_stamp}],
-    'messages_sent':   [{num_messages_sent, time_stamp}],
+    'is_removed': bool,
+    'reset_code': int,
+    'profile_img_url': str,
+    'channels_joined': [{'num_channels_joined': int, 'time_stamp': int unix timestamp}],
+    'dms_joined':      [{'num_dms_joined': int, 'time_stamp': int unix timestamp}],
+    'messages_sent':   [{'num_messages_sent': int, 'time_stamp': int unix timestamp}],
     'notifications': []
+    'user_status': str,
+    'status_manually_set': bool,
+    'standup_attending_now': [int channel_id]
 }
 
 channel = {
@@ -69,7 +75,11 @@ channel = {
     'owner': [int u_id],
     'is_public': bool,
     'members': [int u_id],
-    'messages: []
+    'messages: [],
+    'standup_active': bool,
+    'standup_messages': [], 
+    'standup_finish': None or int unix timestamp
+    'standup_attendee': [int u_id]
 }
 
 dm = {

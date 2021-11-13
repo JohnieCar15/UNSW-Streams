@@ -48,6 +48,13 @@ def auth_login_v2(email, password):
             if user['password'] == hashlib.sha256(password.encode()).hexdigest():
                 session_id = helpers.generate_new_session_id()
 
+                # if there is no session before this login
+                # set user_status to 'available'
+                if len(user['session_list']) == 0:
+                    user['user_status'] = 'available'
+                    user['status_manually_set'] = False
+                # update the timestamp for user's last opration
+                user['last_opration_time_stamp'] = int(datetime.now(timezone.utc).timestamp())
                 user['session_list'].append(session_id)
 
                 data_store.set(store)
@@ -131,7 +138,11 @@ def auth_register_v2(email, password, name_first, name_last):
         'channels_joined': [{'num_channels_joined': 0, 'time_stamp': time_stamp}],
         'dms_joined':      [{'num_dms_joined': 0, 'time_stamp': time_stamp}],
         'messages_sent':   [{'num_messages_sent': 0, 'time_stamp': time_stamp}],
-        'notifications': []
+        'notifications': [],
+        'user_status': 'available',
+        'status_manually_set': False,
+        'standup_attending_now': [],
+        'last_opration_time_stamp': time_stamp
     }
 
     store['users'].append(user_dict)
@@ -169,6 +180,11 @@ def auth_logout_v1(token):
     for user in store['users']:
         if user['id'] == user_id:
             user['session_list'].remove(session_id)
+            # when the user has logout for all sessions
+            # set the user_status to 'offline'
+            if len(user['session_list']) == 0:
+                user['user_status'] = 'offline'
+                user['status_manually_set'] = False
 
     data_store.set(store)
 
