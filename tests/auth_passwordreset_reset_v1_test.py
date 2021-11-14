@@ -6,9 +6,14 @@ from src.error import InputError
 import re
 import imaplib
 import email
-
+'''
+auth_passwordreset_reset_v1_test.py: All functions related to testing the auth_passwordreset_reset_v1 function
+'''
 @pytest.fixture()
 def clear_and_request():
+    '''
+    Clears the datastore, registers a user, then requests a password reset
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -43,6 +48,9 @@ def clear_and_request():
     return reset_code
 
 def test_auth_passwordreset_reset_v1(clear_and_request):
+    '''
+    Tests if valid reset_code changes password of user
+    '''
     reset_code = clear_and_request
 
     requests.post(config.url + 'auth/passwordreset/reset/v1', json={'reset_code': reset_code, 'new_password': 'thisisatest'})
@@ -57,6 +65,9 @@ def test_auth_passwordreset_reset_v1(clear_and_request):
     assert login_return.status_code == 200
 
 def test_invalid_reset_code():
+    '''
+    Tests if invalid reset_code raises error
+    '''
     requests.delete(config.url + '/clear/v1')
 
     reset_return = requests.post(config.url + 'auth/passwordreset/reset/v1', json={'reset_code': '-1', 'new_password': 'aaaaaa'})
@@ -64,6 +75,9 @@ def test_invalid_reset_code():
     assert reset_return.status_code == InputError.code
 
 def test_short_password(clear_and_request):
+    '''
+    Tests if short passworrd raises error
+    '''
     reset_code = clear_and_request
 
     reset_return = requests.post(config.url + 'auth/passwordreset/reset/v1', json={'reset_code': reset_code, 'new_password': 'a'})
