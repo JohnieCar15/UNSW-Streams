@@ -5,7 +5,7 @@ from src import config
 from src.error import AccessError
 
 '''
-users_stats_v1_test,py: All functions related to testing the users_stats_v1 function
+users_stats_v1_test.py: All functions related to testing the users_stats_v1 function
 
 the test function:
     test_invalid_user_token()

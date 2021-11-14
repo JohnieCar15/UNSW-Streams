@@ -17,6 +17,7 @@ from src.user import user_stats_v1, users_stats_v1, user_profile_uploadphoto_v1
 from src.other import clear_v1
 from src.search import search_v1
 from src.standup import standup_start_v1, standup_active_v1, standup_send_v1
+from src.extra import user_status_v1, user_setstatus_v1 
 
 '''
 server.py: This file contains all functions relating to the http endpoints.
@@ -324,6 +325,21 @@ def clear_v1_ep():
 def notifications_get_v1_ep():
     token = request.args.get('token')
     return dumps(notifications_get_v1(token))
+
+# Added for bonus feature
+@APP.route("/user/status/v1", methods=['GET'])
+def user_status_v1_ep():
+    token = request.args.get('token')
+    u_id = int(request.args.get('u_id'))
+    return dumps(user_status_v1(token, u_id))
+
+# Added for bonus feature
+@APP.route("/user/setstatus/v1", methods=['PUT'])
+def user_setstatus_v1_ep():
+    data = request.get_json()
+    return dumps(user_setstatus_v1(data['token'], data['user_status']))
+
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
