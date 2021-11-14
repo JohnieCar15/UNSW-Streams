@@ -106,7 +106,8 @@ def standup_end(channel_dict, auth_user_id, time_finish):
 
     message_store = {
         'message': standup_message,
-        'channel_id': channel_dict['id']
+        'channel_id': channel_dict['id'],
+        'is_dm': False
     }
 
     channel_dict['messages'].insert(0, standup_message)
