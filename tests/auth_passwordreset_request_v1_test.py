@@ -3,12 +3,14 @@ import requests
 
 from src import config
 from src.error import AccessError
+
 '''
 auth_passwordreset_request_v1_test.py: All functions related to testing the auth_passwordreset_request_v1 function
 '''
+
 def test_auth_passwordreset_request_v1():
     '''
-    Tests if valid input gives correct output
+    Success case of requesting a password reset with a valid user
     '''
     requests.delete(config.url + '/clear/v1')
 
@@ -31,7 +33,7 @@ def test_auth_passwordreset_request_v1():
 
 def test_invalid_email():
     '''
-    Tests if invalid email does not raise error and instead does nothing
+    Error case of passing in an invalid email
     '''
     requests.delete(config.url + '/clear/v1')
 

@@ -7,15 +7,18 @@ from src.error import AccessError
 channels_list_v2_test.py: All functions related to testing the channels_list_v2 function
 '''
 
-# Help functions:
 
-# Sorts list of channels by channel_id
 def sort_list(channel_list):
+    '''
+    Sorts list of channels by channel_id
+    '''
     return sorted(channel_list, key=lambda k: k['channel_id'])
 
 
-# register a user and return {"token": token, "auth_user_id": u_id}
 def user_register(email, password, name_first, name_last):
+    '''
+    register a user and return {"token": token, "auth_user_id": u_id}
+    '''
     input = {
         "email" : email,
         "password" : password,
@@ -24,8 +27,10 @@ def user_register(email, password, name_first, name_last):
     }
     return requests.post(config.url + 'auth/register/v2', json=input).json()
 
-# create a channel and return {"channel_id": channel_id}
 def channel_create(creator, name, is_public):
+    '''
+    create a channel and return {"channel_id": channel_id}
+    '''
     input = {
         "token": creator["token"],
         'name': name,
@@ -33,8 +38,10 @@ def channel_create(creator, name, is_public):
     }
     return requests.post(config.url + 'channels/create/v2', json=input).json()
 
-# invite a user to channel
 def channel_invite(inviter, channel, invitee):
+    '''
+    invite a user to channel
+    '''
     input = {
         "token": inviter["token"],
         "channel_id": channel["channel_id"],
@@ -42,18 +49,20 @@ def channel_invite(inviter, channel, invitee):
     }
     requests.post(config.url + 'channel/invite/v2', json=input)
 
-# invite a user to channel, return {channels that user belongs to}
 def channels_list(user):
+    '''
+    invite a user to channel, return {channels that user belongs to}
+    '''
     return requests.get(config.url + 'channels/list/v2', params={"token": user["token"]}).json()
 
 
-# this function will create two channels: public_0 and private_0
-# and register four users: 
-# public_0 owner, public_0, member,
-# private_0 owner, private_0 member,
-# then return all users and channels created by it
 @pytest.fixture
 def clear_then_create_public0_and_private0():
+    '''
+    this function will create two channels: public_0 and private_0 and register four users: 
+      public_0 owner, public_0, member, private_0 owner, private_0 member,
+      then return all users and channels created by it
+    '''
     requests.delete(config.url + 'clear/v1')
     # register public_0_owner and create channel public_0
 
@@ -96,13 +105,17 @@ def clear_then_create_public0_and_private0():
 # test_complex_case
 
 
-# test invalid token and this should raise AccessError 
 def test_invalid_user_id():
+    '''
+    test invalid token and this should raise AccessError 
+    '''
     requests.delete(config.url + 'clear/v1')
     assert requests.get(config.url + 'channels/list/v2', params={"token": "invalid"}).status_code == AccessError.code
 
 def test_valid_user_not_in_any_channel():
-    # create a user who is not in any channel
+    '''
+    create a user who is not in any channel
+    '''
     requests.delete(config.url + 'clear/v1')
     user_in_no_channels = user_register("0000@unsw.edu.au", "password", "firstname0", "lastname0")
     assert channels_list(user_in_no_channels) == {'channels': []}

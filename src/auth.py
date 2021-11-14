@@ -48,6 +48,13 @@ def auth_login_v2(email, password):
             if user['password'] == hashlib.sha256(password.encode()).hexdigest():
                 session_id = helpers.generate_new_session_id()
 
+                # Added for bonus feature
+                # if there is no session before this login, set user_status to 'available'
+                if len(user['session_list']) == 0:
+                    user['user_status'] = 'available'
+                    user['status_manually_set'] = False
+                # update the timestamp for user's last action
+                user['last_action_time_stamp'] = int(datetime.now(timezone.utc).timestamp())
                 user['session_list'].append(session_id)
 
                 data_store.set(store)
@@ -126,12 +133,16 @@ def auth_register_v2(email, password, name_first, name_last):
         'permission_id': permission_id,
         'session_list': [session_id],
         'is_removed': False,
-        'reset_code': 0,
+        'reset_code': '0',
         'profile_img_url': f"{config.url}images/0.jpg",
         'channels_joined': [{'num_channels_joined': 0, 'time_stamp': time_stamp}],
         'dms_joined':      [{'num_dms_joined': 0, 'time_stamp': time_stamp}],
         'messages_sent':   [{'num_messages_sent': 0, 'time_stamp': time_stamp}],
-        'notifications': []
+        'notifications': [],
+        'user_status': 'available',  # Field added for bonus feature
+        'status_manually_set': False,  # Field added for bonus feature
+        'standup_attending_now': [],  # Field added for bonus feature
+        'last_action_time_stamp': time_stamp  # Field added for bonus feature
     }
 
     store['users'].append(user_dict)
@@ -169,6 +180,11 @@ def auth_logout_v1(token):
     for user in store['users']:
         if user['id'] == user_id:
             user['session_list'].remove(session_id)
+            # Added for bonus feature
+            # When the user has logout for all sessions, set the user_status to 'offline'
+            if len(user['session_list']) == 0:
+                user['user_status'] = 'offline'
+                user['status_manually_set'] = False
 
     data_store.set(store)
 
@@ -195,13 +211,13 @@ def auth_passwordreset_request_v1(email):
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
     sender_email = "t13abeagle@gmail.com"  # Enter your address
-    receiver_email = "t13abeagle@gmail.com"  # Enter receiver address
+    receiver_email = email  # Enter receiver address
     password = "t13abeaglecs1531"
     message = """\
     Password Reset Code
 
     Your password reset code is: """
-    reset_code = str(randint(10000, 99999))
+    reset_code = str(randint(100000, 999999))
     message += reset_code
 
     context = ssl.create_default_context()
@@ -247,7 +263,7 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
 
     user = helpers.filter_data_store(store_list='users', key='reset_code', value=hashlib.sha256(reset_code.encode()).hexdigest())[0]
 
-    user['reset_code'] = 0
+    user['reset_code'] = '0'
     user['password'] = hashlib.sha256(new_password.encode()).hexdigest()
     
     data_store.set(store)

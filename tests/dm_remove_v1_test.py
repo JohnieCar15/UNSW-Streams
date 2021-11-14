@@ -4,7 +4,14 @@ import requests
 from src import config
 from src.error import InputError, AccessError
 
+'''
+dm_remove_v1_test.py: All functions related to testing the dm_remove_v1 function 
+'''
+
 def test_dm_remove_v1():
+    '''
+    Successful case of removing a dm
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -42,6 +49,9 @@ def test_dm_remove_v1():
     assert details_return.status_code == InputError.code
 
 def test_invalid_dm_id():
+    '''
+    Error case of passing in an invalid dm_id
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -58,6 +68,9 @@ def test_invalid_dm_id():
     assert remove_return.status_code == InputError.code
 
 def test_unauthorised_user():
+    '''
+    Error case of unauthorised user trying to delete dm
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -87,6 +100,9 @@ def test_unauthorised_user():
     assert remove_return.status_code == AccessError.code
 
 def test_invalid_token_valid_dm_id():
+    '''
+    Error case of passing invalid token with valid dm_id
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -114,6 +130,9 @@ def test_invalid_token_valid_dm_id():
     assert remove_return.status_code == AccessError.code
 
 def test_invalid_token_invalid_dm_id():
+    '''
+    Error case of passing invalid token and invalid dm_id
+    '''
     requests.delete(config.url + '/clear/v1')
 
     remove_return = requests.delete(config.url + 'dm/remove/v1', json={'token': '', 'dm_id': ''})

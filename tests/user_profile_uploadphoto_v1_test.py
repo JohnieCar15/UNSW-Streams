@@ -3,13 +3,15 @@ import requests
 
 from src import config
 from src.error import InputError, AccessError
+
 '''
 user_profile_uploadphoto_v1_test.py: All functions related to testing the user_profile_uploadphoto_v1 function
 '''
+
 @pytest.fixture
 def clear_and_register():
     '''
-    Clears datastore then registers a user
+    Clearing datastore and registering user
     '''
     requests.delete(config.url + 'clear/v1')
     register = requests.post(config.url + 'auth/register/v2', json={'email': 'yes@yes.com', 'password': 'aaaaaa', 'name_first': "firstname", "name_last": "lastname"})
@@ -19,7 +21,7 @@ def clear_and_register():
 
 def test_user_profile_uploadphoto_v1(clear_and_register):
     '''
-    Tests if valid input gives correct output
+    Successful case of uploading and cropping a photo
     '''
     token = clear_and_register
 
@@ -38,7 +40,7 @@ def test_user_profile_uploadphoto_v1(clear_and_register):
 
 def test_invalid_token():
     '''
-    Tests if invalid token raises error
+    Error case of passing an invalid token
     '''
     requests.delete(config.url + 'clear/v1')
 
@@ -57,7 +59,7 @@ def test_invalid_token():
 
 def test_invalid_img_url(clear_and_register):
     '''
-    Tests if invalid img_url raises error
+    Error case of an invalid image url
     '''
     token = clear_and_register
 
@@ -76,7 +78,7 @@ def test_invalid_img_url(clear_and_register):
 
 def test_https_img_url(clear_and_register):
     '''
-    Tests if https img_url works with function
+    Testing case of https img url
     '''
     token = clear_and_register
 
@@ -95,7 +97,7 @@ def test_https_img_url(clear_and_register):
 
 def test_invalid_x_start(clear_and_register):
     '''
-    Tests if invalid x_start raises error
+    Error case of invalid x start coordinate
     '''
     token = clear_and_register
 
@@ -114,7 +116,7 @@ def test_invalid_x_start(clear_and_register):
 
 def test_invalid_y_start(clear_and_register):
     '''
-    Tests if invalid y_start raises error
+    Error case of invalid y start coordinate
     '''
     token = clear_and_register
 
@@ -133,7 +135,7 @@ def test_invalid_y_start(clear_and_register):
 
 def test_invalid_x_end(clear_and_register):
     '''
-    Tests if invalid x_end raises error
+    Error case of invalid x end coordinate
     '''
     token = clear_and_register
 
@@ -152,7 +154,7 @@ def test_invalid_x_end(clear_and_register):
 
 def test_invalid_y_end(clear_and_register):
     '''
-    Tests if invalid y_end raises error
+    Error case of invalid y end coordinate
     '''
     token = clear_and_register
 
@@ -171,7 +173,7 @@ def test_invalid_y_end(clear_and_register):
 
 def test_x_end_less_than_x_start(clear_and_register):
     '''
-    Tests if invalid x crop raises error
+    Error case of invalid x start and end coordinates
     '''
     token = clear_and_register
 
@@ -190,7 +192,7 @@ def test_x_end_less_than_x_start(clear_and_register):
 
 def test_y_end_less_than_y_start(clear_and_register):
     '''
-    Tests if invalid y crop raises error
+    Error case of invalid y start and end coordinates
     '''
     token = clear_and_register
 
@@ -209,7 +211,7 @@ def test_y_end_less_than_y_start(clear_and_register):
 
 def test_img_not_jpg(clear_and_register):
     '''
-    Tests if none jpg image raises error
+    Error case of non jpg image
     '''
     token = clear_and_register
 

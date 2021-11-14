@@ -4,8 +4,14 @@ import requests
 from src import config
 from src.error import InputError
 
-# Test if function works when given correct input
+'''
+auth_register_v2_test.py: All functions related to testing the auth_register_v2 function
+'''
+
 def test_auth_register_v2():
+    '''
+    Test if function works when given correct input
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -28,8 +34,10 @@ def test_auth_register_v2():
     assert register_return.json()['auth_user_id'] == login_return['auth_user_id']
     assert register_return.json()['token'] != login_return['token']
 
-# Test if function is given an invalid email
 def test_invalid_email():
+    '''
+    Test if function is given an invalid email
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -43,8 +51,10 @@ def test_invalid_email():
 
     assert register_return.status_code == InputError.code
 
-# Test if function is given an email that has already been registered
 def test_registered_email():
+    '''
+    Test if function is given an email that has already been registered
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -60,8 +70,10 @@ def test_registered_email():
 
     assert register_return.status_code == InputError.code
 
-# Test if function is given a password < 6 chracters
 def test_short_password():
+    '''
+    Test if function is given a password < 6 chracters
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -75,8 +87,10 @@ def test_short_password():
 
     assert register_return.status_code == InputError.code
 
-# Test if function is given a first name < 1 character
 def test_short_firstname():
+    '''
+    Test if function is given a first name < 1 character
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -90,8 +104,10 @@ def test_short_firstname():
 
     assert register_return.status_code == InputError.code
 
-# Test if function is given a first name > 50 characters
 def test_long_firstname():
+    '''
+    Test if function is given a first name > 50 characters
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -105,8 +121,10 @@ def test_long_firstname():
 
     assert register_return.status_code == InputError.code
 
-# Test if function is given a last name < 1 character
 def test_short_lastname():
+    '''
+    Test if function is given a last name < 1 character
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -120,8 +138,10 @@ def test_short_lastname():
 
     assert register_return.status_code == InputError.code
 
-# Test if function is given a last name > 50 characters
-def test_long_lastname(): 
+def test_long_lastname():
+    '''
+    Test if function is given a last name > 50 characters
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -135,8 +155,10 @@ def test_long_lastname():
 
     assert register_return.status_code == InputError.code
 
-# Test if function is given a first name and last name that do not contain alphanumeric characters
 def test_no_alphanumeric_characters():
+    '''
+    Test if function is given a first name and last name that do not contain alphanumeric characters
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -150,8 +172,10 @@ def test_no_alphanumeric_characters():
 
     assert register_return.status_code == InputError.code
 
-# Test if function generates correct handle
 def test_handle():
+    '''
+    Test if function generates correct handle
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -170,8 +194,10 @@ def test_handle():
 
     assert handle == "firstlast"
 
-# Test if function generates correct handle when given numeric first and last names
 def test_handle_numeric():
+    '''
+    Test if function generates correct handle when given numeric first and last names
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -190,8 +216,10 @@ def test_handle_numeric():
 
     assert handle == "1234512345"
 
-# Test if function generates correct handle when given uppercase first an last names
 def test_handle_uppercase():
+    '''
+    Test if function generates correct handle when given uppercase first an last names
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -210,8 +238,10 @@ def test_handle_uppercase():
 
     assert handle == "firstlast"
 
-# Test if function generates correct handle when the same handle already exists
 def test_double_handles():
+    '''
+    Test if function generates correct handle when the same handle already exists
+    '''
     requests.delete(config.url + '/clear/v1')
 
     requests.post(config.url + 'auth/register/v2', json={
@@ -237,8 +267,10 @@ def test_double_handles():
 
     assert handle == "firstlast0"
 
-# Test if function generates correct handle if multiple of the same handle already exist
 def test_multiple_handles():
+    '''
+    Test if function generates correct handle if multiple of the same handle already exist
+    '''
     requests.delete(config.url + '/clear/v1')
 
     requests.post(config.url + 'auth/register/v2', json={
@@ -270,8 +302,10 @@ def test_multiple_handles():
 
     assert handle == "firstlast1"
 
-# Test if function generates handle firstlast00 when given name_first: first, name_last: last0, and firstlast0 already exists
 def test_numeric_last_char():
+    '''
+    Test if function generates handle firstlast00 when given name_first: first, name_last: last0, and firstlast0 already exists
+    '''
     requests.delete(config.url + '/clear/v1')
 
     requests.post(config.url + 'auth/register/v2', json={
@@ -303,8 +337,10 @@ def test_numeric_last_char():
 
     assert handle == "firstlast00"
 
-# Test if function generates correct handle when more than 10 of the same handle exist
 def test_13_duplicate_handles():
+    '''
+    Test if function generates correct handle when more than 10 of the same handle exist
+    '''
     requests.delete(config.url + '/clear/v1')
     requests.post(config.url + 'auth/register/v2', json={
         'email': 'valid@gmail.com',

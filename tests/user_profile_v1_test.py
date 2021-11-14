@@ -4,15 +4,17 @@ from src import config
 from src.error import AccessError, InputError
 
 '''
-users_profile_v1_test,py: All functions related to testing the users_profile_v1 function
+users_profile_v1_test.py: All functions related to testing the users_profile_v1 function
 '''
 
 # define global variable for default profile_img_url
 global DEFAULT_PROFILE_IMG_URL
 
-# clear and registers first user
 @pytest.fixture
 def clear_and_register_user0():
+    '''
+    clear and registers first user
+    '''
     requests.delete(config.url + 'clear/v1')
     user0_register = {
         'email' : '0000@unsw.edu.au',
@@ -34,8 +36,10 @@ def clear_and_register_user0():
     }
 
 
-# test invalid token with invalid uid, this should raise AccessError
 def test_invalid_token_and_invalid_uid(clear_and_register_user0):
+    '''
+    test invalid token with invalid uid, this should raise AccessError
+    '''
     user0 = clear_and_register_user0
     info = {
         'token': user0['token_valid'] + '1',
@@ -43,8 +47,10 @@ def test_invalid_token_and_invalid_uid(clear_and_register_user0):
     }
     assert requests.get(config.url + 'user/profile/v1', params=info).status_code == AccessError.code
     
-# test invalid token with valid uid, and this should raise AccessError
 def test_invaild_token_and_valid_uid(clear_and_register_user0):
+    '''
+    test invalid token with valid uid, and this should raise AccessError
+    '''
     user0 = clear_and_register_user0
     info = {
         'token': user0['token_valid'] + '1',
@@ -52,8 +58,10 @@ def test_invaild_token_and_valid_uid(clear_and_register_user0):
     }
     assert requests.get(config.url + 'user/profile/v1', params=info).status_code == AccessError.code
 
-# test invalid uid and this should raise InputError
 def test_vaild_token_and_invalid_uid(clear_and_register_user0):
+    '''
+    test invalid uid and this should raise InputError
+    '''
     user0 = clear_and_register_user0
     info = {
         'token': user0['token_valid'],
@@ -61,8 +69,10 @@ def test_vaild_token_and_invalid_uid(clear_and_register_user0):
     }
     assert requests.get(config.url + 'user/profile/v1', params=info).status_code == InputError.code
 
-# test a user with valid token and valid uid
 def test_vaild_token_with_one_user_registered(clear_and_register_user0):
+    '''
+    test a user with valid token and valid uid
+    '''
     user0 = clear_and_register_user0
     info = {
         'token': user0['token_valid'],
@@ -77,8 +87,10 @@ def test_vaild_token_with_one_user_registered(clear_and_register_user0):
         'profile_img_url': DEFAULT_PROFILE_IMG_URL}
     }
     
-# test user with valid token and valid uid, and called by others
 def test_call_others_uid(clear_and_register_user0):
+    '''
+    test user with valid token and valid uid, and called by others
+    '''
     user0 = clear_and_register_user0
     user1_register = {
         'email' : '0001@unsw.edu.au',

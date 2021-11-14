@@ -57,10 +57,16 @@ user = {
     'handle_str': str,
     'permission_id': int,
     'session_list': [int session_id],
-    'channels_joined': [{num_channels_joined, time_stamp}],
-    'dms_joined':      [{num_dms_joined, time_stamp}],
-    'messages_sent':   [{num_messages_sent, time_stamp}],
+    'is_removed': bool,
+    'reset_code': int,
+    'profile_img_url': str,
+    'channels_joined': [{'num_channels_joined': int, 'time_stamp': int unix timestamp}],
+    'dms_joined':      [{'num_dms_joined': int, 'time_stamp': int unix timestamp}],
+    'messages_sent':   [{'num_messages_sent': int, 'time_stamp': int unix timestamp}],
     'notifications': []
+    'user_status': str,
+    'status_manually_set': bool,
+    'standup_attending_now': [int channel_id]
 }
 
 channel = {
@@ -69,7 +75,11 @@ channel = {
     'owner': [int u_id],
     'is_public': bool,
     'members': [int u_id],
-    'messages: []
+    'messages: [],
+    'standup_active': bool,
+    'standup_messages': [], 
+    'standup_finish': None or int unix timestamp
+    'standup_attendee': [int u_id]
 }
 
 dm = {
@@ -128,12 +138,12 @@ data_store = Datastore()
 
 def update_store(store, user=None, key=None, key_value=None, user_value=None):
     '''
-    This helper fuction is used for user_stats and users_stats
+    This helper function is used for user_stats and users_stats
     it will be callled with data_store.set(store, user, key, value, user_value), when there is a change
     of user's num_channels_joined/dms_joined/messages_sent or the total num of channels/dms/messages,
     and update the store
 
-    Note that this fonction should not be put in helpers.py,
+    Note that this function should not be put in helpers.py,
     bacause it will raise circular import as the other functions in it import data_store
 
     # channels_create will return (store, user, key='channel', key_value=1, user_value=1)
@@ -158,7 +168,7 @@ def update_store(store, user=None, key=None, key_value=None, user_value=None):
     }
     new_key = key_dict[key]
 
-    # some of fucntion will return user as a u_id, others will return a list of u_id
+    # some of functions will return user as a u_id, others will return a list of u_id
     # turn all of them to be list, and loop through
     user = [user] if type(user) != list else user
     for u_id in user:
@@ -187,7 +197,7 @@ def update_num_channels_dms_joined_or_message_sent(store, u_id, new_key, user_va
     update channels_dms_joined and messages_sent of specific user
     '''
     # if message_remove is called, user_value == -1
-    # but in this case the num_messages_sent by uesr will not change
+    # but in this case the num_messages_sent by user will not change
     if new_key == 'messages_sent' and user_value < 0:
         return
 

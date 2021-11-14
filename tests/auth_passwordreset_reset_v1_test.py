@@ -6,13 +6,15 @@ from src.error import InputError
 import re
 import imaplib
 import email
+
 '''
 auth_passwordreset_reset_v1_test.py: All functions related to testing the auth_passwordreset_reset_v1 function
 '''
+
 @pytest.fixture()
 def clear_and_request():
     '''
-    Clears the datastore, registers a user, then requests a password reset
+    Clearing datastore and registerring a new user
     '''
     requests.delete(config.url + '/clear/v1')
 
@@ -49,7 +51,7 @@ def clear_and_request():
 
 def test_auth_passwordreset_reset_v1(clear_and_request):
     '''
-    Tests if valid reset_code changes password of user
+    Success case of resetting a user's password
     '''
     reset_code = clear_and_request
 
@@ -66,7 +68,7 @@ def test_auth_passwordreset_reset_v1(clear_and_request):
 
 def test_invalid_reset_code():
     '''
-    Tests if invalid reset_code raises error
+    Error case of resetting a user's password with invalid reset code
     '''
     requests.delete(config.url + '/clear/v1')
 
@@ -76,7 +78,7 @@ def test_invalid_reset_code():
 
 def test_short_password(clear_and_request):
     '''
-    Tests if short passworrd raises error
+    Error case of resetting a user's password with invalid new password
     '''
     reset_code = clear_and_request
 

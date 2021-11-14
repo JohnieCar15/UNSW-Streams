@@ -2,7 +2,7 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helpers import validate_token, filter_data_store, is_global_owner
 '''
-search.py: This file contains the function search endpoints.
+search.py: This file contains the search_v1 function.
 
 Functions:
     - search_v1(token, query_str)
@@ -45,6 +45,11 @@ def search_v1(token, query_str):
         for message in dm['messages']:
             if query_str in message['message']:
                 messages_list.append(message)
+
+    for message in messages_list:
+        for react in message['reacts']:
+            react['is_this_user_reacted'] = True if auth_user_id in react['u_ids'] else False
+
     data_store.set(store)
     # return messages list
     return {'messages': messages_list}
