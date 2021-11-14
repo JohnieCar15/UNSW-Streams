@@ -74,7 +74,7 @@ Any Streams user can set their user status at any time. In certain cases, a user
     * when a user has registered or logged in
     * after the user has finished all standups, except the user set status during the standup he/her attended.
 * Set to 'away':
-    * after an hour of the user's last action, excluding cases when the user's status is set to 'offline' or 'busy'.
+    * after an hour (now set to 5 seconds for testing on CSE machine) of the user's last action, excluding cases when the user's status is set to 'offline' or 'busy'.
 * Set to 'busy':
     * after a user joins an active standup (by starting a standup or send a message in an active standup).
 * Set to 'offline':

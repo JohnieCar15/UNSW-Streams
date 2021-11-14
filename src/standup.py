@@ -97,13 +97,18 @@ def standup_end(channel_dict, auth_user_id, time_finish):
     channel_dict['standup_finish'] = None
     # loop for all the attendee of the standup
     for user_id in channel_dict['standup_attendee']:
+        #print(data_store.get())
+        #print(channel_dict['standup_attendee'])
+        #print(user_id)
+        #print(filter_data_store(store_list='users',key='id',value=user_id))
         user = filter_data_store(store_list='users',key='id',value=user_id)[0]
         # remove the channel_id form user's standup_attending_now list
-        user['standup_attending_now'].remove(channel_dict['id'])
+        if channel_dict['id'] in user['standup_attending_now']:
+            user['standup_attending_now'].remove(channel_dict['id'])
         # if the user is not in any standup and not set status during any standups
         # set user_status to be 'available'
         if len(user['standup_attending_now']) == 0 and user['user_status'] == 'busy' \
-                                                and user['status_manually_set'] == False:
+                                            and user['status_manually_set'] == False:
             user['user_status'] = 'available'
             user['status_manually_set'] = False
 

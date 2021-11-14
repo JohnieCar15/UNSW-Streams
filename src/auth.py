@@ -53,8 +53,8 @@ def auth_login_v2(email, password):
                 if len(user['session_list']) == 0:
                     user['user_status'] = 'available'
                     user['status_manually_set'] = False
-                # update the timestamp for user's last opration
-                user['last_opration_time_stamp'] = int(datetime.now(timezone.utc).timestamp())
+                # update the timestamp for user's last action
+                user['last_action_time_stamp'] = int(datetime.now(timezone.utc).timestamp())
                 user['session_list'].append(session_id)
 
                 data_store.set(store)
@@ -142,7 +142,7 @@ def auth_register_v2(email, password, name_first, name_last):
         'user_status': 'available',
         'status_manually_set': False,
         'standup_attending_now': [],
-        'last_opration_time_stamp': time_stamp
+        'last_action_time_stamp': time_stamp
     }
 
     store['users'].append(user_dict)
@@ -182,6 +182,7 @@ def auth_logout_v1(token):
             user['session_list'].remove(session_id)
             # when the user has logout for all sessions
             # set the user_status to 'offline'
+            
             if len(user['session_list']) == 0:
                 user['user_status'] = 'offline'
                 user['status_manually_set'] = False

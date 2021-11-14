@@ -47,8 +47,8 @@ def user_status_v1(token, u_id):
     if user == []:
         raise InputError(description="Invalid u_id")
     
-    # set the time need (in seconds) for user_status to be 'away' after the user's last opration
-    time_need_to_be_away = 5
+    # set the time need (in seconds) for user_status to be 'away' after the user's last action
+    time_need_to_be_away = 5 # 5 sconds for test, 3600 (one hour) in real case
 
     # get user_status
     user_status = get_status(user[0], time_need_to_be_away)
@@ -98,10 +98,10 @@ def user_setstatus_v1(token, user_status):
 # helper fuunctions:
 def get_status(user, time_need_to_be_away):
     user_status = user['user_status']
-    # if now is more than and including an hour after the user's last opration
+    # if now is more than and including an hour after the user's last action
     # set the user_status to be 'away', except the user is 'offline' or 'busy'
     if user['user_status'] != 'offline' and user['user_status'] != 'busy'\
-        and (int(datetime.now(timezone.utc).timestamp()) - user['last_opration_time_stamp']) >= time_need_to_be_away:
+        and (int(datetime.now(timezone.utc).timestamp()) - user['last_action_time_stamp']) >= time_need_to_be_away:
         user['user_status'] = 'away'
         user_status = user['user_status']
     return user_status

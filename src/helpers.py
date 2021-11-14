@@ -75,7 +75,7 @@ def is_global_owner(u_id):
 
 def update_user_status(user_id):
     '''
-    update_user_status: update timestamp for user's last opration,
+    update_user_status: update timestamp for user's last action,
     if the latest user_status is 'away', srt it to 'available'
     
     This dunction will be called in validate_token(encoded_jwt), since all functions calls validate_token(encoded_jwt)
@@ -88,6 +88,6 @@ def update_user_status(user_id):
                * no need to update timestamp
     '''
     user = filter_data_store(store_list='users', key='id', value=user_id)[0]
-    user['last_opration_time_stamp'] = int(datetime.now(timezone.utc).timestamp())
+    user['last_action_time_stamp'] = int(datetime.now(timezone.utc).timestamp())
     # if the latest user_status is 'away', srt it to 'available'
     user['user_status'] = 'available' if user['user_status'] == 'away' else user['user_status']

@@ -151,18 +151,18 @@ def test_status_in_and_after_standup(clear_and_register_user0):
     time.sleep(2)
     assert user_status(user1, user0)['user_status'] == 'be right back'
 
+    
+def test_one_hour_after_last_action(clear_and_register_user0):
     '''
-def test_one_hour_after_last_opration(clear_and_register_user0):
-    '''
-    #test if user_status become 'away' one_hour_after_last_opration
-    #test if user_status become 'available' again, after the user is back
-    #    by do an opration after be 'away'
-    #
-    #!!! NOTE this test can not be running due to the time limit on SEC machine
-    #And this will decrease the code coverage.
-    #But this test has be done by setting the time needed to become 'away' be 5s 
-    #    to do the test with smaller time gap change line 177 time.sleep(3600) in this test,
-    #    and change 'time_need_to_be_away' at line 51 in extra.py
+    test if user_status become 'away' one_hour_after_last_action
+    test if user_status become 'available' again, after the user is back
+        by do an action after be 'away'
+    
+    !!! NOTE this test can not be running due to the time limit on SEC machine
+    And this will decrease the code coverage.
+    But this test has be done by setting the time needed to become 'away' be 5s 
+        to do the test with smaller time gap change line 177 time.sleep(3600) in this test,
+        and change 'time_need_to_be_away' at line 51 in extra.py
     '''
     # test the status after register user0 and user1
     user0 = clear_and_register_user0
@@ -171,18 +171,21 @@ def test_one_hour_after_last_opration(clear_and_register_user0):
     user_setstatus(user0, 'do not disturb')
     assert user_status(user1, user0)['user_status'] == 'do not disturb'
 
-    # user0 is away after an hour
+    # user0 is away after an hour (5 seconds for test)
     # IMPORT:
     # note here user_status(user0, user0) should not be call since it will update the user0's
-    # last opration's time_stamp, to test this user_status(another_user, user0)
-    time.sleep(3600)
+    # last action's time_stamp, to test this user_status(another_user, user0)
+    
+    time.sleep(5)
+    # actual test
+    # time.sleep(3600)
     assert user_status(user1, user0)['user_status'] == 'away'
 
-    # when user0 is back and do any opration (create a channel here)
+    # when user0 is back and do any action (create a channel here)
     # test if user0 is 'available'
     channel_create(user0, 'channel_1', True)
     assert user_status(user1, user0)['user_status'] == 'available'
-    '''
+
 
 # below is the helper functions for calling the functions in server for test
 
