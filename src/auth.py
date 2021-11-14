@@ -176,7 +176,16 @@ def auth_logout_v1(token):
 
 def auth_passwordreset_request_v1(email):
     '''
-    TODO
+    auth_passwordreset_request_v1: Given an email, checks if email is registered, if registered sends an email with a reset code
+
+    Arguments:
+        email (str)     - email of a user
+
+    Exceptions:
+        None
+
+    Return Value:
+        Returns {}
     '''
     user_email_list = helpers.filter_data_store(store_list='users', key='email')
 
@@ -213,7 +222,18 @@ def auth_passwordreset_request_v1(email):
 
 def auth_passwordreset_reset_v1(reset_code, new_password):
     '''
-    TODO
+    auth_passwordreset_reset_v1: Given a valid reset code, changes a users password to a given password
+
+    Arguments:
+        reset_code (str)    - reset code of a user
+        new_password (str)  - new password that a user wants to change to
+
+    Exceptions:
+        InputError          - Occurs when reset_code is not a valid reset code
+                            - Occurs when password entered is less than 6 characters long
+
+    Return Value:
+        Returns {}
     '''
     user_reset_code_list = helpers.filter_data_store(store_list='users', key='reset_code')
 
