@@ -348,7 +348,6 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     if (channel_id == -1 and dm_id == -1) or (channel_id != -1 and dm_id != -1):
         raise InputError(description="only channel id or dm id can be equal to -1")
     
-    check = True
     if dm_id == -1:
         # Checks if channel id is valid
         if channel_id not in filter_data_store(store_list='channels', key='id'):
@@ -391,7 +390,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
     # Sets up new keys for new message
     new_message = {
-        'message_id': len(store['messages']) + len(store['removed_messages']) + len(store['pending_messages'])+ 1,
+        'message_id': len(store['messages']) + len(store['removed_messages']) + len(store['pending_messages']) + 1,
         'u_id': auth_user_id,
         'message': f"{message}" + "\n\n" + f'"""\n{og_selected_message["message"]}\n"""',
         'time_created': int(datetime.now(timezone.utc).timestamp()),

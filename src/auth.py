@@ -133,7 +133,7 @@ def auth_register_v2(email, password, name_first, name_last):
         'permission_id': permission_id,
         'session_list': [session_id],
         'is_removed': False,
-        'reset_code': 0,
+        'reset_code': '0',
         'profile_img_url': f"{config.url}images/0.jpg",
         'channels_joined': [{'num_channels_joined': 0, 'time_stamp': time_stamp}],
         'dms_joined':      [{'num_dms_joined': 0, 'time_stamp': time_stamp}],
@@ -192,7 +192,16 @@ def auth_logout_v1(token):
 
 def auth_passwordreset_request_v1(email):
     '''
-    TODO
+    auth_passwordreset_request_v1: Given an email, checks if email is registered, if registered sends an email with a reset code
+
+    Arguments:
+        email (str)     - email of a user
+
+    Exceptions:
+        None
+
+    Return Value:
+        Returns {}
     '''
     user_email_list = helpers.filter_data_store(store_list='users', key='email')
 
@@ -202,13 +211,13 @@ def auth_passwordreset_request_v1(email):
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
     sender_email = "t13abeagle@gmail.com"  # Enter your address
-    receiver_email = "t13abeagle@gmail.com"  # Enter receiver address
+    receiver_email = email  # Enter receiver address
     password = "t13abeaglecs1531"
     message = """\
     Password Reset Code
 
     Your password reset code is: """
-    reset_code = str(randint(10000, 99999))
+    reset_code = str(randint(100000, 999999))
     message += reset_code
 
     context = ssl.create_default_context()
@@ -229,7 +238,18 @@ def auth_passwordreset_request_v1(email):
 
 def auth_passwordreset_reset_v1(reset_code, new_password):
     '''
-    TODO
+    auth_passwordreset_reset_v1: Given a valid reset code, changes a users password to a given password
+
+    Arguments:
+        reset_code (str)    - reset code of a user
+        new_password (str)  - new password that a user wants to change to
+
+    Exceptions:
+        InputError          - Occurs when reset_code is not a valid reset code
+                            - Occurs when password entered is less than 6 characters long
+
+    Return Value:
+        Returns {}
     '''
     user_reset_code_list = helpers.filter_data_store(store_list='users', key='reset_code')
 
@@ -243,7 +263,7 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
 
     user = helpers.filter_data_store(store_list='users', key='reset_code', value=hashlib.sha256(reset_code.encode()).hexdigest())[0]
 
-    user['reset_code'] = 0
+    user['reset_code'] = '0'
     user['password'] = hashlib.sha256(new_password.encode()).hexdigest()
     
     data_store.set(store)

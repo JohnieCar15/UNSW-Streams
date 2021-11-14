@@ -11,9 +11,11 @@ user_profile_setname_v1_test.py: All functions related to testing the user_profi
 # entered by the user is same with previous name, InputError will be raised
 
 
-# clear and registers first user
 @pytest.fixture
 def clear_and_register_user0():
+    '''
+    clear and registers first user
+    '''
     requests.delete(config.url + 'clear/v1')
     user0_register = {
         'email' : '0000@unsw.edu.au',
@@ -35,8 +37,10 @@ def clear_and_register_user0():
     }
 
 
-# test invalid token with valid name, this should raise AccessError
 def test_invalid_token_and_valid_name(clear_and_register_user0):
+    '''
+    test invalid token with valid name, this should raise AccessError
+    '''
     user0 = clear_and_register_user0
     input = {
         'token': user0['token'] + '1',
@@ -46,8 +50,10 @@ def test_invalid_token_and_valid_name(clear_and_register_user0):
     assert requests.put(config.url + 'user/profile/setname/v1', json=input).status_code == AccessError.code
 
 
-# test invalid token with invalid name, this should raise AccessError
 def test_invalid_token_and_invalid_name(clear_and_register_user0):
+    '''
+    test invalid token with invalid name, this should raise AccessError
+    '''
     user0 = clear_and_register_user0
     input = {
         'token': user0['token'] + '1',
@@ -57,8 +63,10 @@ def test_invalid_token_and_invalid_name(clear_and_register_user0):
     assert requests.put(config.url + 'user/profile/setname/v1', json=input).status_code == AccessError.code
 
 
-# test valid token with invalid name, this should raise InputError
 def test_valid_token_and_invalid_name(clear_and_register_user0):
+    '''
+    test valid token with invalid name, this should raise InputError
+    '''
     user0 = clear_and_register_user0
     input = {
         'token': user0['token'],
@@ -74,9 +82,11 @@ def test_valid_token_and_invalid_name(clear_and_register_user0):
             assert requests.put(config.url + 'user/profile/setname/v1', json=input).status_code == InputError.code
 
 
-# test valid token with valid name but first and last name all same with previous name, 
-# this should raise InputError by assumption
 def test_same_name_as_previous(clear_and_register_user0):
+    '''
+    test valid token with valid name but first and last name all same with previous name, 
+    this should raise InputError by assumption
+    '''
     user0 = clear_and_register_user0
     input = {
         'token': user0['token'] ,
@@ -86,8 +96,10 @@ def test_same_name_as_previous(clear_and_register_user0):
     assert requests.put(config.url + 'user/profile/setname/v1', json=input).status_code == InputError.code
 
 
-# test valid token with valid name but same with others, this should still work because same name is allowed
 def test_same_name_with_others(clear_and_register_user0):
+    '''
+    test valid token with valid name but same with others, this should still work because same name is allowed
+    '''
     user0 = clear_and_register_user0
     user1_register = {
         'email' : '0001@unsw.edu.au',
@@ -112,8 +124,10 @@ def test_same_name_with_others(clear_and_register_user0):
     assert profile_user1['user']['name_last'] == 'lastname0'
 
 
-# test valid token with valid name
 def test_valid_token_and_valid_name(clear_and_register_user0):
+    '''
+    test valid token with valid name
+    '''
     user0 = clear_and_register_user0
     input = {
         'token': user0['token'],

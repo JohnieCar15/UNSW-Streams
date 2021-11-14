@@ -50,6 +50,7 @@ def add_notification(u_id, trigger_u_id, channel_id, notification_type, message=
         'channel_id': channel_id if channels_list != [] else -1,
         'dm_id': channel_id if dms_list != [] else -1
     }
+
     if notification_type == 'tagged':
         notification['notification_message'] = f"{trigger_user_handle} tagged you in {channel_name}: {message[:20]}"
     if notification_type == 'react':

@@ -4,7 +4,14 @@ import requests
 from src import config
 from src.error import InputError
 
+'''
+auth_login_v2_test.py: All functions related to testing the auth_login_v2 function
+'''
+
 def test_auth_login_v1():
+    '''
+    Successful case of logging in a standard user
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -28,6 +35,9 @@ def test_auth_login_v1():
     assert register_auth_user_id['token'] != login_auth_user_id.json()['token']
 
 def test_unregistered_email():
+    '''
+    Error case of logging in a with an invalid email
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {
@@ -49,6 +59,9 @@ def test_unregistered_email():
     assert login_return.status_code == InputError.code
     
 def test_incorrect_password():
+    '''
+    Error case of logging in a with an invalid password
+    '''
     requests.delete(config.url + '/clear/v1')
 
     auth_register_input = {

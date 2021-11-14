@@ -61,10 +61,10 @@ def message_dict(message_id, auth_user_id, message):
         'message_id': message_id,
         'u_id': auth_user_id,
         'message': message,
-        'time_created': int(datetime.now(timezone.utc).timestamp()),
         'reacts': [{
             'react_id': 1,
             'u_ids': [],
+            'is_this_user_reacted': False
         }],
         'is_pinned': False
     }
@@ -96,7 +96,8 @@ def test_success_case_channel(clear_and_send_messages):
     message_two_dict = message_dict(message_two['message_id'], auth_user_id_2, 'hi2')
 
     search = requests.get(config.url + 'search/v1', params={'token': token, 'query_str': 'hi'}).json()
-    
+    for message in search['messages']:
+        message.pop('time_created', None)
     assert message_one_dict in search['messages']
     assert message_two_dict in search['messages']
 
@@ -124,7 +125,8 @@ def test_success_case_dm(clear_and_send_messages):
     }).json()
     message_two_dict = message_dict(message_two['message_id'], auth_user_id_2, 'hi2')
     search = requests.get(config.url + 'search/v1', params={'token': token, 'query_str': 'hi'}).json()
-    
+    for message in search['messages']:
+        message.pop('time_created', None)
     assert message_one_dict in search['messages']
     assert message_two_dict in search['messages']
 
@@ -165,6 +167,8 @@ def test_success_case_channel_and_dm(clear_and_send_messages):
     }).json()
     
     search = requests.get(config.url + 'search/v1', params={'token': token, 'query_str': 'hi1'}).json()
+    for message in search['messages']:
+        message.pop('time_created', None)
     assert c_message_one_dict in search['messages']
     assert dm_message_one_dict in search['messages']
 
