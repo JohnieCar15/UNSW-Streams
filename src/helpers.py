@@ -1,4 +1,5 @@
 import jwt
+from datetime import datetime, timezone
 from src.error import AccessError
 from src.data_store import data_store, session_tracker, SECRET, img_tracker
 
@@ -50,6 +51,7 @@ def validate_token(encoded_jwt):
         if decoded_jwt['session_id'] not in session_id_list[0]['session_list']:
             raise AccessError(description='Invalid Token')
     
+    update_user_status(decoded_jwt['user_id'])
     return decoded_jwt
 
 
@@ -70,3 +72,23 @@ def is_global_owner(u_id):
     '''
     user_dict = filter_data_store(store_list='users', key='id',value=u_id)
     return user_dict[0]['permission_id'] == 1
+
+def update_user_status(user_id):
+    '''
+    update_user_status: update timestamp for user's last action,
+    if the latest user_status is 'away', srt it to 'available'
+    
+    This function will be called in validate_token(encoded_jwt), since all functions calls validate_token(encoded_jwt)
+    Exceptions: the five functions below don't call validate_token(encoded_jwt)
+        auth_register_v2 and auth_login_v2
+               * for these two the update of timestamp is in another way
+        auth_passwordreset_request_v1 and auth_passwordreset_reset_v1 
+               * no need to update timestamp since the use has not logged in yet
+        clear_v1
+               * no need to update timestamp
+    '''
+    # Function added for bonus feature
+    user = filter_data_store(store_list='users', key='id', value=user_id)[0]
+    user['last_action_time_stamp'] = int(datetime.now(timezone.utc).timestamp())
+    # if the latest user_status is 'away', set it to 'available'
+    user['user_status'] = 'available' if user['user_status'] == 'away' else user['user_status']
