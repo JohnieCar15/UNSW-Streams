@@ -78,16 +78,17 @@ def update_user_status(user_id):
     update_user_status: update timestamp for user's last action,
     if the latest user_status is 'away', srt it to 'available'
     
-    This dunction will be called in validate_token(encoded_jwt), since all functions calls validate_token(encoded_jwt)
-    Exceptions: the five function below don't call validate_token(encoded_jwt)
+    This function will be called in validate_token(encoded_jwt), since all functions calls validate_token(encoded_jwt)
+    Exceptions: the five functions below don't call validate_token(encoded_jwt)
         auth_register_v2 and auth_login_v2
                * for these two the update of timestamp is in another way
         auth_passwordreset_request_v1 and auth_passwordreset_reset_v1 
-               * no need to update timestamp since the use have not actually login yet
+               * no need to update timestamp since the use has not logged in yet
         clear_v1
                * no need to update timestamp
     '''
+    # Function added for bonus feature
     user = filter_data_store(store_list='users', key='id', value=user_id)[0]
     user['last_action_time_stamp'] = int(datetime.now(timezone.utc).timestamp())
-    # if the latest user_status is 'away', srt it to 'available'
+    # if the latest user_status is 'away', set it to 'available'
     user['user_status'] = 'available' if user['user_status'] == 'away' else user['user_status']

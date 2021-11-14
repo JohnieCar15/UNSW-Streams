@@ -326,16 +326,20 @@ def notifications_get_v1_ep():
     token = request.args.get('token')
     return dumps(notifications_get_v1(token))
 
+# Added for bonus feature
 @APP.route("/user/status/v1", methods=['GET'])
 def user_status_v1_ep():
     token = request.args.get('token')
     u_id = int(request.args.get('u_id'))
     return dumps(user_status_v1(token, u_id))
 
+# Added for bonus feature
 @APP.route("/user/setstatus/v1", methods=['PUT'])
 def user_setstatus_v1_ep():
     data = request.get_json()
     return dumps(user_setstatus_v1(data['token'], data['user_status']))
+
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":

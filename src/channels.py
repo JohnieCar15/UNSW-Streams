@@ -54,7 +54,7 @@ def channels_create_v2(token, name, is_public):
         'standup_active': False,
         'standup_messages': [], 
         'standup_finish': None,
-        'standup_attendee': []
+        'standup_attendee': []  # Added for bonus feature
     }
     store['channels'].append(channel_dictionary)
     data_store.set(store, user=auth_user_id, key='channel', key_value=1, user_value=1)

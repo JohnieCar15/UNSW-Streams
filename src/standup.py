@@ -60,12 +60,16 @@ def standup_start_v1(token, channel_id, length):
     # threading after length set standup to be False 
     t = threading.Timer(length, standup_end, [channel_dict, auth_user_id, time_finish])
     t.start()
+
+    # Added for bonus feature
     # set user_status of the starter of standup 'busy'
     channel_dict['standup_attendee'].append(auth_user_id)
     starter_user = filter_data_store(store_list='users',key='id',value=auth_user_id)[0]
     starter_user['user_status'] = 'busy'
     starter_user['status_manually_set'] = False
     starter_user['standup_attending_now'].append(channel_id)
+
+
     data_store.set(store)
     # return time_finish
     return {'time_finish': time_finish}
@@ -95,6 +99,8 @@ def standup_end(channel_dict, auth_user_id, time_finish):
     channel_dict['standup_active'] = False
     # set finish time to none
     channel_dict['standup_finish'] = None
+
+    # Added for bonus feature
     # loop for all the attendee of the standup
     for user_id in channel_dict['standup_attendee']:
         #print(data_store.get())
@@ -107,13 +113,12 @@ def standup_end(channel_dict, auth_user_id, time_finish):
             user['standup_attending_now'].remove(channel_dict['id'])
         # if the user is not in any standup and not set status during any standups
         # set user_status to be 'available'
-        if len(user['standup_attending_now']) == 0 and user['user_status'] == 'busy' \
-                                            and user['status_manually_set'] == False:
+        if len(user['standup_attending_now']) == 0 and user['user_status'] == 'busy' and user['status_manually_set'] == False:
             user['user_status'] = 'available'
             user['status_manually_set'] = False
-
     # set standup_attendee to empty list
     channel_dict['standup_attendee'] = []
+    
     data_store.set(store, user=auth_user_id, key='messages', key_value=1, user_value=1)
 
 def standup_active_v1(token, channel_id):
