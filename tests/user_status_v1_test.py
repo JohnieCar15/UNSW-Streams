@@ -145,10 +145,11 @@ def test_status_in_and_after_standup(clear_and_register_user0):
     # user0 is still in standup in channel_1
     assert user_status(user1, user0)['user_status'] == 'busy'
 
-    # after all standups containing user0 isx finished,
-    # user0 is 'available'
+    # after all standups containing user0 is finished,
+    # user0 is 'available', unless the user set status duing the standup
+    user_setstatus(user0, 'be right back')
     time.sleep(2)
-    assert user_status(user1, user0)['user_status'] == 'available'
+    assert user_status(user1, user0)['user_status'] == 'be right back'
 
     '''
 def test_one_hour_after_last_opration(clear_and_register_user0):
