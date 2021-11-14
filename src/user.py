@@ -247,23 +247,43 @@ def user_profile_sethandle_v1(token, handle):
     data_store.set(store)
     return {}
 
-def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):    
+def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
+    '''
+    user_profile_uploadphoto_v1: Changes a users profile photo, given a valid image url
+
+    Arguments:
+        token (str)     - token of a user
+        img_url (str)   - img_url that the user wants to upload
+        x_start (int)   - x-dimension start for image crop
+        y_start (int)   - y-dimension start for image crop
+        x_end (int)     - x-dimension end for image crop
+        y_end (int)     - y-dimension end for image crop
+
+    Exceptions:
+        InputError      - Occurs when img_url returns an HTTP status other than 200
+                        - Occurs when any of x_start, y_start, x_end, y_end are not within the dimensions of the image at the URL
+                        - Occurs when x_end is less than x_start or y_end is less than y_start
+                        - Occurs when image uploaded is not a JPG
+
+    Return Value:
+        Returns {}
+    '''  
+    # Checking token is valid
+    u_id = validate_token(token)['user_id']
+
+    # Checking correct file type
     if not img_url.endswith(".jpg") and not img_url.endswith(".jpeg"):
         raise InputError(description='Image uploaded is not a JPG')
 
+    # Checking correct dimensions
     if x_end < x_start:
         raise InputError(description='x_end is less than x_start')
-
     if y_end < y_start:
         raise InputError(description='y_end is less than y_start')
-
     if x_start < 0 or y_start < 0:
         raise InputError(description='Given dimensions are not within the dimensions of the image at the URL')
 
-    u_id = validate_token(token)['user_id']
-
     img_id = generate_new_img_id()
-
     img_path = f"src/images/{img_id}.jpg"
 
     try:
@@ -273,25 +293,23 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
 
     image_object = Image.open(img_path)
-
     width, height = image_object.size
 
     if x_end > width or y_end > height:
         raise InputError(description='Given dimensions are not within the dimensions of the image at the URL')
 
     cropped_image = image_object.crop((x_start, y_start, x_end, y_end))
-
     cropped_image.save(img_path)
 
     store = data_store.get()
     
     user = filter_data_store(store_list='users', key='id', value=u_id)[0]
-
     user['profile_img_url'] = f"{config.url}images/{img_id}.jpg"
 
     data_store.set(store)
 
     return {}
+    
 def user_stats_v1(token):
     '''
     user_stats_v1: Fetches the required statistics about this user's use of UNSW Streams.

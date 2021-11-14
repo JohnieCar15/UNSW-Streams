@@ -10,9 +10,11 @@ users_all_v1_test.py: All functions related to testing the users_all_v1 function
 # define global variable for default profile_img_url
 global DEFAULT_PROFILE_IMG_URL
 
-# clear and registers first user
 @pytest.fixture
 def clear_and_register_user0():
+    '''
+    clear and registers first user
+    '''
     requests.delete(config.url + 'clear/v1')
 
     user0_register = {
@@ -37,8 +39,10 @@ def clear_and_register_user0():
         'u_id': user0['auth_user_id']
     }
 
-# test invalid token and this should raise AccessError
 def test_invalid_token(clear_and_register_user0):
+    '''
+    test invalid token and this should raise AccessError
+    '''
     user0 = clear_and_register_user0
     input_token = {'token': user0['token_valid'] + '1'}
     assert requests.get(config.url + 'users/all/v1', params=input_token).status_code == AccessError.code

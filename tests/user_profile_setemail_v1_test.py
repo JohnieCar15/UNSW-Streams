@@ -11,9 +11,11 @@ user_profile_setemail_v1_test.py: All functions related to testing the user_prof
 # entered by the user is same with previous email, InputError will be raised
 
 
-# clear and registers first user
 @pytest.fixture
 def clear_and_register_user0():
+    '''
+    clear and registers first user
+    '''
     requests.delete(config.url + 'clear/v1')
     user0_register = {
         'email' : '0000@unsw.edu.au',
@@ -36,8 +38,10 @@ def clear_and_register_user0():
     }
 
 
-# test invalid token with valid email, this should raise AccessError
 def test_invalid_token_and_valid_email(clear_and_register_user0):
+    '''
+    test invalid token with valid email, this should raise AccessError
+    '''
     user0 = clear_and_register_user0
     input = {
         'token': user0['token'] + '1',
@@ -46,8 +50,10 @@ def test_invalid_token_and_valid_email(clear_and_register_user0):
     assert requests.put(config.url + 'user/profile/setemail/v1', json=input).status_code == AccessError.code
 
 
-# test invalid token with invalid email, this should raise AccessError
 def test_invalid_token_and_invalid_email(clear_and_register_user0):
+    '''
+    test invalid token with invalid email, this should raise AccessError
+    '''
     user0 = clear_and_register_user0
     input = {
         'token': user0['token'] + '1',
@@ -56,8 +62,10 @@ def test_invalid_token_and_invalid_email(clear_and_register_user0):
     assert requests.put(config.url + 'user/profile/setemail/v1', json=input).status_code == AccessError.code
 
 
-# test valid token with invalid email, this should raise InputError
 def test_valid_token_and_invalid_email(clear_and_register_user0):
+    '''
+    test valid token with invalid email, this should raise InputError
+    '''
     user0 = clear_and_register_user0
     input = {
         'token': user0['token'],
@@ -66,8 +74,10 @@ def test_valid_token_and_invalid_email(clear_and_register_user0):
     assert requests.put(config.url + 'user/profile/setemail/v1', json=input).status_code == InputError.code
 
 
-# test valid token and email, but the email is used by others, this should raise InputError
 def test_email_used_by_others(clear_and_register_user0):
+    '''
+    test valid token and email, but the email is used by others, this should raise InputError
+    '''
     clear_and_register_user0
     user1_register = {
         'email' : '0001@unsw.edu.au',
@@ -82,8 +92,10 @@ def test_email_used_by_others(clear_and_register_user0):
     }
     assert requests.put(config.url + 'user/profile/setemail/v1', json=input).status_code == InputError.code
 
-# test valid token and email, the email is the same as previous, this should raise InputError
 def test_same_email_as_previous(clear_and_register_user0):
+    '''
+    test valid token and email, the email is the same as previous, this should raise InputError
+    '''
     user0 = clear_and_register_user0
     input = {
         'token': user0['token'],
@@ -91,8 +103,10 @@ def test_same_email_as_previous(clear_and_register_user0):
     }
     assert requests.put(config.url + 'user/profile/setemail/v1', json=input).status_code == InputError.code
 
-# test valid token with valid name
 def test_valid_token_and_valid_email(clear_and_register_user0):
+    '''
+    test valid token with valid name
+    '''
     user0 = clear_and_register_user0
     input = {
         'token': user0['token'],
