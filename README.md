@@ -2,25 +2,6 @@
 
 **✨ Teamwork makes the [UNSW] Streams work 🌈**
 
-## Contents
-
-  1.  Aims
-  2.  Overview
-  3.  Iteration 1: Basic functionality and tests
-  4.  Iteration 2: Building a web server
-  5.  Iteration 3: Completing the lifecycle
-  6.  Interface specifications
-  7.  Due Dates and Weightings
-  8.  Other Expectations
-  9.  Automarking
-  10. Plagiarism
-
-
-## 0. Change log:
-* Clarified `message/share` and edited a rogue `auth_user_id` to say token instead
-
-## 1. Aims:
-
 * To provide students with hands on experience testing, developing, and maintaining a backend server in Python.
 * To develop students' problem solving skills in relation to the software development lifecycle.
 * Learn to work effectively as part of a team by managing your project, planning, and allocation of responsibilities among the members of your team.
@@ -28,45 +9,6 @@
 * Apply appropriate design practices and methodologies in the development of their solution
 * Develop an appreciation for product design and an intuition of how a typical customer will use a product.
 
-## 2. Overview
-
-<b>Please watch our introduction video here</b>:
- * [Part 1: About the project](https://youtu.be/iARiNetEZV8)
- * [Part 2: Getting started](https://youtu.be/_nlrxuYTdIc)
-
-To manage the transition from trimesters to hexamesters in 2021, UNSW has established a new focus on building an in-house digital collaboration and communication tool for groups and teams to support the high intensity learning environment.
-
-Rather than re-invent the wheel, UNSW has decided that it finds the functionality of **<a href="https://www.microsoft.com/en-au/microsoft-teams/group-chat-software">Microsoft Teams</a>** to be nearly exactly what it needs. For this reason, UNSW has contracted out Penguin Pty Ltd (a small software business run by Hayden) to build the new product. In UNSW's attempt to try and add a lighter note to the generally fatigued and cynical student body, they have named their UNSW-based product **UNSW Streams** (or just **Streams** for short). **UNSW Streams** is the communication tool that allows you to share, communication, and collaborate to (attempt to) make streams a reality.
-
-Penguin Pty Ltd has sub-contracted two software firms:
-
-* BlueBottle Pty Ltd (two software developers, Andrea and Andrew, who will build the initial web-based GUI)
-* YourTeam Pty Ltd (a team of talented misfits completing COMP1531 in 21T3), who will build the backend Python server
-
-In summary, UNSW contracts Penguin Pty Ltd, who sub contracts:
-
-* BlueBottle (Andrea and Andrew) for frontend work
-* YourTeam (you and others) for backend work
-
-Penguin Pty Ltd met with Andrea and Andrew (the frontend development team) 2 weeks ago to brief them on this project. While you are still trying to get up to speed on the requirements of this project, Andrea and Andrew understand the requirements of the project very well.
-
-Because of this they have already specified a **common interface** for the frontend and backend to operate on. This allows both parties to go off and do their own development and testing under the assumption that both parties will comply with the common interface. This is the interface **you are required to use**.
-
-The specific capabilities that need to be built for this project are described in the interface at the bottom. This is clearly a lot of features, but not all of them are to be implemented at once.
-
-## 3. Iteration 1: Basic Functionality and Tests
-
-Completed
-
-## 4. Iteration 2: Building a Web Server
-
-Completed
-
-## 5. Iteration 3: Completing the Lifecycle
-
-Iteration 3 builds off all of the work you've completed in iteration 2.
-
-If you haven't completed the implementation for iteration 2, you must complete them as part of this iteration. The automarking for iteration 3 will test on a fully completed interface.
 
 ### 5.1. Task
 
@@ -1385,53 +1327,3 @@ Return Value:
     Returns <return value> on <condition>
 ```
 
-In each iteration you will be assessed on ensuring that every relevant function/endpoint in the specification is appropriately documented.
-
-### 8.3. Individual Marks
-
-Whilst we do award a tentative mark to your group as a whole, your actual mark for each iteration is given to you individually. Your individual mark is determined by your tutor, with your group mark as a reference point. Your tutor will look at your code contribution, documentation contribution (for iteration 3), peer assessment results, any other issues raised by group members throughout term, and your attendance at project check-ins and demonstrations.
-
-### 8.3.1. Code contribution
-
-All team members must contribute code to the project to a generally similar degree. Tutors will assess the degree to which you have contributed by looking at your **git history** and analysing lines of code, number of commits, timing of commits, etc. If you contribute significantly less code than your team members, your work will be closely examined to determine what scaling needs to be applied.
-
-### 8.3.2. Documentation contribution
-
-All team members must contribute documentation to the project to a generally similar degree. Tutors will assess the degree to which you have contributed by looking at your **git history** but also **asking questions** (essentially interviewing you) during your demonstration.
-
-Note that, **contributing more documentation is not a substitute for not contributing code**.
-
-### 8.3.3. Peer Assessment
-
-At the end of each iteration there will be a peer assessment survey where you will rate and leave comments about each team member's contribution to the project up until that point. 
-
-Your other team members will **not** be able to see how you rated them or what comments you left in either peer assessment. If your team members give you a less than satisfactory rating, your contribution will be scrutinised and you may find your final mark scaled down.
-
-### 8.3.4. Attendance
-
-It is generally assumed that all team members will be present at the demonstrations and at weekly check-ins. If you're absent for more than 80% of the weekly check-ins or any of the demonstrations, your mark may be scaled down.
-
-If, due to exceptional circumstances, you are unable to attend your lab for a demonstration, please apply for special consideration.
-
-## 9. Automarking
-
-Each iteration consists of an automarking component. The particular formula used to calculate this mark is specific to the iteration (and detailed above).
-
-When running your code or tests as part of the automarking, we place a 2 minutes timer on the running of your groups tests and implementation. This is more than enough time to complete everything unless you're doing something very wrong or silly with your code.
-
-Once you receive your results for each iteration, your mark may be lower than expected. If you find this is due to many marks being lost due to one or two trivial, systematic bugs, you are welcome to branch off the submission commit, make some changes, and push to another branch. If you share this branch with your tutor and ask them to rerun it, they can rerun it for you. Your new automarking mark will be your new mark with a 20% penalty (of the total automark mark) for the change.
-Prior to the iterations being due, we will be running your code against the actual automarkers (the same ones that determine your final mark) and publishing the results of every group on a leaderboard. [The leaderboard will be available here once released](http://cgi.cse.unsw.edu.au/~cs1531/21T3/leaderboard). Your position and mark on the leaderboard will be referenced against an alias for your group (for privacy). By now you should know your alias.
-
-The automarker for the leaderboard will be run at 10am on Tuesday 9th, Thursday 11th, and Saturday 13th of November. This means the leaderboard will only be updated <b>3 times</b> prior to your submission.
-
-The leaderboard gives you a chance to sanity check your automark (without knowing the details of what you did right and wrong), and is just a bit of fun.
-
-## 10. Plagiarism
-
-The work you and your group submit must be your own work. Submission of work partially or completely derived from any other person or jointly written with any other person is not permitted. The penalties for such an offence may include negative marks, automatic failure of the course and possibly other academic discipline. Assignment submissions will be examined both automatically and manually for such submissions.
-
-Relevant scholarship authorities will be informed if students holding scholarships are involved in an incident of plagiarism or other misconduct.
-
-Do not provide or show your project work to any other person, except for your group and the teaching staff of COMP1531. If you knowingly provide or show your assignment work to another person for any reason, and work derived from it is submitted you may be penalized, even if the work was submitted without your knowledge or consent. This may apply even if your work is submitted by a third party unknown to you.
-
-Note, you will not be penalized if your work has the potential to be taken without your consent or knowledge.
